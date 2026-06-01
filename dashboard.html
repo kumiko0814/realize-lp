@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re:alize にっき ｜ あなたとミーの半年</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;--sub:#5a5a5a;--bg:#fcf8f3;--bg2:#fdf4ec;--card:#ffffff;
+  --line:#ece5d8;--line-soft:#f5eee2;--accent:#c25b3f;--accent-soft:#e89378;
+  --accent2:#1f6f5e;--soft:#f5ebde;--hot:#fff3eb;--pink:#f5d4c2;--gold:#d4a574;
+  --shadow:0 4px 24px rgba(194,91,63,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:"Yu Gothic","YuGothic","游ゴシック","Hiragino Kaku Gothic ProN",sans-serif;
+  color:var(--ink);
+  background:linear-gradient(180deg,#fdf4ec 0%,#fcf8f3 60%);
+  font-size:14px;line-height:1.7;letter-spacing:0.02em;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"palt";min-height:100vh;
+}
+.serif{font-family:"Cormorant Garamond",serif;letter-spacing:0.04em}
+.app{max-width:980px;margin:0 auto;padding:24px 20px 48px}
+@media(max-width:720px){.app{padding:16px 14px 40px}}
+
+.app-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 24px;background:var(--card);border:1px solid var(--line);
+  border-radius:18px;margin-bottom:20px;
+}
+.app-title{display:flex;align-items:center;gap:14px}
+.app-logo{font-family:"Cormorant Garamond",serif;font-size:20px;letter-spacing:0.25em;color:var(--accent);font-weight:600}
+.app-logo-sub{font-size:11px;color:var(--sub);letter-spacing:0.15em;border-left:1px solid var(--line);padding-left:14px;margin-left:6px}
+.user-info{text-align:right;font-size:12px;color:var(--sub)}
+.user-name{font-size:13px;font-weight:700;color:var(--ink);display:block}
+
+.hero-card{
+  background:linear-gradient(165deg,#fffaf3 0%,#fdeede 100%);
+  border:1px solid var(--line);border-radius:24px;
+  padding:24px 24px 28px;margin-bottom:20px;
+  position:relative;overflow:hidden;box-shadow:var(--shadow);
+}
+.hero-card::before{
+  content:"";position:absolute;top:-50px;right:-50px;
+  width:220px;height:220px;
+  background:radial-gradient(circle,rgba(232,147,120,0.10) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.kitten-arena{
+  position:relative;width:100%;height:240px;
+  background:linear-gradient(180deg,#fefaf4 0%,#fbeede 100%);
+  border:1px solid var(--line-soft);border-radius:18px;
+  overflow:hidden;margin-bottom:24px;
+}
+.kitten-arena::before{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:40px;
+  background:linear-gradient(180deg,transparent 0%,rgba(194,91,63,0.06) 100%);
+}
+.kitten-arena::after{
+  content:"";position:absolute;left:8%;right:8%;bottom:14px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(91,85,77,0.18) 20%,rgba(91,85,77,0.18) 80%,transparent);
+}
+.dot{position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(194,91,63,0.18);animation:twinkle 3s ease-in-out infinite}
+.dot.d1{top:24px;left:14%}
+.dot.d2{top:48px;right:20%;animation-delay:0.7s}
+.dot.d3{top:80px;left:32%;animation-delay:1.4s}
+.dot.d4{top:30px;right:38%;animation-delay:0.3s;width:3px;height:3px}
+@keyframes twinkle{0%,100%{opacity:0.25;transform:scale(1)}50%{opacity:0.7;transform:scale(1.4)}}
+
+.kitten-walker{
+  position:absolute;bottom:0;left:50%;
+  width:220px;height:220px;margin-left:-110px;
+  z-index:2;transition:none;
+}
+.bouncer{width:100%;height:100%}
+#kittenSvg{width:100%;height:100%;display:block}
+
+.kitten-walker.mode-walk{animation:walk 16s ease-in-out infinite}
+.kitten-walker.mode-walk .bouncer{animation:bounce 0.55s ease-in-out infinite}
+.kitten-walker.mode-walk-slow{animation:walk 22s ease-in-out infinite}
+.kitten-walker.mode-walk-slow .bouncer{animation:bounce 0.75s ease-in-out infinite}
+.kitten-walker.mode-bounce{animation:none}
+.kitten-walker.mode-bounce .bouncer{animation:bounce 0.7s ease-in-out infinite}
+.kitten-walker.mode-static{animation:none}
+.kitten-walker.mode-static .bouncer{animation:none}
+.kitten-walker.mode-sway{animation:sway 4s ease-in-out infinite}
+.kitten-walker.mode-sway .bouncer{animation:none}
+.kitten-walker.mode-sleep .bouncer{animation:breathe 4s ease-in-out infinite}
+.kitten-walker.mode-sleep{animation:none}
+
+@keyframes walk{
+  0%{transform:translateX(-30%) scaleX(1)}
+  46%{transform:translateX(30%) scaleX(1)}
+  50%{transform:translateX(30%) scaleX(-1)}
+  96%{transform:translateX(-30%) scaleX(-1)}
+  100%{transform:translateX(-30%) scaleX(1)}
+}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18) rotate(-3deg)}70%{transform:scale(0.95) rotate(2deg)}100%{transform:scale(1)}}
+/* PC typing paws */
+@keyframes pawL{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes pawR{0%,100%{transform:translateY(-3px)}50%{transform:translateY(0)}}
+.pc-paw-l{animation:pawL 0.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.pc-paw-r{animation:pawR 0.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.kitten-pop .kitten-walker{animation:pop 0.6s ease-out !important}
+.kitten-pop .kitten-walker .bouncer{animation:none !important}
+
+.kitten-info{display:flex;flex-direction:column;align-items:center;text-align:center}
+.kitten-stage-label{
+  display:inline-block;font-family:"Cormorant Garamond",serif;
+  font-size:11px;letter-spacing:0.3em;color:var(--accent);
+  border:1px solid var(--accent);padding:4px 14px;border-radius:999px;margin-bottom:12px;
+}
+.kitten-info h2{font-size:20px;font-weight:700;margin-bottom:14px;letter-spacing:0.04em}
+.kitten-mood{
+  background:rgba(255,255,255,0.7);border:1px solid var(--line-soft);
+  border-radius:14px;padding:14px 22px;font-size:13px;line-height:1.85;
+  color:var(--ink);max-width:520px;position:relative;
+}
+.kitten-mood::before{
+  content:"";position:absolute;top:-7px;left:50%;
+  width:14px;height:14px;background:rgba(255,255,255,0.7);
+  border-top:1px solid var(--line-soft);border-left:1px solid var(--line-soft);
+  transform:translateX(-50%) rotate(45deg);
+}
+.kitten-mood-from{
+  display:block;font-size:11px;color:var(--accent);letter-spacing:0.1em;
+  margin-top:6px;font-family:"Cormorant Garamond",serif;font-style:italic;
+}
+.scene-name{
+  font-size:10px;color:var(--sub);letter-spacing:0.2em;margin-top:6px;
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+}
+
+.level-bar{margin-top:18px;width:100%;max-width:420px}
+.level-bar-top{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--sub);margin-bottom:6px;letter-spacing:0.1em}
+.level-bar-top .lv{font-family:"Cormorant Garamond",serif;color:var(--accent);font-size:13px}
+.level-track{height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden}
+.level-fill{height:100%;background:linear-gradient(90deg,#e89378 0%,#c25b3f 100%);border-radius:999px;transition:width 0.8s ease-out}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:720px){.stats{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 18px;text-align:center}
+.stat-card .ico{width:30px;height:30px;margin:0 auto 8px}
+.stat-num{font-family:"Cormorant Garamond",serif;font-size:32px;color:var(--accent);font-weight:600;line-height:1}
+.stat-unit{font-size:14px;color:var(--accent);margin-left:2px;font-family:"Cormorant Garamond",serif}
+.stat-label{font-size:11px;color:var(--sub);margin-top:6px;letter-spacing:0.1em}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px 26px;margin-bottom:18px}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line-soft)}
+.card-title{font-size:15px;font-weight:700;letter-spacing:0.06em}
+.card-meta{font-size:11px;color:var(--sub);letter-spacing:0.1em}
+.card-meta .ratio{font-family:"Cormorant Garamond",serif;color:var(--accent);font-size:18px;margin-left:6px}
+
+.goal-list{display:flex;flex-direction:column;gap:10px}
+.goal-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg);border:1px solid var(--line-soft);border-radius:14px;cursor:pointer;transition:all 0.25s;user-select:none}
+.goal-item:hover{background:var(--hot);border-color:var(--pink)}
+.goal-item.done{background:#f5ebde;border-color:#e89378}
+.goal-item.done .goal-text{color:var(--sub);text-decoration:line-through;text-decoration-color:var(--accent-soft)}
+.goal-check{width:22px;height:22px;border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--card);transition:all 0.25s}
+.goal-item.done .goal-check{background:var(--accent);border-color:var(--accent)}
+.goal-check svg{opacity:0;transition:opacity 0.2s}
+.goal-item.done .goal-check svg{opacity:1}
+.goal-text{flex:1;font-size:14px;line-height:1.5}
+.goal-edit{background:transparent;border:none;color:var(--sub);font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all 0.2s}
+.goal-edit:hover{background:var(--line-soft);color:var(--accent)}
+.add-goal{width:100%;background:transparent;border:1.5px dashed var(--line);color:var(--sub);padding:14px;font-size:13px;font-family:inherit;border-radius:14px;cursor:pointer;margin-top:8px;transition:all 0.2s;letter-spacing:0.05em}
+.add-goal:hover{border-color:var(--accent);color:var(--accent);background:var(--hot)}
+
+.memo-area{width:100%;min-height:90px;border:1px solid var(--line-soft);background:var(--bg2);border-radius:14px;padding:14px 16px;font-family:inherit;font-size:13px;color:var(--ink);line-height:1.85;resize:vertical;outline:none}
+.memo-area:focus{border-color:var(--accent);background:#fff8f4}
+.memo-hint{font-size:11px;color:var(--sub);margin-top:10px;text-align:right}
+.btn-save{background:var(--accent);color:#fff;border:none;padding:10px 24px;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:0.1em;border-radius:999px;cursor:pointer;margin-top:12px;transition:all 0.25s}
+.btn-save:hover{background:#a84829;transform:translateY(-1px)}
+
+.history-grid{display:grid;grid-template-columns:repeat(26,1fr);gap:3px;padding:8px 0 14px}
+@media(max-width:720px){.history-grid{grid-template-columns:repeat(13,1fr);gap:4px}}
+.history-cell{aspect-ratio:1/1;background:var(--line-soft);border-radius:3px;transition:background 0.3s;cursor:pointer}
+.history-cell[data-rate="1"]{background:#f5d4c2}
+.history-cell[data-rate="2"]{background:#eab295}
+.history-cell[data-rate="3"]{background:#e89378}
+.history-cell[data-rate="4"]{background:#c25b3f}
+.history-cell.current{box-shadow:0 0 0 2px var(--accent2)}
+.history-legend{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--sub);margin-top:8px;letter-spacing:0.05em}
+.legend-scale{display:flex;align-items:center;gap:4px}
+.legend-scale span{display:inline-block;width:10px;height:10px;border-radius:2px}
+
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px}
+.item-card{background:var(--bg);border:1px solid var(--line-soft);border-radius:12px;padding:14px 6px;text-align:center;position:relative;opacity:0.35;transition:all 0.3s}
+.item-card.unlocked{opacity:1;background:linear-gradient(180deg,#fff8f0 0%,#fdeede 100%);border-color:var(--pink)}
+.item-icon{width:36px;height:36px;margin:0 auto 6px}
+.item-name{font-size:11px;font-weight:600;letter-spacing:0.05em}
+.item-cond{font-size:10px;color:var(--sub);margin-top:2px}
+
+.footer-msg{text-align:center;font-size:11px;color:var(--sub);letter-spacing:0.1em;margin-top:24px;padding-top:24px;border-top:1px solid var(--line-soft)}
+.footer-msg .serif{display:block;font-size:13px;color:var(--accent);margin-bottom:6px;font-style:italic}
+.reset-btn{background:transparent;border:1px solid var(--line);color:var(--sub);font-family:inherit;font-size:11px;padding:6px 14px;border-radius:999px;cursor:pointer;margin-left:8px;transition:all 0.2s}
+.reset-btn:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="app-header">
+    <div class="app-title">
+      <div class="app-logo">Re:alize</div>
+      <div class="app-logo-sub">あなたとミーの半年</div>
+    </div>
+    <div class="user-info">
+      <span class="user-name" id="userName">ゲストさん</span>
+      <span id="weekLabel">— Week 1 / 26 —</span>
+    </div>
+  </header>
+
+  <section class="hero-card" id="heroCard">
+    <div class="kitten-arena">
+      <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="dot d4"></span>
+      <div class="kitten-walker mode-sway" id="kittenWalker">
+        <div class="bouncer">
+          <svg id="kittenSvg" viewBox="0 0 200 200"></svg>
+        </div>
+      </div>
+    </div>
+    <div class="kitten-info">
+      <span class="kitten-stage-label" id="stageLabel">STAGE 01 — たまご</span>
+      <h2 id="kittenName">ミー</h2>
+      <div class="kitten-mood">
+        <span id="moodText">あなたが目標を書いてくれたら、ミーが生まれるよ。</span>
+        <span class="kitten-mood-from">— next milestone</span>
+      </div>
+      <div class="scene-name" id="sceneName">— sleeping —</div>
+      <div class="level-bar">
+        <div class="level-bar-top">
+          <span>LEVEL <span class="lv" id="lvNum">1</span></span>
+          <span><span id="pointNow">0</span> / <span id="pointMax">10</span> pt</span>
+        </div>
+        <div class="level-track"><div class="level-fill" id="lvFill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat-card">
+      <svg class="ico" viewBox="0 0 30 30" fill="none">
+        <circle cx="15" cy="15" r="11" stroke="#c25b3f" stroke-width="1.5"/>
+        <path d="M 10 15 L 14 19 L 21 11" stroke="#c25b3f" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div><span class="stat-num" id="thisWeekRate">0</span><span class="stat-unit">%</span></div>
+      <div class="stat-label">今週の達成率</div>
+    </div>
+    <div class="stat-card">
+      <svg class="ico" viewBox="0 0 30 30" fill="none">
+        <path d="M 15 5 L 17.5 11 L 24 11.5 L 19 16 L 20.5 22.5 L 15 19 L 9.5 22.5 L 11 16 L 6 11.5 L 12.5 11 Z" stroke="#c25b3f" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
+      </svg>
+      <div><span class="stat-num" id="totalDone">0</span><span class="stat-unit">回</span></div>
+      <div class="stat-label">これまで達成した数</div>
+    </div>
+    <div class="stat-card">
+      <svg class="ico" viewBox="0 0 30 30" fill="none">
+        <rect x="5" y="8" width="20" height="17" rx="2" stroke="#c25b3f" stroke-width="1.5" fill="none"/>
+        <line x1="5" y1="13" x2="25" y2="13" stroke="#c25b3f" stroke-width="1.5"/>
+        <line x1="10" y1="5" x2="10" y2="10" stroke="#c25b3f" stroke-width="1.5"/>
+        <line x1="20" y1="5" x2="20" y2="10" stroke="#c25b3f" stroke-width="1.5"/>
+      </svg>
+      <div><span class="stat-num" id="weekStreak">0</span><span class="stat-unit">週</span></div>
+      <div class="stat-label">続けている週数</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div class="card-title">今週の目標 — Week <span id="weekNum">1</span></div>
+      <div class="card-meta">達成<span class="ratio" id="goalRatio">0 / 0</span></div>
+    </div>
+    <div class="goal-list" id="goalList"></div>
+    <button class="add-goal" id="addGoalBtn">＋ 今週の目標を追加する</button>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div class="card-title">今週、ミーへの一言</div>
+      <div class="card-meta">月曜の夜、5分だけ書こう</div>
+    </div>
+    <textarea class="memo-area" id="weekMemo" placeholder="今週どんな1週間だった？ できたこと、できなかったこと、なんでもいいよ。"></textarea>
+    <div class="memo-hint"><button class="btn-save" id="saveMemoBtn">今週の振り返りを保存する</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div class="card-title">これまでの26週</div>
+      <div class="card-meta">1マス＝1週間</div>
+    </div>
+    <div class="history-grid" id="historyGrid"></div>
+    <div class="history-legend">
+      <span>たくさん休んだ週も、ぜんぶあなたの半年</span>
+      <span class="legend-scale">
+        少ない
+        <span style="background:#f5d4c2"></span><span style="background:#eab295"></span><span style="background:#e89378"></span><span style="background:#c25b3f"></span>
+        たくさん
+      </span>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div class="card-title">ミーの宝物</div>
+      <div class="card-meta">達成のごほうび</div>
+    </div>
+    <div class="items-grid" id="itemsGrid"></div>
+  </section>
+
+  <footer class="footer-msg">
+    <span class="serif">— You are not alone. —</span>
+    Re:alize にっき ｜ あなただけの記録は、あなたのブラウザに保存されています
+    <button class="reset-btn" id="resetBtn">記録をリセット</button>
+  </footer>
+
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const userKey = params.get('u') || 'guest';
+const storageKey = 're_alize_data_' + userKey;
+document.getElementById('userName').textContent = (params.get('name') || (userKey === 'guest' ? 'ゲスト' : userKey)) + 'さん';
+
+const DEFAULT_GOALS = ['毎日、決めた時間に起きる','15分だけ、自分の時間をつくる','今週、ひとつだけ前に進める'];
+const TOTAL_WEEKS = 26;
+
+function loadState(){
+  const raw = localStorage.getItem(storageKey);
+  if(raw){ try{ return JSON.parse(raw); }catch(e){} }
+  return { startDate: new Date().toISOString().slice(0,10), currentWeek:1, weeks:{}, totalDone:0, kittenName:'ミー' };
+}
+function saveState(s){ localStorage.setItem(storageKey, JSON.stringify(s)); }
+
+let state = loadState();
+if(!state.weeks[state.currentWeek]){
+  state.weeks[state.currentWeek] = { goals: DEFAULT_GOALS.map(t=>({text:t,done:false})), memo:'', completedDate:null };
+  saveState(state);
+}
+
+/* ============ RAINBOW DEFS (shared in stage 5) ============ */
+const RAINBOW_DEFS = `
+<defs>
+  <linearGradient id="rb-p" x1="0" y1="0.3" x2="1" y2="0.7">
+    <stop offset="0%" stop-color="#f5a8a8"/><stop offset="18%" stop-color="#f5c89c"/>
+    <stop offset="36%" stop-color="#f5e4a0"/><stop offset="54%" stop-color="#b4e0a8"/>
+    <stop offset="72%" stop-color="#a8c8e8"/><stop offset="100%" stop-color="#d4a8e8"/>
+  </linearGradient>
+  <linearGradient id="rb-pb" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#fcd8d8"/><stop offset="20%" stop-color="#fce0c8"/>
+    <stop offset="40%" stop-color="#fcf0c8"/><stop offset="60%" stop-color="#d4ecc8"/>
+    <stop offset="80%" stop-color="#cce0f0"/><stop offset="100%" stop-color="#e8d4f0"/>
+  </linearGradient>
+</defs>`;
+
+/* ============ SVG SCENES ============ */
+
+// STAGE 1
+const SVG_EGG = `
+  <ellipse cx="100" cy="180" rx="42" ry="5" fill="#000" opacity="0.12"/>
+  <path d="M 100 30 C 60 30 54 100 54 132 C 54 166 72 180 100 180 C 128 180 146 166 146 132 C 146 100 140 30 100 30 Z" fill="#dcd5c8" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+  <ellipse cx="83" cy="78" rx="9" ry="16" fill="#fff" opacity="0.6"/>
+  <ellipse cx="93" cy="56" rx="4" ry="6" fill="#fff" opacity="0.78"/>
+`;
+
+// STAGE 2 BABY
+const SVG_BABY_SLEEP = `
+  <ellipse cx="100" cy="172" rx="62" ry="5" fill="#000" opacity="0.10"/>
+  <!-- big round body (butt side bigger right) -->
+  <ellipse cx="118" cy="138" rx="56" ry="28" fill="#c2bbb0" stroke="#5b554d" stroke-width="3"/>
+  <!-- belly visible -->
+  <ellipse cx="100" cy="158" rx="44" ry="11" fill="#e8e2d6"/>
+  <!-- back stripes -->
+  <path d="M 108 114 Q 112 106 116 114" stroke="#5b554d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M 124 110 Q 128 100 132 110" stroke="#5b554d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M 142 114 Q 146 106 150 114" stroke="#5b554d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- head left (peaceful) -->
+  <circle cx="54" cy="138" r="24" fill="#c2bbb0" stroke="#5b554d" stroke-width="3"/>
+  <!-- ears peeking up -->
+  <path d="M 42 116 Q 38 100 58 116" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 64 118 Q 70 100 76 122" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- inner ear pink -->
+  <path d="M 46 116 Q 48 108 54 116" fill="#f0b6c0" opacity="0.5"/>
+  <path d="M 68 118 Q 70 110 74 120" fill="#f0b6c0" opacity="0.5"/>
+  <!-- closed peaceful eyes -->
+  <path d="M 42 136 Q 46 140 50 136" stroke="#3a342d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M 56 136 Q 60 140 64 136" stroke="#3a342d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- nose -->
+  <path d="M 51 146 L 53 148 L 55 146 Z" fill="#5b554d"/>
+  <!-- gentle smile -->
+  <path d="M 50 151 Q 53 153 56 151" stroke="#5b554d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- cheek blush -->
+  <ellipse cx="38" cy="146" rx="3.5" ry="2.2" fill="#f0b6c0" opacity="0.7"/>
+  <ellipse cx="66" cy="146" rx="3.5" ry="2.2" fill="#f0b6c0" opacity="0.7"/>
+  <!-- whiskers -->
+  <line x1="18" y1="142" x2="36" y2="142" stroke="#5b554d" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="18" y1="148" x2="36" y2="148" stroke="#5b554d" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- small paws tucked underneath -->
+  <ellipse cx="92" cy="164" rx="6" ry="4" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5"/>
+  <ellipse cx="142" cy="164" rx="6" ry="4" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5"/>
+  <!-- tail wrapped & striped -->
+  <path d="M 170 140 Q 186 130 178 114 Q 170 104 162 112 Q 160 120 168 122" stroke="#5b554d" stroke-width="3" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="174" y1="118" x2="186" y2="120" stroke="#5b554d" stroke-width="1.8"/>
+  <!-- Z Z z -->
+  <text x="80" y="78" font-family="Cormorant Garamond" font-size="26" font-weight="700" fill="#5b554d">Z</text>
+  <text x="100" y="56" font-family="Cormorant Garamond" font-size="18" font-weight="700" fill="#5b554d">Z</text>
+  <text x="116" y="40" font-family="Cormorant Garamond" font-size="12" font-weight="700" fill="#5b554d">z</text>
+`;
+
+const SVG_BABY_MILK = `
+  <!-- shadow -->
+  <ellipse cx="100" cy="170" rx="42" ry="4" fill="#000" opacity="0.12"/>
+  <!-- body SMALL horizontal oval (Pusheen baby) -->
+  <path d="M 100 102 C 62 102 58 118 58 132 C 58 154 78 166 100 166 C 122 166 142 154 142 132 C 142 118 138 102 100 102 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round"/>
+  <!-- belly -->
+  <path d="M 100 114 C 80 114 78 126 78 134 C 78 150 88 160 100 160 C 112 160 122 150 122 134 C 122 126 120 114 100 114 Z" fill="#e8e2d6"/>
+  <!-- ears (SMALLER triangle) -->
+  <path d="M 76 104 L 72 92 L 86 102 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 124 104 L 128 92 L 114 102 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- inner ear pink -->
+  <path d="M 78 102 L 75 95 L 83 101 Z" fill="#f0b6c0"/>
+  <path d="M 122 102 L 125 95 L 117 101 Z" fill="#f0b6c0"/>
+  <!-- closed happy eyes -->
+  <path d="M 82 124 Q 86 119 90 124" stroke="#3a342d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 110 124 Q 114 119 118 124" stroke="#3a342d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- cheek blush -->
+  <ellipse cx="75" cy="130" rx="4.5" ry="2.8" fill="#f0b6c0" opacity="0.85"/>
+  <ellipse cx="125" cy="130" rx="4.5" ry="2.8" fill="#f0b6c0" opacity="0.85"/>
+  <!-- PACIFIER (original simple style) -->
+  <circle cx="100" cy="138" r="9" fill="#f5b8c2" stroke="#3a342d" stroke-width="2"/>
+  <circle cx="100" cy="138" r="4" fill="#fff" stroke="#3a342d" stroke-width="1.5"/>
+  <ellipse cx="100" cy="148" rx="5" ry="3.5" fill="#f5b8c2" stroke="#3a342d" stroke-width="1.5"/>
+  <!-- whiskers -->
+  <line x1="46" y1="128" x2="64" y2="128" stroke="#3a342d" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="46" y1="134" x2="64" y2="134" stroke="#3a342d" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="136" y1="128" x2="154" y2="128" stroke="#3a342d" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="136" y1="134" x2="154" y2="134" stroke="#3a342d" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- 4 tiny paws -->
+  <ellipse cx="74" cy="162" rx="8" ry="4.5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.5"/>
+  <ellipse cx="92" cy="164" rx="8" ry="4.5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.5"/>
+  <ellipse cx="108" cy="164" rx="8" ry="4.5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.5"/>
+  <ellipse cx="126" cy="162" rx="8" ry="4.5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.5"/>
+  <!-- short tail with stripes -->
+  <path d="M 140 140 Q 156 132 150 116" stroke="#3a342d" stroke-width="2.8" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="146" y1="122" x2="156" y2="122" stroke="#3a342d" stroke-width="1.8"/>
+`;
+
+const SVG_BABY_PLAY = `
+  <ellipse cx="100" cy="170" rx="46" ry="5" fill="#000" opacity="0.10"/>
+  <!-- body lying on back -->
+  <ellipse cx="100" cy="148" rx="46" ry="18" fill="#c2bbb0" stroke="#5b554d" stroke-width="3"/>
+  <ellipse cx="100" cy="140" rx="34" ry="12" fill="#e8e2d6"/>
+  <!-- 4 paws up -->
+  <ellipse cx="78" cy="128" rx="5" ry="7" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.2"/>
+  <ellipse cx="92" cy="124" rx="5" ry="7" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.2"/>
+  <ellipse cx="108" cy="124" rx="5" ry="7" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.2"/>
+  <ellipse cx="122" cy="128" rx="5" ry="7" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.2"/>
+  <!-- head right side, upside-down -->
+  <circle cx="148" cy="145" r="20" fill="#c2bbb0" stroke="#5b554d" stroke-width="3"/>
+  <!-- ears below (upside down look) -->
+  <path d="M 138 158 Q 134 168 146 162" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 154 162 Q 160 170 162 158" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- closed eyes -->
+  <path d="M 138 144 Q 142 140 146 144" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 150 144 Q 154 140 158 144" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- mouth (small smile, upside down view) -->
+  <path d="M 144 136 Q 148 134 152 136" stroke="#5b554d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- whisker -->
+  <line x1="166" y1="142" x2="174" y2="142" stroke="#5b554d" stroke-width="1.3"/>
+  <line x1="166" y1="146" x2="174" y2="146" stroke="#5b554d" stroke-width="1.3"/>
+  <!-- tail -->
+  <path d="M 56 148 Q 38 144 36 130" stroke="#5b554d" stroke-width="2.8" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- heart float -->
+  <path d="M 100 100 q 0 -3 3 -3 q 3 0 3 3 q 0 -3 3 -3 q 3 0 3 3 q 0 4 -6 8 q -6 -4 -6 -8 Z" fill="#f0b6c0" stroke="#a84040" stroke-width="0.8"/>
+`;
+
+// STAGE 3 TODDLER
+const SVG_TODD_WALK = `
+  <!-- shadow -->
+  <ellipse cx="100" cy="172" rx="52" ry="5" fill="#000" opacity="0.12"/>
+  <!-- body MID size horizontal oval -->
+  <path d="M 100 90 C 50 90 42 108 42 124 C 42 152 74 166 100 166 C 126 166 158 152 158 124 C 158 108 150 90 100 90 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.3" stroke-linejoin="round"/>
+  <!-- belly -->
+  <path d="M 100 108 C 74 108 70 120 70 132 C 70 152 84 160 100 160 C 116 160 130 152 130 132 C 130 120 126 108 100 108 Z" fill="#e8e2d6"/>
+  <!-- ears (smaller triangle) -->
+  <path d="M 66 92 L 62 78 L 84 90 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 134 92 L 138 78 L 116 90 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- inner ear pink -->
+  <path d="M 69 90 L 65 82 L 81 89 Z" fill="#f0b6c0"/>
+  <path d="M 131 90 L 135 82 L 119 89 Z" fill="#f0b6c0"/>
+  <!-- eyes -->
+  <circle cx="84" cy="116" r="4" fill="#3a342d"/>
+  <circle cx="116" cy="116" r="4" fill="#3a342d"/>
+  <!-- nose -->
+  <path d="M 97 124 L 100 127 L 103 124 Z" fill="#3a342d"/>
+  <!-- mouth -->
+  <path d="M 93 130 Q 96 133 100 131 Q 104 133 107 130" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- cheek -->
+  <ellipse cx="70" cy="126" rx="5.5" ry="3" fill="#f0b6c0" opacity="0.85"/>
+  <ellipse cx="130" cy="126" rx="5.5" ry="3" fill="#f0b6c0" opacity="0.85"/>
+  <!-- whiskers -->
+  <line x1="34" y1="122" x2="60" y2="122" stroke="#3a342d" stroke-width="1.7" stroke-linecap="round"/>
+  <line x1="34" y1="128" x2="60" y2="128" stroke="#3a342d" stroke-width="1.7" stroke-linecap="round"/>
+  <line x1="140" y1="122" x2="166" y2="122" stroke="#3a342d" stroke-width="1.7" stroke-linecap="round"/>
+  <line x1="140" y1="128" x2="166" y2="128" stroke="#3a342d" stroke-width="1.7" stroke-linecap="round"/>
+  <!-- 4 paws -->
+  <ellipse cx="62" cy="162" rx="9" ry="5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="84" cy="164" rx="9" ry="5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="116" cy="164" rx="9" ry="5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="138" cy="162" rx="9" ry="5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+  <!-- tail with stripes -->
+  <path d="M 158 126 Q 178 118 174 96" stroke="#3a342d" stroke-width="3.2" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="166" y1="104" x2="178" y2="104" stroke="#3a342d" stroke-width="2"/>
+  <line x1="164" y1="118" x2="176" y2="118" stroke="#3a342d" stroke-width="2"/>
+`;
+
+const SVG_TODD_YARN = `
+  <ellipse cx="100" cy="172" rx="55" ry="5" fill="#000" opacity="0.10"/>
+  <!-- body lying belly up -->
+  <ellipse cx="105" cy="148" rx="52" ry="22" fill="#c2bbb0" stroke="#5b554d" stroke-width="3"/>
+  <ellipse cx="105" cy="140" rx="38" ry="16" fill="#e8e2d6"/>
+  <!-- paws holding yarn up -->
+  <ellipse cx="95" cy="125" rx="6" ry="9" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5"/>
+  <ellipse cx="115" cy="125" rx="6" ry="9" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5"/>
+  <!-- yarn ball above -->
+  <circle cx="105" cy="100" r="16" fill="#e89378" stroke="#a84829" stroke-width="2.2"/>
+  <path d="M 92 96 Q 105 92 118 98 M 90 102 Q 105 100 120 104 M 92 108 Q 105 108 118 110 M 94 113 Q 105 114 116 113" stroke="#a84829" stroke-width="1" fill="none"/>
+  <!-- yarn string -->
+  <path d="M 105 116 Q 100 132 95 142" stroke="#a84829" stroke-width="1.5" fill="none"/>
+  <!-- back paws bent -->
+  <ellipse cx="78" cy="154" rx="7" ry="6" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5"/>
+  <ellipse cx="138" cy="154" rx="7" ry="6" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5"/>
+  <!-- head left, sideways -->
+  <ellipse cx="50" cy="145" rx="22" ry="20" fill="#c2bbb0" stroke="#5b554d" stroke-width="3"/>
+  <!-- ear -->
+  <path d="M 38 134 Q 32 122 50 132" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 56 130 Q 58 118 64 132" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- stripes -->
+  <path d="M 44 132 Q 46 124 48 132" stroke="#5b554d" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- happy eyes -->
+  <path d="M 38 144 Q 42 140 46 144" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 52 144 Q 56 140 60 144" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- nose -->
+  <path d="M 47 152 L 50 154 L 53 152 Z" fill="#5b554d"/>
+  <!-- mouth -->
+  <path d="M 45 156 Q 50 160 55 156" stroke="#5b554d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- whisker -->
+  <line x1="22" y1="146" x2="36" y2="146" stroke="#5b554d" stroke-width="1.3" stroke-linecap="round"/>
+  <line x1="22" y1="152" x2="36" y2="152" stroke="#5b554d" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- tail flicking -->
+  <path d="M 154 148 Q 172 140 168 122" stroke="#5b554d" stroke-width="3" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+`;
+
+const SVG_TODD_BELLY = `
+  <ellipse cx="100" cy="172" rx="70" ry="5" fill="#000" opacity="0.10"/>
+  <!-- body belly up (fat oval, head centered) -->
+  <ellipse cx="100" cy="138" rx="68" ry="30" fill="#c2bbb0" stroke="#5b554d" stroke-width="3.5"/>
+  <!-- belly cream area -->
+  <ellipse cx="100" cy="128" rx="54" ry="14" fill="#e8e2d6"/>
+  <!-- 4 tiny paws curled up -->
+  <ellipse cx="56" cy="116" rx="5" ry="6" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.2"/>
+  <ellipse cx="82" cy="112" rx="5" ry="6" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.2"/>
+  <ellipse cx="118" cy="112" rx="5" ry="6" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.2"/>
+  <ellipse cx="144" cy="116" rx="5" ry="6" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.2"/>
+  <!-- belly little dots -->
+  <circle cx="72" cy="148" r="1.8" fill="#5b554d" opacity="0.45"/>
+  <circle cx="100" cy="153" r="1.8" fill="#5b554d" opacity="0.45"/>
+  <circle cx="128" cy="148" r="1.8" fill="#5b554d" opacity="0.45"/>
+  <!-- ears (upside-down on bottom) -->
+  <path d="M 86 158 Q 80 170 96 164" fill="#c2bbb0" stroke="#5b554d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 104 164 Q 110 170 114 158" fill="#c2bbb0" stroke="#5b554d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- inner ear -->
+  <path d="M 88 160 Q 90 166 94 162" fill="#f0b6c0" opacity="0.6"/>
+  <path d="M 106 162 Q 110 166 112 160" fill="#f0b6c0" opacity="0.6"/>
+  <!-- happy closed eyes (upside-down view: like u-shapes) -->
+  <path d="M 88 144 Q 92 140 96 144" stroke="#3a342d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 104 144 Q 108 140 112 144" stroke="#3a342d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- nose tiny -->
+  <path d="M 98 138 L 100 140 L 102 138 Z" fill="#5b554d"/>
+  <!-- contented mouth (upside down view) -->
+  <path d="M 96 135 Q 100 132 104 135" stroke="#5b554d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- cheek blush -->
+  <ellipse cx="80" cy="142" rx="4" ry="2.5" fill="#f0b6c0" opacity="0.7"/>
+  <ellipse cx="120" cy="142" rx="4" ry="2.5" fill="#f0b6c0" opacity="0.7"/>
+  <!-- whiskers -->
+  <line x1="56" y1="142" x2="76" y2="142" stroke="#5b554d" stroke-width="1.7" stroke-linecap="round"/>
+  <line x1="56" y1="148" x2="76" y2="148" stroke="#5b554d" stroke-width="1.7" stroke-linecap="round"/>
+  <line x1="124" y1="142" x2="144" y2="142" stroke="#5b554d" stroke-width="1.7" stroke-linecap="round"/>
+  <line x1="124" y1="148" x2="144" y2="148" stroke="#5b554d" stroke-width="1.7" stroke-linecap="round"/>
+  <!-- tail sticking out right with stripes -->
+  <path d="M 164 142 Q 182 146 180 162" stroke="#5b554d" stroke-width="3.2" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="170" y1="148" x2="182" y2="150" stroke="#5b554d" stroke-width="2"/>
+  <line x1="172" y1="156" x2="182" y2="158" stroke="#5b554d" stroke-width="2"/>
+  <!-- tiny heart -->
+  <path d="M 96 88 q 0 -3 3 -3 q 3 0 3 3 q 0 -3 3 -3 q 3 0 3 3 q 0 4 -6 8 q -6 -4 -6 -8 Z" fill="#f0b6c0" stroke="#a84040" stroke-width="0.8"/>
+`;
+
+// STAGE 4 ADULT
+const SVG_ADULT_PC = `
+  <!-- shadow -->
+  <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.12"/>
+  <!-- body Pusheen full size (horizontal capsule) -->
+  <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- belly -->
+  <path d="M 100 96 C 64 96 56 114 56 128 C 56 154 80 168 100 168 C 120 168 144 154 144 128 C 144 114 136 96 100 96 Z" fill="#e8e2d6"/>
+  <!-- ears (smaller triangle) -->
+  <path d="M 56 82 L 52 62 L 78 80 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 144 82 L 148 62 L 122 80 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- inner ear pink -->
+  <path d="M 60 79 L 56 67 L 75 78 Z" fill="#f0b6c0"/>
+  <path d="M 140 79 L 144 67 L 125 78 Z" fill="#f0b6c0"/>
+  <!-- eyes -->
+  <circle cx="80" cy="100" r="4.5" fill="#3a342d"/>
+  <circle cx="120" cy="100" r="4.5" fill="#3a342d"/>
+  <!-- nose triangle -->
+  <path d="M 96 114 L 100 118 L 104 114 Z" fill="#3a342d"/>
+  <!-- mouth concentrated -->
+  <path d="M 94 122 Q 100 124 106 122" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- cheek blush -->
+  <ellipse cx="62" cy="118" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.8"/>
+  <ellipse cx="138" cy="118" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.8"/>
+  <!-- whiskers -->
+  <line x1="12" y1="108" x2="56" y2="110" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="12" y1="118" x2="56" y2="118" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="12" y1="128" x2="56" y2="124" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="110" x2="188" y2="108" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="118" x2="188" y2="118" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="124" x2="188" y2="128" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <!-- laptop -->
+  <rect x="42" y="148" width="116" height="22" rx="2" fill="#3a342d"/>
+  <rect x="44" y="150" width="112" height="18" rx="1" fill="#a8c8e8"/>
+  <rect x="50" y="153" width="42" height="2.5" fill="#fff" opacity="0.75"/>
+  <rect x="50" y="158" width="68" height="2" fill="#fff" opacity="0.55"/>
+  <rect x="50" y="162" width="36" height="2" fill="#fff" opacity="0.55"/>
+  <rect x="40" y="170" width="120" height="3" rx="1" fill="#3a342d"/>
+  <!-- TYPING PAWS (animated, alternating) -->
+  <g class="pc-paw-l">
+    <ellipse cx="72" cy="144" rx="12" ry="7" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+    <circle cx="68" cy="144" r="1.2" fill="#3a342d"/>
+    <circle cx="72" cy="144" r="1.2" fill="#3a342d"/>
+    <circle cx="76" cy="144" r="1.2" fill="#3a342d"/>
+  </g>
+  <g class="pc-paw-r">
+    <ellipse cx="128" cy="144" rx="12" ry="7" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+    <circle cx="124" cy="144" r="1.2" fill="#3a342d"/>
+    <circle cx="128" cy="144" r="1.2" fill="#3a342d"/>
+    <circle cx="132" cy="144" r="1.2" fill="#3a342d"/>
+  </g>
+  <!-- back paws -->
+  <ellipse cx="40" cy="172" rx="10" ry="5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="160" cy="172" rx="10" ry="5" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+  <!-- tail -->
+  <path d="M 176 110 Q 198 96 188 70" stroke="#3a342d" stroke-width="3.5" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="186" y1="82" x2="198" y2="80" stroke="#3a342d" stroke-width="2.2"/>
+  <line x1="184" y1="96" x2="198" y2="94" stroke="#3a342d" stroke-width="2.2"/>
+  <!-- typing motion lines beside laptop -->
+  <text x="20" y="148" font-family="Cormorant Garamond" font-size="13" font-style="italic" fill="#5b554d" opacity="0.6">tap</text>
+  <text x="170" y="148" font-family="Cormorant Garamond" font-size="13" font-style="italic" fill="#5b554d" opacity="0.6">tap</text>
+`;
+
+const SVG_ADULT_SLEEP = `
+  <ellipse cx="100" cy="180" rx="80" ry="6" fill="#000" opacity="0.10"/>
+  <!-- big round body, butt heavy on right -->
+  <ellipse cx="120" cy="134" rx="68" ry="34" fill="#c2bbb0" stroke="#5b554d" stroke-width="3.5"/>
+  <!-- belly cream area -->
+  <ellipse cx="100" cy="160" rx="54" ry="13" fill="#e8e2d6"/>
+  <!-- back stripes -->
+  <path d="M 106 106 Q 110 96 114 106" stroke="#5b554d" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+  <path d="M 124 100 Q 128 90 132 100" stroke="#5b554d" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+  <path d="M 144 106 Q 148 96 152 106" stroke="#5b554d" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+  <!-- head left -->
+  <circle cx="50" cy="134" r="28" fill="#c2bbb0" stroke="#5b554d" stroke-width="3.2"/>
+  <!-- ears -->
+  <path d="M 36 110 Q 30 90 56 110" fill="#c2bbb0" stroke="#5b554d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 64 110 Q 70 90 76 116" fill="#c2bbb0" stroke="#5b554d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- inner ear pink -->
+  <path d="M 40 110 Q 44 102 50 112" fill="#f0b6c0" opacity="0.55"/>
+  <path d="M 66 112 Q 70 104 74 116" fill="#f0b6c0" opacity="0.55"/>
+  <!-- closed peaceful eyes -->
+  <path d="M 38 132 Q 43 137 48 132" stroke="#3a342d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 54 132 Q 59 137 64 132" stroke="#3a342d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- nose -->
+  <path d="M 48 144 L 51 146 L 54 144 Z" fill="#5b554d"/>
+  <!-- gentle smile -->
+  <path d="M 47 150 Q 51 152 55 150" stroke="#5b554d" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+  <!-- cheek blush -->
+  <ellipse cx="36" cy="144" rx="4" ry="2.8" fill="#f0b6c0" opacity="0.7"/>
+  <ellipse cx="66" cy="144" rx="4" ry="2.8" fill="#f0b6c0" opacity="0.7"/>
+  <!-- whiskers -->
+  <line x1="14" y1="140" x2="34" y2="140" stroke="#5b554d" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="14" y1="148" x2="34" y2="148" stroke="#5b554d" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- paws tucked -->
+  <ellipse cx="92" cy="166" rx="9" ry="5" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.8"/>
+  <ellipse cx="150" cy="166" rx="9" ry="5" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.8"/>
+  <!-- tail wrapped & striped -->
+  <path d="M 176 138 Q 192 128 184 110 Q 174 100 164 110 Q 160 120 170 122" stroke="#5b554d" stroke-width="3.2" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="178" y1="114" x2="190" y2="115" stroke="#5b554d" stroke-width="2"/>
+  <line x1="174" y1="124" x2="184" y2="125" stroke="#5b554d" stroke-width="2"/>
+  <!-- Z Z z -->
+  <text x="80" y="78" font-family="Cormorant Garamond" font-size="28" font-weight="700" fill="#5b554d">Z</text>
+  <text x="102" y="56" font-family="Cormorant Garamond" font-size="20" font-weight="700" fill="#5b554d">Z</text>
+  <text x="120" y="40" font-family="Cormorant Garamond" font-size="13" font-weight="700" fill="#5b554d">z</text>
+`;
+
+const SVG_ADULT_EAT = `
+  <ellipse cx="100" cy="178" rx="78" ry="6" fill="#000" opacity="0.10"/>
+  <!-- body sitting on left -->
+  <ellipse cx="74" cy="115" rx="48" ry="48" fill="#c2bbb0" stroke="#5b554d" stroke-width="3.5"/>
+  <ellipse cx="74" cy="128" rx="30" ry="32" fill="#e8e2d6"/>
+  <!-- ears -->
+  <path d="M 46 82 Q 44 62 66 80" fill="#c2bbb0" stroke="#5b554d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 102 82 Q 104 62 84 80" fill="#c2bbb0" stroke="#5b554d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- inner ear pink -->
+  <path d="M 50 82 Q 54 72 58 82" fill="#f0b6c0" opacity="0.55"/>
+  <path d="M 90 82 Q 94 72 98 82" fill="#f0b6c0" opacity="0.55"/>
+  <!-- stripes -->
+  <path d="M 58 84 Q 60 74 62 84" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 70 80 Q 72 69 74 80" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 86 84 Q 88 74 90 84" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- bright dot eyes -->
+  <circle cx="60" cy="106" r="3.8" fill="#3a342d"/>
+  <circle cx="88" cy="106" r="3.8" fill="#3a342d"/>
+  <circle cx="61.5" cy="104" r="1.2" fill="#fff"/>
+  <circle cx="89.5" cy="104" r="1.2" fill="#fff"/>
+  <!-- nose -->
+  <path d="M 72 116 L 74 119 L 76 116 Z" fill="#5b554d"/>
+  <!-- smile (open happy) -->
+  <path d="M 66 122 Q 70 128 74 124 Q 78 128 82 122" stroke="#5b554d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- cheek blush -->
+  <ellipse cx="52" cy="118" rx="4" ry="2.5" fill="#f0b6c0" opacity="0.7"/>
+  <ellipse cx="96" cy="118" rx="4" ry="2.5" fill="#f0b6c0" opacity="0.7"/>
+  <!-- whiskers -->
+  <line x1="30" y1="114" x2="50" y2="114" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="30" y1="120" x2="50" y2="118" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="98" y1="114" x2="118" y2="114" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="98" y1="118" x2="118" y2="120" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <!-- legs -->
+  <ellipse cx="52" cy="158" rx="9" ry="6" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.8"/>
+  <ellipse cx="90" cy="160" rx="9" ry="6" fill="#c2bbb0" stroke="#5b554d" stroke-width="2.8"/>
+  <!-- tail -->
+  <path d="M 118 122 Q 138 116 132 96" stroke="#5b554d" stroke-width="3.5" fill="#c2bbb0" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="128" y1="102" x2="138" y2="104" stroke="#5b554d" stroke-width="2"/>
+  <line x1="132" y1="112" x2="142" y2="114" stroke="#5b554d" stroke-width="2"/>
+  <!-- BURGER -->
+  <g transform="translate(132 142)">
+    <ellipse cx="0" cy="14" rx="20" ry="6" fill="#d4a574" stroke="#a87a4a" stroke-width="2"/>
+    <rect x="-19" y="5" width="38" height="5" fill="#7a4a32" stroke="#5b3520" stroke-width="1.5"/>
+    <path d="M -18 5 q 3 -4 6 0 q 3 -4 6 0 q 3 -4 6 0 q 3 -4 6 0 q 3 -4 5 0" stroke="#5b9050" stroke-width="2" fill="#7eb060"/>
+    <path d="M -18 0 Q 0 -16 18 0 Z" fill="#e89378" stroke="#a84829" stroke-width="2" stroke-linejoin="round"/>
+    <ellipse cx="-6" cy="-6" rx="1.2" ry="0.6" fill="#fff8d4"/>
+    <ellipse cx="5" cy="-8" rx="1.2" ry="0.6" fill="#fff8d4"/>
+    <ellipse cx="0" cy="-10" rx="1.2" ry="0.6" fill="#fff8d4"/>
+  </g>
+  <!-- DRINK CUP with straw -->
+  <g transform="translate(168 122)">
+    <path d="M -11 0 L -9 38 L 9 38 L 11 0 Z" fill="#7eb8e0" stroke="#3a7aa8" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="-11" y="-2" width="22" height="6" rx="1" fill="#fff" stroke="#3a7aa8" stroke-width="1.5"/>
+    <text x="0" y="24" text-anchor="middle" font-family="Cormorant Garamond" font-size="16" font-weight="700" fill="#3a7aa8">P</text>
+    <rect x="-2.5" y="-16" width="5" height="16" fill="#fff" stroke="#3a7aa8" stroke-width="1.5"/>
+    <path d="M -2.5 -10 L 2.5 -10" stroke="#3a7aa8" stroke-width="1.5"/>
+  </g>
+  <!-- FRIES carton -->
+  <g transform="translate(146 158)">
+    <path d="M -10 -8 L -12 14 L 12 14 L 10 -8 Z" fill="#c25b3f" stroke="#8a3a26" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="-9" y="-6" width="18" height="4" fill="#fff" opacity="0.4"/>
+    <rect x="-8" y="-18" width="2.5" height="11" fill="#f5d77a" stroke="#a87a4a" stroke-width="0.8"/>
+    <rect x="-4" y="-20" width="2.5" height="13" fill="#f5d77a" stroke="#a87a4a" stroke-width="0.8"/>
+    <rect x="0" y="-17" width="2.5" height="10" fill="#f5d77a" stroke="#a87a4a" stroke-width="0.8"/>
+    <rect x="4" y="-19" width="2.5" height="12" fill="#f5d77a" stroke="#a87a4a" stroke-width="0.8"/>
+  </g>
+`;
+
+// STAGE 5 RAINBOW
+const SVG_RAIN_WALK = RAINBOW_DEFS + `
+  <!-- shadow -->
+  <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.12"/>
+  <!-- body rainbow (horizontal capsule) -->
+  <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="url(#rb-p)" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M 100 96 C 64 96 56 114 56 128 C 56 154 80 168 100 168 C 120 168 144 154 144 128 C 144 114 136 96 100 96 Z" fill="url(#rb-pb)"/>
+  <!-- ears smaller triangle -->
+  <path d="M 56 82 L 52 62 L 78 80 Z" fill="url(#rb-p)" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 144 82 L 148 62 L 122 80 Z" fill="url(#rb-p)" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 60 79 L 56 67 L 75 78 Z" fill="#f0b6c0"/>
+  <path d="M 140 79 L 144 67 L 125 78 Z" fill="#f0b6c0"/>
+  <!-- crown -->
+  <g transform="translate(74 36)">
+    <path d="M 4 22 L 9 6 L 19 16 L 26 2 L 33 16 L 43 6 L 48 22 Z" fill="#f5d77a" stroke="#a87a4a" stroke-width="2.5" stroke-linejoin="round"/>
+    <rect x="4" y="22" width="44" height="7" rx="1" fill="#d4a574" stroke="#a87a4a" stroke-width="2.2"/>
+    <circle cx="26" cy="10" r="2.8" fill="#e87878" stroke="#a84040" stroke-width="0.8"/>
+    <circle cx="11" cy="17" r="1.8" fill="#7eb8e0" stroke="#3a7aa8" stroke-width="0.6"/>
+    <circle cx="41" cy="17" r="1.8" fill="#7eb8e0" stroke="#3a7aa8" stroke-width="0.6"/>
+    <circle cx="18" cy="26" r="1.4" fill="#fff"/><circle cx="34" cy="26" r="1.4" fill="#fff"/>
+  </g>
+  <!-- eyes -->
+  <circle cx="80" cy="104" r="4.5" fill="#3a342d"/>
+  <circle cx="120" cy="104" r="4.5" fill="#3a342d"/>
+  <circle cx="81.2" cy="102" r="1.4" fill="#fff"/>
+  <circle cx="121.2" cy="102" r="1.4" fill="#fff"/>
+  <!-- nose triangle -->
+  <path d="M 96 116 L 100 120 L 104 116 Z" fill="#3a342d"/>
+  <!-- mouth -->
+  <path d="M 89 124 Q 95 130 100 126 Q 105 130 111 124" stroke="#3a342d" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- cheek blush -->
+  <ellipse cx="62" cy="120" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.85"/>
+  <ellipse cx="138" cy="120" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.85"/>
+  <!-- whiskers -->
+  <line x1="12" y1="112" x2="56" y2="114" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="12" y1="120" x2="56" y2="120" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="12" y1="130" x2="56" y2="126" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="114" x2="188" y2="112" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="120" x2="188" y2="120" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="126" x2="188" y2="130" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <!-- 4 rounded paws -->
+  <ellipse cx="50" cy="168" rx="11" ry="6" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="80" cy="170" rx="11" ry="6" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="120" cy="170" rx="11" ry="6" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="150" cy="168" rx="11" ry="6" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <!-- tail with stripes -->
+  <path d="M 176 116 Q 198 104 188 78" stroke="#3a342d" stroke-width="3.5" fill="url(#rb-p)" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="184" y1="86" x2="198" y2="86" stroke="#3a342d" stroke-width="2.2"/>
+  <line x1="184" y1="100" x2="198" y2="100" stroke="#3a342d" stroke-width="2.2"/>
+  <!-- sparkles -->
+  <g fill="#f5d77a">
+    <path d="M 14 92 L 16 96 L 20 98 L 16 100 L 14 104 L 12 100 L 8 98 L 12 96 Z"/>
+    <circle cx="190" cy="62" r="2"/>
+    <circle cx="32" cy="140" r="1.5"/>
+  </g>
+`;
+
+const SVG_RAIN_WAVE_OLD_UNUSED = RAINBOW_DEFS + `
+  <ellipse cx="100" cy="180" rx="46" ry="6" fill="#000" opacity="0.10"/>
+  <!-- vertical standing body (egg/teardrop shape) -->
+  <path d="M 100 60 Q 60 60 60 130 Q 60 175 100 175 Q 140 175 140 130 Q 140 60 100 60 Z" fill="url(#rb-p)" stroke="#5b554d" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- belly cream area (front) -->
+  <path d="M 100 88 Q 76 88 76 130 Q 76 168 100 168 Q 124 168 124 130 Q 124 88 100 88 Z" fill="url(#rb-pb)"/>
+  <!-- ears at top -->
+  <path d="M 76 70 Q 72 50 96 68" fill="url(#rb-p)" stroke="#5b554d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 124 70 Q 128 50 104 68" fill="url(#rb-p)" stroke="#5b554d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- inner ear pink -->
+  <path d="M 80 70 Q 84 60 90 70" fill="#f0b6c0" opacity="0.6"/>
+  <path d="M 110 70 Q 116 60 120 70" fill="#f0b6c0" opacity="0.6"/>
+  <!-- stripes on head -->
+  <path d="M 86 76 Q 88 66 90 76" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 96 72 Q 98 62 100 72" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 110 76 Q 112 66 114 76" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- crown -->
+  <g transform="translate(72 18)">
+    <path d="M 4 32 L 8 14 L 18 24 L 28 8 L 38 24 L 48 14 L 52 32 Z" fill="#f5d77a" stroke="#a87a4a" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="4" y="32" width="48" height="7" rx="1" fill="#d4a574" stroke="#a87a4a" stroke-width="2"/>
+    <circle cx="28" cy="16" r="3" fill="#e87878" stroke="#a84040" stroke-width="1"/>
+    <circle cx="10" cy="22" r="2" fill="#7eb8e0" stroke="#3a7aa8" stroke-width="0.8"/>
+    <circle cx="46" cy="22" r="2" fill="#7eb8e0" stroke="#3a7aa8" stroke-width="0.8"/>
+    <circle cx="19" cy="36" r="1.5" fill="#fff"/><circle cx="37" cy="36" r="1.5" fill="#fff"/>
+  </g>
+  <!-- big sparkle eyes -->
+  <circle cx="88" cy="104" r="4.5" fill="#3a342d"/>
+  <circle cx="112" cy="104" r="4.5" fill="#3a342d"/>
+  <circle cx="89.5" cy="102" r="1.5" fill="#fff"/>
+  <circle cx="113.5" cy="102" r="1.5" fill="#fff"/>
+  <!-- nose -->
+  <path d="M 98 116 L 100 119 L 102 116 Z" fill="#5b554d"/>
+  <!-- big smile -->
+  <path d="M 89 124 Q 95 132 100 128 Q 105 132 111 124" stroke="#5b554d" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- cheek blush (big) -->
+  <ellipse cx="76" cy="120" rx="5.5" ry="3.5" fill="#f0b6c0" opacity="0.75"/>
+  <ellipse cx="124" cy="120" rx="5.5" ry="3.5" fill="#f0b6c0" opacity="0.75"/>
+  <!-- whiskers -->
+  <line x1="42" y1="114" x2="76" y2="114" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="42" y1="122" x2="76" y2="120" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="124" y1="114" x2="158" y2="114" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="124" y1="120" x2="158" y2="122" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <!-- raised waving paw high above head -->
+  <g>
+    <path d="M 138 118 Q 152 95 150 70" stroke="#5b554d" stroke-width="3.5" fill="url(#rb-p)" stroke-linecap="round"/>
+    <ellipse cx="151" cy="60" rx="13" ry="11" fill="url(#rb-p)" stroke="#5b554d" stroke-width="2.8"/>
+    <!-- toe pads -->
+    <circle cx="145" cy="56" r="1.8" fill="#5b554d"/>
+    <circle cx="151" cy="52" r="1.8" fill="#5b554d"/>
+    <circle cx="157" cy="56" r="1.8" fill="#5b554d"/>
+    <ellipse cx="151" cy="62" rx="3" ry="2.2" fill="#5b554d"/>
+  </g>
+  <!-- other paw across belly -->
+  <ellipse cx="80" cy="148" rx="11" ry="7" fill="url(#rb-p)" stroke="#5b554d" stroke-width="2.8"/>
+  <!-- feet at bottom -->
+  <ellipse cx="88" cy="172" rx="11" ry="6" fill="url(#rb-p)" stroke="#5b554d" stroke-width="2.8"/>
+  <ellipse cx="112" cy="172" rx="11" ry="6" fill="url(#rb-p)" stroke="#5b554d" stroke-width="2.8"/>
+  <!-- tail curled at side -->
+  <path d="M 140 155 Q 162 162 162 142" stroke="#5b554d" stroke-width="3.2" fill="url(#rb-p)" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="148" y1="154" x2="158" y2="156" stroke="#5b554d" stroke-width="2"/>
+  <!-- sparkles + hi text -->
+  <g fill="#f5d77a">
+    <path d="M 168 86 L 170 90 L 174 92 L 170 94 L 168 98 L 166 94 L 162 92 L 166 90 Z"/>
+    <path d="M 28 100 L 30 104 L 34 106 L 30 108 L 28 112 L 26 108 L 22 106 L 26 104 Z"/>
+    <circle cx="170" cy="120" r="1.5"/>
+    <circle cx="36" cy="56" r="2"/>
+  </g>
+  <text x="30" y="78" font-family="Cormorant Garamond" font-size="18" font-style="italic" font-weight="600" fill="#c25b3f">hi !</text>
+`;
+
+const SVG_RAIN_WAVE = RAINBOW_DEFS + `
+  <!-- shadow -->
+  <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.12"/>
+  <!-- body rainbow (same as walk) -->
+  <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="url(#rb-p)" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M 100 96 C 64 96 56 114 56 128 C 56 154 80 168 100 168 C 120 168 144 154 144 128 C 144 114 136 96 100 96 Z" fill="url(#rb-pb)"/>
+  <!-- ears smaller triangle -->
+  <path d="M 56 82 L 52 62 L 78 80 Z" fill="url(#rb-p)" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 144 82 L 148 62 L 122 80 Z" fill="url(#rb-p)" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 60 79 L 56 67 L 75 78 Z" fill="#f0b6c0"/>
+  <path d="M 140 79 L 144 67 L 125 78 Z" fill="#f0b6c0"/>
+  <!-- crown -->
+  <g transform="translate(74 36)">
+    <path d="M 4 22 L 9 6 L 19 16 L 26 2 L 33 16 L 43 6 L 48 22 Z" fill="#f5d77a" stroke="#a87a4a" stroke-width="2.5" stroke-linejoin="round"/>
+    <rect x="4" y="22" width="44" height="7" rx="1" fill="#d4a574" stroke="#a87a4a" stroke-width="2.2"/>
+    <circle cx="26" cy="10" r="2.8" fill="#e87878" stroke="#a84040" stroke-width="0.8"/>
+    <circle cx="11" cy="17" r="1.8" fill="#7eb8e0" stroke="#3a7aa8" stroke-width="0.6"/>
+    <circle cx="41" cy="17" r="1.8" fill="#7eb8e0" stroke="#3a7aa8" stroke-width="0.6"/>
+    <circle cx="18" cy="26" r="1.4" fill="#fff"/><circle cx="34" cy="26" r="1.4" fill="#fff"/>
+  </g>
+  <!-- happy eyes -->
+  <path d="M 75 106 Q 80 100 85 106" stroke="#3a342d" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M 115 106 Q 120 100 125 106" stroke="#3a342d" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- nose -->
+  <path d="M 96 118 L 100 122 L 104 118 Z" fill="#3a342d"/>
+  <!-- smile -->
+  <path d="M 88 124 Q 95 132 100 128 Q 105 132 112 124" stroke="#3a342d" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- cheek -->
+  <ellipse cx="62" cy="120" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.85"/>
+  <ellipse cx="138" cy="120" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.85"/>
+  <!-- whiskers -->
+  <line x1="12" y1="112" x2="56" y2="114" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="12" y1="120" x2="56" y2="120" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="12" y1="130" x2="56" y2="126" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="114" x2="188" y2="112" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="120" x2="188" y2="120" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="144" y1="126" x2="188" y2="130" stroke="#3a342d" stroke-width="2" stroke-linecap="round"/>
+  <!-- 3 stationary paws -->
+  <ellipse cx="50" cy="168" rx="11" ry="6" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="80" cy="170" rx="11" ry="6" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="120" cy="170" rx="11" ry="6" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <!-- raised SHORT paw beside head -->
+  <rect x="146" y="80" width="14" height="20" rx="7" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <ellipse cx="153" cy="72" rx="11" ry="9" fill="url(#rb-p)" stroke="#3a342d" stroke-width="2.8"/>
+  <circle cx="149" cy="68" r="1.4" fill="#3a342d"/>
+  <circle cx="153" cy="65" r="1.4" fill="#3a342d"/>
+  <circle cx="157" cy="68" r="1.4" fill="#3a342d"/>
+  <ellipse cx="153" cy="74" rx="2.5" ry="1.8" fill="#3a342d"/>
+  <text x="168" y="56" font-family="Cormorant Garamond" font-size="20" font-style="italic" font-weight="600" fill="#c25b3f">hi !</text>
+  <!-- tail left -->
+  <path d="M 24 132 Q 4 122 12 96" stroke="#3a342d" stroke-width="3.5" fill="url(#rb-p)" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="14" y1="106" x2="2" y2="104" stroke="#3a342d" stroke-width="2.2"/>
+  <line x1="18" y1="120" x2="6" y2="120" stroke="#3a342d" stroke-width="2.2"/>
+  <g fill="#f5d77a">
+    <circle cx="40" cy="56" r="2"/>
+    <path d="M 178 88 L 180 92 L 184 94 L 180 96 L 178 100 L 176 96 L 172 94 L 176 92 Z"/>
+  </g>
+`;
+
+const SVG_RAIN_TRIKE = RAINBOW_DEFS + `
+  <ellipse cx="100" cy="180" rx="80" ry="6" fill="#000" opacity="0.10"/>
+  <!-- tricycle wheels -->
+  <circle cx="44" cy="158" r="18" fill="#3a342d"/>
+  <circle cx="44" cy="158" r="10" fill="#fff" stroke="#5b554d" stroke-width="2"/>
+  <line x1="44" y1="148" x2="44" y2="168" stroke="#5b554d" stroke-width="1.5"/>
+  <line x1="34" y1="158" x2="54" y2="158" stroke="#5b554d" stroke-width="1.5"/>
+  <circle cx="44" cy="158" r="2.5" fill="#5b554d"/>
+  <circle cx="156" cy="158" r="18" fill="#3a342d"/>
+  <circle cx="156" cy="158" r="10" fill="#fff" stroke="#5b554d" stroke-width="2"/>
+  <line x1="156" y1="148" x2="156" y2="168" stroke="#5b554d" stroke-width="1.5"/>
+  <line x1="146" y1="158" x2="166" y2="158" stroke="#5b554d" stroke-width="1.5"/>
+  <circle cx="156" cy="158" r="2.5" fill="#5b554d"/>
+  <!-- frame -->
+  <path d="M 44 158 L 100 158 L 156 158" stroke="#c25b3f" stroke-width="6" stroke-linecap="round"/>
+  <rect x="80" y="146" width="40" height="8" rx="2" fill="#c25b3f"/>
+  <!-- handlebar -->
+  <line x1="156" y1="158" x2="156" y2="128" stroke="#5b554d" stroke-width="4" stroke-linecap="round"/>
+  <line x1="138" y1="128" x2="174" y2="128" stroke="#5b554d" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="138" cy="128" r="3" fill="#c25b3f"/>
+  <circle cx="174" cy="128" r="3" fill="#c25b3f"/>
+  <!-- body -->
+  <ellipse cx="100" cy="112" rx="48" ry="34" fill="url(#rb-p)" stroke="#5b554d" stroke-width="3.5"/>
+  <ellipse cx="100" cy="122" rx="32" ry="22" fill="url(#rb-pb)"/>
+  <!-- ears -->
+  <path d="M 76 86 Q 74 70 92 84" fill="url(#rb-p)" stroke="#5b554d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 124 86 Q 126 70 108 84" fill="url(#rb-p)" stroke="#5b554d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- stripes -->
+  <path d="M 84 88 Q 86 80 88 88" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 96 86 Q 98 77 100 86" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 112 88 Q 114 80 116 88" stroke="#5b554d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- crown -->
+  <g transform="translate(72 36)">
+    <path d="M 4 26 L 8 10 L 18 20 L 28 4 L 38 20 L 48 10 L 52 26 Z" fill="#f5d77a" stroke="#a87a4a" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="4" y="26" width="48" height="6" rx="1" fill="#d4a574" stroke="#a87a4a" stroke-width="2"/>
+    <circle cx="28" cy="13" r="2.5" fill="#e87878" stroke="#a84040" stroke-width="0.8"/>
+    <circle cx="10" cy="20" r="1.5" fill="#7eb8e0"/>
+    <circle cx="46" cy="20" r="1.5" fill="#7eb8e0"/>
+  </g>
+  <!-- happy eyes ^^ -->
+  <path d="M 80 106 Q 84 100 88 106" stroke="#3a342d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 112 106 Q 116 100 120 106" stroke="#3a342d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 98 116 L 100 119 L 102 116 Z" fill="#5b554d"/>
+  <path d="M 90 122 Q 95 128 100 125 Q 105 128 110 122" stroke="#5b554d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="56" y1="114" x2="80" y2="114" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="56" y1="120" x2="80" y2="118" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="120" y1="114" x2="144" y2="114" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <line x1="120" y1="118" x2="144" y2="120" stroke="#5b554d" stroke-width="2" stroke-linecap="round"/>
+  <!-- paws on handlebar -->
+  <ellipse cx="138" cy="124" rx="8" ry="6" fill="url(#rb-p)" stroke="#5b554d" stroke-width="2.5"/>
+  <ellipse cx="172" cy="124" rx="8" ry="6" fill="url(#rb-p)" stroke="#5b554d" stroke-width="2.5"/>
+  <!-- tail flowing back -->
+  <path d="M 54 130 Q 32 124 26 106" stroke="#5b554d" stroke-width="3.2" fill="url(#rb-p)" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="36" y1="116" x2="28" y2="113" stroke="#5b554d" stroke-width="2"/>
+  <!-- sparkles -->
+  <g fill="#f5d77a">
+    <circle cx="14" cy="78" r="2"/>
+    <circle cx="184" cy="88" r="2"/>
+    <path d="M 178 50 L 179 53 L 182 54 L 179 55 L 178 58 L 177 55 L 174 54 L 177 53 Z"/>
+  </g>
+`;
+
+/* ============ STAGES ============ */
+const STAGES = [
+  {
+    label:'STAGE 01 — たまご', threshold:0,
+    scenes:[ {svg:SVG_EGG, mode:'sway', dur:99999999, name:'sleeping inside'} ],
+    mood:[
+      'まだ卵🥚 殻を破ってどんな子が出てくるかな？',
+      'あと{next}達成で、生まれたての姿が見られるよ',
+      '目標をチェックして卵を温めよう'
+    ]
+  },
+  {
+    label:'STAGE 02 — 生まれたて', threshold:3,
+    scenes:[ {svg:SVG_BABY_MILK, mode:'bounce', dur:99999999, name:'with pacifier'} ],
+    mood:[
+      '今はまだ赤ちゃん！頑張って次の成長した姿を見てみましょう',
+      'あと{next}達成で、あんよ期へ進化するよ',
+      'おしゃぶり姿は今だけ。次はトコトコ歩く子に'
+    ]
+  },
+  {
+    label:'STAGE 03 — あんよ期', threshold:6,
+    scenes:[ {svg:SVG_TODD_WALK, mode:'walk', dur:99999999, name:'walking'} ],
+    mood:[
+      'よちよち歩きはじめた！あと{next}達成で大人サイズに',
+      'もう少しで一人前。あと{next}で次の成長',
+      '次は堂々とした大人ミーに育つよ'
+    ]
+  },
+  {
+    label:'STAGE 04 — おっとり大人', threshold:14,
+    scenes:[ {svg:SVG_ADULT_PC, mode:'static', dur:99999999, name:'on the laptop'} ],
+    mood:[
+      '大人ミーに成長！あと{next}達成で最終形へ',
+      '最終ステージまであと{next}達成',
+      'もう半分以上来た。完走まであと一歩'
+    ]
+  },
+  {
+    label:'STAGE 05 — レインボーミー', threshold:30,
+    scenes:[
+      {svg:SVG_RAIN_WALK,  mode:'walk',   dur:14000, name:'strolling'},
+      {svg:SVG_RAIN_WAVE,  mode:'bounce', dur:6000,  name:'waving hi!'}
+    ],
+    mood:[
+      '最終形に到達！王冠が似合うレインボーミー',
+      '半年完走おめでとう。この記録があなたの宝物',
+      'これ以上の成長はないけど、ここに来た事実がすべて'
+    ]
+  }
+];
+
+const MOOD_LOW = [
+  '今週はゆっくりペース。来週ひとつでもチェックできれば前進',
+  'できなかった週も記録のうち。来週からまた一歩',
+  '休む週があっても大丈夫。ペースを崩さず続けよう'
+];
+const MOOD_MID = [
+  'いいペース。この調子で次の成長へ',
+  '少しずつ進んでる。続けるのが何より大事',
+  '今のペースなら、次のステージはもうすぐ'
+];
+const MOOD_HIGH = [
+  '全部達成！素晴らしい一週間',
+  '満点ウィーク。次の成長まで一気に近づいた',
+  'この勢いで次のステージへ'
+];
+
+const ITEMS = [
+  { name:'はじめの一歩', cond:1, icon:'<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="8" fill="#f5d4c2" stroke="#c25b3f" stroke-width="1.5"/><path d="M 11 15 L 14 18 L 19 12" stroke="#c25b3f" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+  { name:'毛糸玉',     cond:5, icon:'<svg viewBox="0 0 30 30"><circle cx="15" cy="16" r="9" fill="#e89378"/><path d="M 8 13 Q 15 11 22 14 M 7 17 Q 15 15 23 18 M 8 20 Q 15 19 22 21" stroke="#a84829" stroke-width="0.8" fill="none"/></svg>' },
+  { name:'おさかな',    cond:10, icon:'<svg viewBox="0 0 30 30"><path d="M 6 15 Q 12 9 20 15 Q 12 21 6 15 Z" fill="#1f6f5e"/><path d="M 20 15 L 26 11 L 26 19 Z" fill="#1f6f5e"/><circle cx="11" cy="14" r="1" fill="#fff"/></svg>' },
+  { name:'リボン',      cond:18, icon:'<svg viewBox="0 0 30 30"><path d="M 8 13 L 4 9 L 4 19 Z" fill="#c25b3f"/><path d="M 22 13 L 26 9 L 26 19 Z" fill="#c25b3f"/><circle cx="15" cy="14" r="4" fill="#e89378"/><rect x="13" y="14" width="4" height="6" fill="#c25b3f"/></svg>' },
+  { name:'お花',        cond:30, icon:'<svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="3.5" fill="#e89378"/><circle cx="9" cy="14" r="3.5" fill="#e89378"/><circle cx="21" cy="14" r="3.5" fill="#e89378"/><circle cx="12" cy="20" r="3.5" fill="#e89378"/><circle cx="18" cy="20" r="3.5" fill="#e89378"/><circle cx="15" cy="15" r="2.5" fill="#d4a574"/></svg>' },
+  { name:'本',          cond:45, icon:'<svg viewBox="0 0 30 30"><rect x="6" y="7" width="8" height="16" fill="#1f6f5e" stroke="#0f4a3e" stroke-width="0.8"/><rect x="14" y="7" width="10" height="16" fill="#c25b3f" stroke="#8a3a26" stroke-width="0.8"/><line x1="8" y1="11" x2="12" y2="11" stroke="#fff" stroke-width="0.6"/><line x1="16" y1="11" x2="22" y2="11" stroke="#fff" stroke-width="0.6"/></svg>' },
+  { name:'お月さま',    cond:60, icon:'<svg viewBox="0 0 30 30"><path d="M 20 15 A 8 8 0 1 1 14 7 A 6 6 0 0 0 20 15 Z" fill="#d4a574"/></svg>' },
+  { name:'王冠',        cond:80, icon:'<svg viewBox="0 0 30 30"><path d="M 6 18 L 8 10 L 12 14 L 15 8 L 18 14 L 22 10 L 24 18 Z" fill="#d4a574" stroke="#a87a4a" stroke-width="1"/><rect x="6" y="18" width="18" height="3" fill="#a87a4a"/><circle cx="15" cy="11" r="1.2" fill="#c25b3f"/></svg>' }
+];
+
+function getStageIndex(pt){
+  let idx = 0;
+  for(let i=STAGES.length-1; i>=0; i--){
+    if(pt >= STAGES[i].threshold){ idx = i; break; }
+  }
+  return idx;
+}
+function getCurrentWeek(){ return state.weeks[state.currentWeek]; }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function randPick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function getStreak(){
+  let s = 0;
+  for(let i=state.currentWeek; i>=1; i--){
+    const w = state.weeks[i];
+    if(!w) break;
+    if(w.memo || w.goals.some(g=>g.done)) s++; else break;
+  }
+  return s;
+}
+
+let sceneTimer;
+let currentStageIdx = -1;
+let currentSceneIdx = 0;
+
+function applyScene(scene){
+  const walker = document.getElementById('kittenWalker');
+  walker.classList.remove('mode-walk','mode-walk-slow','mode-bounce','mode-static','mode-sway','mode-sleep');
+  walker.classList.add('mode-' + scene.mode);
+  document.getElementById('kittenSvg').innerHTML = scene.svg;
+  document.getElementById('sceneName').textContent = '— ' + scene.name + ' —';
+}
+
+function startSceneRotation(){
+  clearTimeout(sceneTimer);
+  const stage = STAGES[currentStageIdx];
+  const play = () => {
+    const scene = stage.scenes[currentSceneIdx];
+    applyScene(scene);
+    sceneTimer = setTimeout(() => {
+      currentSceneIdx = (currentSceneIdx + 1) % stage.scenes.length;
+      play();
+    }, scene.dur);
+  };
+  play();
+}
+
+function render(){
+  const w = getCurrentWeek();
+  const list = document.getElementById('goalList');
+  list.innerHTML = '';
+  w.goals.forEach((g, idx) => {
+    const item = document.createElement('div');
+    item.className = 'goal-item' + (g.done ? ' done' : '');
+    item.innerHTML = `
+      <div class="goal-check"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M 2 6 L 5 9 L 10 3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="goal-text">${escapeHtml(g.text)}</span>
+      <button class="goal-edit" data-edit="${idx}">編集</button>
+      <button class="goal-edit" data-delete="${idx}">削除</button>
+    `;
+    item.addEventListener('click', e => { if(e.target.closest('.goal-edit')) return; toggleGoal(idx); });
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); editGoal(parseInt(btn.dataset.edit)); }));
+  list.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); deleteGoal(parseInt(btn.dataset.delete)); }));
+
+  const doneCount = w.goals.filter(g => g.done).length;
+  const total = w.goals.length;
+  const rate = total ? Math.round(doneCount/total*100) : 0;
+  document.getElementById('goalRatio').textContent = `${doneCount} / ${total}`;
+  document.getElementById('thisWeekRate').textContent = rate;
+  document.getElementById('totalDone').textContent = state.totalDone;
+  document.getElementById('weekStreak').textContent = getStreak();
+  document.getElementById('weekNum').textContent = state.currentWeek;
+  document.getElementById('weekLabel').textContent = `— Week ${state.currentWeek} / ${TOTAL_WEEKS} —`;
+  document.getElementById('weekMemo').value = w.memo || '';
+
+  const pt = state.totalDone;
+  const newStageIdx = getStageIndex(pt);
+  const stage = STAGES[newStageIdx];
+  document.getElementById('stageLabel').textContent = stage.label;
+
+  // restart scene rotation only if stage changed
+  if(newStageIdx !== currentStageIdx){
+    currentStageIdx = newStageIdx;
+    currentSceneIdx = 0;
+    startSceneRotation();
+  }
+
+  const lv = Math.max(1, Math.floor(pt/3)+1);
+  const nextLv = lv*3;
+  document.getElementById('lvNum').textContent = lv;
+  document.getElementById('pointNow').textContent = pt;
+  document.getElementById('pointMax').textContent = nextLv;
+  document.getElementById('lvFill').style.width = Math.min(100, (pt/nextLv)*100) + '%';
+
+  let mood;
+  if(state.totalDone === 0 && doneCount === 0) mood = randPick(stage.mood);
+  else if(rate === 0 && total > 0) mood = randPick(stage.mood);
+  else if(rate < 50) mood = randPick(MOOD_LOW);
+  else if(rate < 100) mood = randPick(MOOD_MID);
+  else mood = randPick(MOOD_HIGH);
+  // {next} placeholder — 次の閾値までの残り達成数を表示
+  if(mood.includes('{next}')){
+    const nextIdx = newStageIdx + 1;
+    if(nextIdx < STAGES.length){
+      const remaining = Math.max(1, STAGES[nextIdx].threshold - state.totalDone);
+      mood = mood.replace('{next}', remaining + '回');
+    } else {
+      mood = mood.replace('{next}', '0回');
+    }
+  }
+  document.getElementById('moodText').textContent = mood;
+
+  const grid = document.getElementById('historyGrid');
+  grid.innerHTML = '';
+  for(let i=1; i<=TOTAL_WEEKS; i++){
+    const cell = document.createElement('div');
+    cell.className = 'history-cell' + (i===state.currentWeek ? ' current' : '');
+    const wk = state.weeks[i];
+    let r = 0;
+    if(wk){
+      const d = wk.goals.filter(g=>g.done).length;
+      const t = wk.goals.length;
+      const pct = t ? d/t : 0;
+      if(pct === 0) r=0;
+      else if(pct < 0.34) r=1;
+      else if(pct < 0.67) r=2;
+      else if(pct < 1) r=3;
+      else r=4;
+    }
+    cell.dataset.rate = r;
+    cell.title = `Week ${i}`;
+    cell.addEventListener('click', () => switchWeek(i));
+    grid.appendChild(cell);
+  }
+
+  const itemsGrid = document.getElementById('itemsGrid');
+  itemsGrid.innerHTML = '';
+  ITEMS.forEach(it => {
+    const card = document.createElement('div');
+    const unlocked = state.totalDone >= it.cond;
+    card.className = 'item-card' + (unlocked ? ' unlocked' : '');
+    card.innerHTML = `<div class="item-icon">${it.icon}</div><div class="item-name">${it.name}</div><div class="item-cond">${it.cond}回達成</div>`;
+    itemsGrid.appendChild(card);
+  });
+}
+
+function toggleGoal(idx){
+  const w = getCurrentWeek();
+  const wasDone = w.goals[idx].done;
+  w.goals[idx].done = !wasDone;
+  if(!wasDone){ state.totalDone++; triggerPop(); }
+  else state.totalDone = Math.max(0, state.totalDone-1);
+  saveState(state); render();
+}
+function editGoal(idx){
+  const w = getCurrentWeek();
+  const nv = prompt('目標を編集する', w.goals[idx].text);
+  if(nv !== null && nv.trim() !== ''){ w.goals[idx].text = nv.trim(); saveState(state); render(); }
+}
+function deleteGoal(idx){
+  if(!confirm('この目標を削除する？')) return;
+  const w = getCurrentWeek();
+  if(w.goals[idx].done) state.totalDone = Math.max(0, state.totalDone-1);
+  w.goals.splice(idx,1); saveState(state); render();
+}
+function addGoal(){
+  const nv = prompt('今週の目標を書こう。小さくていいよ。', '');
+  if(nv !== null && nv.trim() !== ''){
+    getCurrentWeek().goals.push({ text: nv.trim(), done: false });
+    saveState(state); render();
+  }
+}
+function switchWeek(n){
+  state.currentWeek = n;
+  if(!state.weeks[n]) state.weeks[n] = { goals: DEFAULT_GOALS.map(t=>({text:t,done:false})), memo:'', completedDate:null };
+  saveState(state); render();
+}
+function saveMemo(){
+  const w = getCurrentWeek();
+  const text = document.getElementById('weekMemo').value.trim();
+  const wasEmpty = !w.memo;
+  w.memo = text;
+  if(wasEmpty && text){ state.totalDone += 1; triggerPop(); }
+  if(state.currentWeek < TOTAL_WEEKS && text){
+    state.currentWeek++;
+    if(!state.weeks[state.currentWeek]) state.weeks[state.currentWeek] = { goals: DEFAULT_GOALS.map(t=>({text:t,done:false})), memo:'', completedDate:null };
+  }
+  saveState(state); render();
+  alert('今週のぶん、ちゃんと受け取りました。来週もよろしくね。');
+}
+function triggerPop(){
+  const hero = document.getElementById('heroCard');
+  hero.classList.remove('kitten-pop');
+  void hero.offsetWidth;
+  hero.classList.add('kitten-pop');
+  setTimeout(()=>hero.classList.remove('kitten-pop'), 700);
+}
+function resetAll(){
+  if(!confirm('これまでの記録をすべて消す？ ミーもまた、卵から始まるよ。')) return;
+  localStorage.removeItem(storageKey);
+  state = loadState();
+  state.weeks[1] = { goals: DEFAULT_GOALS.map(t=>({text:t,done:false})), memo:'', completedDate:null };
+  currentStageIdx = -1;
+  saveState(state); render();
+}
+
+document.getElementById('addGoalBtn').addEventListener('click', addGoal);
+document.getElementById('saveMemoBtn').addEventListener('click', saveMemo);
+document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+render();
+</script>
+
+</body>
+</html>

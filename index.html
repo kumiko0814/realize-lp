@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Re:alize（リアライズ）｜自立しよう、自分の足で立つと気持ちいい。Realize×Re:startで半年、自分を創り直す相互応援型目標達成コミュニティ">
+<title>Re:alize ｜ 自立しよう、自分の足で立つと気持ちいい</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;
+  --sub:#5a5a5a;
+  --mute:#8b8278;
+  --bg:#ffffff;
+  --bg-soft:#fdfaf7;
+  --line:#ede5dc;
+  --line-soft:#f5efe7;
+  --accent:#c25b3f;        /* Terracotta */
+  --accent-deep:#a64626;
+  --leaf:#7a9070;          /* Logo leaf green */
+  --leaf-deep:#5a7050;
+  --pink:#e8b6bc;          /* Coral pink */
+  --pink-soft:#fce8eb;
+  --pink-light:#fdf4f5;
+  --gold:#c9a574;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:"Yu Gothic","YuGothic","游ゴシック","Hiragino Kaku Gothic ProN",sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  font-size:15px;
+  line-height:1.95;
+  letter-spacing:0.06em;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"palt";
+}
+.serif{font-family:"Cormorant Garamond","Yu Mincho","游明朝",serif;letter-spacing:0.04em}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+section{padding:128px 24px;position:relative}
+@media(max-width:720px){section{padding:80px 20px}}
+.wrap{max-width:1080px;margin:0 auto}
+.wrap-narrow{max-width:680px;margin:0 auto}
+
+/* ============== LOGO MARK ============== */
+.logo-mark{
+  display:inline-block;
+  text-align:center;
+  line-height:1;
+}
+.logo-mark .symbol{
+  display:block;
+  margin:0 auto 14px;
+}
+.logo-mark .text{
+  font-family:"Cormorant Garamond",serif;
+  font-weight:500;
+  letter-spacing:0.04em;
+  color:var(--leaf-deep);
+}
+
+/* ============== HERO ============== */
+.hero{
+  background:#fff;
+  padding:88px 24px 132px;
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  top:0;left:50%;transform:translateX(-50%);
+  width:1px;height:64px;
+  background:linear-gradient(180deg,transparent 0%,var(--leaf) 100%);
+}
+.hero-inner{max-width:780px;margin:0 auto;position:relative;z-index:2}
+.hero-logo{margin-bottom:48px}
+.hero-tag{
+  display:inline-block;
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:14px;
+  letter-spacing:0.32em;
+  color:var(--mute);
+  margin-bottom:40px;
+  padding-bottom:6px;
+  position:relative;
+}
+.hero-tag::after{
+  content:"";
+  position:absolute;
+  bottom:0;left:50%;transform:translateX(-50%);
+  width:24px;height:1px;background:var(--leaf);
+}
+.hero h1{
+  font-size:48px;
+  font-weight:300;
+  line-height:1.55;
+  letter-spacing:0.08em;
+  margin-bottom:32px;
+  color:var(--ink);
+  font-family:"Yu Mincho","游明朝","Yu Gothic","游ゴシック",serif;
+}
+.hero h1 strong{font-weight:600;color:var(--leaf-deep)}
+.hero h1 .accent{font-style:normal;color:var(--accent);font-weight:500}
+.hero-sub{
+  font-size:15px;
+  font-weight:400;
+  line-height:2.15;
+  color:var(--sub);
+  max-width:520px;
+  margin:0 auto 32px;
+  letter-spacing:0.1em;
+}
+.hero-meaning{
+  display:inline-block;
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:17px;
+  color:var(--leaf-deep);
+  letter-spacing:0.08em;
+  margin-bottom:64px;
+}
+.hero-meaning .sep{display:inline-block;margin:0 12px;color:var(--mute)}
+.hero-stat{
+  display:flex;
+  justify-content:center;
+  gap:64px;
+  margin-bottom:64px;
+  flex-wrap:wrap;
+}
+.hero-stat-item{text-align:center}
+.hero-stat-num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:44px;
+  color:var(--leaf-deep);
+  font-weight:500;
+  line-height:1;
+}
+.hero-stat-unit{font-size:18px;margin-left:2px;color:var(--leaf)}
+.hero-stat-label{
+  font-size:11px;
+  color:var(--mute);
+  letter-spacing:0.28em;
+  margin-top:14px;
+  font-family:"Cormorant Garamond",serif;
+  text-transform:uppercase;
+}
+@media(max-width:720px){
+  .hero{padding:64px 20px 96px}
+  .hero h1{font-size:30px;letter-spacing:0.06em}
+  .hero-sub{font-size:14px}
+  .hero-meaning{font-size:14px}
+  .hero-stat{gap:32px}
+  .hero-stat-num{font-size:32px}
+}
+
+/* ============== CTA BUTTON ============== */
+.cta-btn{
+  display:inline-block;
+  background:#fff;
+  color:var(--leaf-deep);
+  font-family:inherit;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:0.32em;
+  padding:22px 56px;
+  border-radius:999px;
+  transition:all 0.4s ease;
+  border:1px solid var(--leaf);
+  cursor:pointer;
+  position:relative;
+}
+.cta-btn:hover{background:var(--leaf-deep);color:#fff;border-color:var(--leaf-deep)}
+.cta-btn.primary{
+  background:var(--leaf-deep);color:#fff;border-color:var(--leaf-deep);
+}
+.cta-btn.primary:hover{background:var(--leaf);border-color:var(--leaf)}
+.cta-note{
+  display:block;
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:12px;
+  color:var(--mute);
+  margin-top:18px;
+  letter-spacing:0.2em;
+}
+
+/* ============== SECTION HEADING ============== */
+.section-label{
+  font-family:"Cormorant Garamond",serif;
+  font-size:12px;
+  letter-spacing:0.5em;
+  color:var(--leaf);
+  text-align:center;
+  margin-bottom:24px;
+  font-style:italic;
+}
+.section-title{
+  font-family:"Yu Mincho","游明朝","Yu Gothic","游ゴシック",serif;
+  font-size:34px;
+  font-weight:500;
+  text-align:center;
+  margin-bottom:24px;
+  line-height:1.65;
+  letter-spacing:0.06em;
+}
+.section-title .em{color:var(--leaf-deep);font-weight:600}
+.section-lead{
+  text-align:center;
+  font-size:14px;
+  line-height:2.2;
+  color:var(--sub);
+  margin-bottom:88px;
+  max-width:580px;
+  margin-left:auto;
+  margin-right:auto;
+  letter-spacing:0.1em;
+}
+.section-divider{
+  display:block;
+  width:32px;height:1px;
+  background:var(--leaf);
+  margin:0 auto 40px;
+}
+@media(max-width:720px){
+  .section-title{font-size:24px}
+  .section-lead{font-size:13px;margin-bottom:64px}
+}
+
+/* ============== QUOTE BLOCK (引用) ============== */
+.quote-block{
+  background:#fdfaf6;
+  padding:96px 24px;
+  text-align:center;
+  position:relative;
+  border-top:1px solid var(--line-soft);
+  border-bottom:1px solid var(--line-soft);
+}
+.quote-logo{
+  width:52px;height:52px;
+  margin:0 auto 32px;
+  display:block;
+  opacity:0.88;
+}
+.quote-text{
+  font-family:"Yu Mincho","游明朝",serif;
+  font-size:32px;
+  line-height:2;
+  color:var(--leaf-deep);
+  letter-spacing:0.12em;
+  font-weight:300;
+}
+.quote-attr{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:13px;
+  color:var(--mute);
+  letter-spacing:0.3em;
+  margin-top:32px;
+  display:block;
+}
+@media(max-width:720px){.quote-text{font-size:20px}}
+
+/* ============== STORY (悩み) ============== */
+.story{background:#fff}
+.story-list{
+  list-style:none;
+  padding:0;
+  max-width:560px;
+  margin:0 auto;
+}
+.story-list li{
+  display:flex;
+  align-items:flex-start;
+  gap:24px;
+  padding:24px 0;
+  border-bottom:1px solid var(--line-soft);
+  font-size:16px;
+  line-height:1.85;
+  font-weight:500;
+}
+.story-list li:last-child{border-bottom:none}
+.story-list li::before{
+  content:"";
+  display:inline-block;
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--pink);
+  flex-shrink:0;
+  margin-top:14px;
+}
+.story-bottom{
+  text-align:center;
+  font-family:"Yu Mincho",serif;
+  font-size:19px;
+  line-height:2.2;
+  color:var(--ink);
+  padding:48px 32px 0;
+  margin-top:48px;
+  border-top:1px solid var(--line-soft);
+  max-width:600px;margin-left:auto;margin-right:auto;
+  font-weight:400;
+  letter-spacing:0.06em;
+}
+.story-bottom .em{color:var(--leaf-deep);font-weight:600}
+
+/* ============== FUTURE ============== */
+.future{background:var(--bg-soft)}
+.future-list{
+  max-width:780px;
+  margin:0 auto;
+}
+.future-item{
+  display:grid;
+  grid-template-columns:80px 1fr;
+  gap:48px;
+  padding:48px 0;
+  border-bottom:1px solid var(--line);
+  align-items:start;
+}
+.future-item:last-child{border-bottom:none}
+@media(max-width:720px){
+  .future-item{grid-template-columns:1fr;gap:8px;padding:36px 0}
+}
+.future-num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:48px;
+  color:var(--leaf);
+  font-weight:300;
+  line-height:1;
+  letter-spacing:0.04em;
+}
+.future-item h3{
+  font-family:"Yu Mincho",serif;
+  font-size:20px;
+  font-weight:500;
+  margin-bottom:14px;
+  line-height:1.65;
+  color:var(--ink);
+  letter-spacing:0.05em;
+}
+.future-item p{
+  font-size:14px;
+  line-height:2.1;
+  color:var(--sub);
+  letter-spacing:0.06em;
+}
+
+/* ============== PILLARS ============== */
+.system{background:#fff}
+.pillar{
+  display:grid;
+  grid-template-columns:1fr 1.4fr;
+  gap:88px;
+  align-items:center;
+  margin-bottom:112px;
+}
+.pillar:last-child{margin-bottom:0}
+.pillar.reverse{grid-template-columns:1.4fr 1fr}
+.pillar.reverse .pillar-visual{order:2}
+.pillar.reverse .pillar-text{order:1}
+@media(max-width:720px){
+  .pillar,.pillar.reverse{grid-template-columns:1fr;gap:40px;margin-bottom:72px}
+  .pillar.reverse .pillar-visual,.pillar.reverse .pillar-text{order:initial}
+}
+.pillar-visual{
+  background:linear-gradient(135deg,#f7f1ea 0%,#fdf9f3 100%);
+  aspect-ratio:1/1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  border-radius:4px;
+}
+.pillar-visual::before{
+  content:"";
+  position:absolute;
+  inset:24px;
+  border:1px solid rgba(122,144,112,0.18);
+  pointer-events:none;
+}
+.pillar-visual-num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:120px;
+  color:var(--leaf-deep);
+  font-weight:300;
+  line-height:1;
+  letter-spacing:0.02em;
+  opacity:0.4;
+  margin-bottom:0;
+}
+.pillar-visual-label{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:13px;
+  letter-spacing:0.35em;
+  color:var(--leaf-deep);
+  margin-top:16px;
+}
+.pillar-num{
+  display:inline-block;
+  font-family:"Cormorant Garamond",serif;
+  font-size:13px;
+  letter-spacing:0.4em;
+  color:var(--leaf);
+  margin-bottom:24px;
+}
+.pillar-text h3{
+  font-family:"Yu Mincho",serif;
+  font-size:30px;
+  font-weight:500;
+  margin-bottom:24px;
+  line-height:1.65;
+  letter-spacing:0.06em;
+}
+.pillar-text h3 .em{color:var(--leaf-deep);font-weight:600}
+.pillar-text p{
+  font-size:14.5px;
+  line-height:2.15;
+  color:var(--sub);
+  margin-bottom:24px;
+  letter-spacing:0.08em;
+}
+.pillar-feat{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:12px;
+  letter-spacing:0.18em;
+  color:var(--mute);
+  border-top:1px solid var(--line);
+  padding-top:16px;
+}
+@media(max-width:720px){.pillar-text h3{font-size:22px}}
+
+/* ============== KPI ============== */
+.kpi{background:var(--bg-soft)}
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  max-width:920px;
+  margin:0 auto;
+  border-top:1px solid var(--line);
+  border-left:1px solid var(--line);
+}
+@media(max-width:720px){.kpi-grid{grid-template-columns:1fr 1fr}}
+.kpi-card{
+  background:#fff;
+  padding:56px 24px;
+  text-align:center;
+  border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.kpi-num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:56px;
+  color:var(--leaf-deep);
+  font-weight:300;
+  line-height:1;
+  margin-bottom:8px;
+  letter-spacing:0.02em;
+}
+.kpi-unit{
+  font-family:"Cormorant Garamond",serif;
+  font-size:22px;
+  color:var(--leaf);
+  margin-left:4px;
+}
+.kpi-label{
+  font-size:12px;
+  color:var(--ink);
+  font-weight:600;
+  margin:14px 0 8px;
+  letter-spacing:0.15em;
+}
+.kpi-desc{font-size:11px;color:var(--mute);line-height:2;letter-spacing:0.06em}
+@media(max-width:720px){.kpi-num{font-size:40px}}
+
+/* ============== MI（ミー育成セクション） ============== */
+.mi{background:#fff;position:relative;overflow:hidden}
+.mi::before{
+  content:"";
+  position:absolute;
+  top:0;right:-100px;
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(232,182,188,0.18) 0%,transparent 70%);
+  pointer-events:none;
+}
+.mi::after{
+  content:"";
+  position:absolute;
+  bottom:0;left:-100px;
+  width:380px;height:380px;
+  background:radial-gradient(circle,rgba(122,144,112,0.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.mi-intro{
+  display:inline-block;
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:14px;
+  letter-spacing:0.32em;
+  color:var(--pink);
+  background:var(--pink-light);
+  padding:8px 24px;
+  border-radius:999px;
+  margin-bottom:24px;
+}
+.mi-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+  max-width:880px;
+  margin:0 auto;
+}
+@media(max-width:720px){.mi-grid{grid-template-columns:repeat(2,1fr)}}
+.mi-card{
+  background:linear-gradient(180deg,#fdfaf6 0%,#fff 100%);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:24px 12px 20px;
+  text-align:center;
+  position:relative;
+}
+.mi-svg-wrap{
+  width:120px;
+  height:120px;
+  margin:0 auto 14px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.mi-svg-wrap svg{max-width:100%;max-height:100%}
+.mi-svg-wrap.locked .svg-content{
+  filter:blur(12px) saturate(0.55);
+  opacity:0.6;
+}
+.mi-svg-wrap.locked::after{
+  content:"?";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"Cormorant Garamond",serif;
+  font-size:64px;
+  color:var(--pink);
+  font-weight:300;
+  font-style:italic;
+  letter-spacing:0;
+  text-shadow:0 2px 12px rgba(255,255,255,0.8);
+}
+.mi-label{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:11px;
+  letter-spacing:0.3em;
+  color:var(--leaf-deep);
+  display:block;
+  margin-bottom:4px;
+}
+.mi-name{
+  font-size:11.5px;
+  color:var(--ink);
+  letter-spacing:0.05em;
+}
+.mi-name.locked{color:var(--mute);font-style:italic}
+.mi-bottom{
+  margin-top:56px;
+  padding:48px 40px;
+  background:linear-gradient(135deg,#fdfaf6 0%,#fce8eb 100%);
+  border-radius:24px;
+  text-align:center;
+  max-width:720px;
+  margin-left:auto;margin-right:auto;
+  position:relative;
+}
+.mi-bottom .gift{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:13px;
+  letter-spacing:0.32em;
+  color:var(--pink);
+  margin-bottom:16px;
+  display:block;
+}
+.mi-bottom h3{
+  font-family:"Yu Mincho",serif;
+  font-size:22px;
+  font-weight:500;
+  line-height:1.85;
+  letter-spacing:0.06em;
+  margin-bottom:20px;
+}
+.mi-bottom h3 .em{color:var(--leaf-deep);font-weight:600}
+.mi-bottom p{
+  font-size:13.5px;
+  line-height:2.1;
+  color:var(--sub);
+  letter-spacing:0.06em;
+  max-width:480px;
+  margin:0 auto;
+}
+.mi-tagline{
+  font-family:"Yu Mincho",serif;
+  font-size:18px;
+  text-align:center;
+  color:var(--leaf-deep);
+  margin-top:40px;
+  letter-spacing:0.1em;
+  font-weight:500;
+}
+.mi-tagline::before,.mi-tagline::after{
+  content:"—";
+  margin:0 16px;
+  color:var(--leaf);
+}
+@media(max-width:720px){
+  .mi-bottom h3{font-size:17px}
+  .mi-tagline{font-size:15px}
+}
+
+/* ============== OKR ============== */
+.okr{background:#fff}
+.okr-list{max-width:680px;margin:0 auto}
+.okr-step{
+  display:grid;
+  grid-template-columns:90px 1fr;
+  gap:40px;
+  padding:36px 0;
+  border-bottom:1px solid var(--line-soft);
+}
+.okr-step:last-child{border-bottom:none}
+@media(max-width:720px){.okr-step{grid-template-columns:1fr;gap:8px}}
+.okr-step-num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:36px;
+  color:var(--leaf);
+  font-weight:400;
+  line-height:1;
+}
+.okr-step-tag{
+  display:block;
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:10px;
+  letter-spacing:0.3em;
+  color:var(--mute);
+  margin-top:8px;
+}
+.okr-step h4{
+  font-family:"Yu Mincho",serif;
+  font-size:18px;
+  font-weight:500;
+  margin-bottom:10px;
+  letter-spacing:0.05em;
+}
+.okr-step p{
+  font-size:13.5px;
+  line-height:2.05;
+  color:var(--sub);
+  letter-spacing:0.06em;
+}
+
+/* ============== RULES ============== */
+.rules{background:var(--bg-soft)}
+.rules-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:48px;
+  max-width:920px;
+  margin:0 auto;
+}
+@media(max-width:720px){.rules-grid{grid-template-columns:1fr;gap:32px}}
+.rule-card{
+  background:#fff;
+  padding:48px 40px;
+  border:1px solid var(--line);
+  position:relative;
+}
+.rule-card h3{
+  font-family:"Yu Mincho",serif;
+  font-size:18px;
+  font-weight:600;
+  margin-bottom:24px;
+  color:var(--leaf-deep);
+  letter-spacing:0.08em;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--line);
+}
+.rule-card ul{list-style:none;padding:0}
+.rule-card li{
+  font-size:14px;
+  line-height:2.1;
+  color:var(--ink);
+  padding-left:18px;
+  position:relative;
+  margin-bottom:14px;
+  letter-spacing:0.06em;
+}
+.rule-card li::before{
+  content:"";
+  position:absolute;
+  left:0;top:14px;
+  width:6px;height:1px;
+  background:var(--leaf);
+}
+.rule-card li strong{color:var(--leaf-deep);font-weight:600}
+
+/* ============== VOICES ============== */
+.voices{background:#fff}
+.voice-list{max-width:780px;margin:0 auto}
+.voice-item{
+  padding:48px 0;
+  border-bottom:1px solid var(--line-soft);
+}
+.voice-item:last-child{border-bottom:none}
+.voice-q{
+  font-family:"Yu Mincho",serif;
+  font-size:18px;
+  line-height:2.1;
+  color:var(--ink);
+  margin-bottom:24px;
+  letter-spacing:0.06em;
+  position:relative;
+  padding-left:36px;
+}
+.voice-q::before{
+  content:"〝";
+  font-family:"Cormorant Garamond",serif;
+  position:absolute;
+  left:0;top:-8px;
+  font-size:36px;
+  color:var(--leaf);
+  font-weight:400;
+}
+.voice-who{
+  font-size:11px;
+  color:var(--mute);
+  letter-spacing:0.18em;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding-left:36px;
+}
+.voice-meta{
+  display:inline-block;
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:11px;
+  color:var(--leaf-deep);
+  letter-spacing:0.15em;
+}
+
+/* ============== SCHEDULE ============== */
+.schedule{background:var(--bg-soft)}
+.schedule-list{max-width:720px;margin:0 auto}
+.schedule-row{
+  display:grid;
+  grid-template-columns:150px 1fr;
+  gap:48px;
+  padding:32px 0;
+  border-bottom:1px solid var(--line);
+  align-items:start;
+}
+.schedule-row:last-child{border-bottom:none}
+@media(max-width:720px){.schedule-row{grid-template-columns:1fr;gap:6px;padding:24px 0}}
+.schedule-when{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:14px;
+  color:var(--leaf-deep);
+  letter-spacing:0.18em;
+  font-weight:500;
+}
+.schedule-what h4{
+  font-family:"Yu Mincho",serif;
+  font-size:16px;
+  font-weight:500;
+  margin-bottom:6px;
+  letter-spacing:0.06em;
+}
+.schedule-what p{
+  font-size:13px;
+  color:var(--sub);
+  line-height:2;
+  letter-spacing:0.06em;
+}
+
+/* ============== FAQ ============== */
+.faq{background:#fff}
+.faq-list{max-width:680px;margin:0 auto}
+.faq-item{
+  padding:32px 0;
+  border-bottom:1px solid var(--line-soft);
+}
+.faq-item:last-child{border-bottom:none}
+.faq-q{
+  font-family:"Yu Mincho",serif;
+  font-size:16px;
+  font-weight:500;
+  margin-bottom:14px;
+  color:var(--ink);
+  position:relative;
+  padding-left:36px;
+  letter-spacing:0.05em;
+}
+.faq-q::before{
+  content:"Q.";
+  font-family:"Cormorant Garamond",serif;
+  position:absolute;
+  left:0;top:-2px;
+  color:var(--leaf);
+  font-size:20px;font-weight:500;
+  letter-spacing:0.04em;
+}
+.faq-a{
+  font-size:13.5px;
+  line-height:2.15;
+  color:var(--sub);
+  padding-left:36px;
+  letter-spacing:0.06em;
+}
+
+/* ============== CTA BLOCK ============== */
+.cta-block{
+  text-align:center;
+  padding:128px 24px;
+  background:#fff;
+  position:relative;
+  border-top:1px solid var(--line-soft);
+}
+.cta-inner{position:relative;z-index:2;max-width:560px;margin:0 auto}
+.cta-block h2{
+  font-family:"Yu Mincho",serif;
+  font-size:32px;
+  line-height:1.85;
+  margin-bottom:32px;
+  font-weight:400;
+  letter-spacing:0.08em;
+}
+.cta-block h2 .em{color:var(--leaf-deep);font-weight:600}
+.cta-block .lead{
+  font-size:14px;color:var(--sub);max-width:520px;margin:0 auto 48px;line-height:2.2;letter-spacing:0.08em;
+}
+@media(max-width:720px){.cta-block h2{font-size:24px}}
+
+/* ============== FOOTER ============== */
+footer{
+  background:#fdfaf6;
+  color:var(--mute);
+  padding:80px 24px 40px;
+  text-align:center;
+  font-size:12px;
+  letter-spacing:0.15em;
+}
+footer .brand-mark{margin-bottom:24px}
+footer .slogan{
+  font-family:"Cormorant Garamond",serif;
+  font-style:italic;
+  font-size:14px;
+  color:var(--leaf-deep);
+  margin-bottom:32px;
+  letter-spacing:0.12em;
+}
+footer .info{font-size:11px;line-height:2;color:var(--mute)}
+footer .copy{
+  font-family:"Cormorant Garamond",serif;
+  font-size:11px;
+  color:var(--mute);
+  letter-spacing:0.18em;
+  margin-top:48px;
+  padding-top:32px;
+  border-top:1px solid var(--line);
+}
+</style>
+</head>
+<body>
+
+<!-- =================== LOGO MARK (公式ロゴ準拠) =================== -->
+<svg style="display:none">
+  <symbol id="re-mark" viewBox="0 0 200 200">
+    <defs>
+      <linearGradient id="leafG" x1="0%" y1="100%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#6fa6c0"/>
+        <stop offset="40%" stop-color="#7eb8a8"/>
+        <stop offset="100%" stop-color="#c5d574"/>
+      </linearGradient>
+      <linearGradient id="dotG" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#cad876"/>
+        <stop offset="100%" stop-color="#6ea5b0"/>
+      </linearGradient>
+    </defs>
+    <!-- 葉ハート（2本の曲線で構成） -->
+    <g fill="none" stroke="url(#leafG)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+      <!-- 左の葉ループ -->
+      <path d="M 95 138 C 55 110 50 78 70 62 C 92 46 110 70 105 90"/>
+      <!-- 右の葉ループ -->
+      <path d="M 95 138 C 128 108 125 78 110 64 C 92 50 78 72 88 90"/>
+      <!-- 下のしずく細線 -->
+      <path d="M 95 138 C 98 145 99 150 95 155"/>
+    </g>
+    <!-- 右半周のドット（小→大→中） -->
+    <g fill="url(#dotG)">
+      <circle cx="118" cy="22" r="4"/>
+      <circle cx="138" cy="28" r="5.5"/>
+      <circle cx="158" cy="42" r="7.5"/>
+      <circle cx="174" cy="62" r="9"/>
+      <circle cx="182" cy="86" r="10.5"/>
+      <circle cx="180" cy="112" r="10"/>
+      <circle cx="168" cy="134" r="8.5"/>
+      <circle cx="150" cy="150" r="6.5"/>
+    </g>
+    <!-- 左上の小ドット2つ -->
+    <circle cx="92" cy="22" r="3" fill="#a8c490"/>
+    <circle cx="74" cy="32" r="2.5" fill="#a8c490"/>
+  </symbol>
+</svg>
+
+<!-- ============== HERO ============== -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-logo logo-mark">
+      <svg class="symbol" width="110" height="110"><use href="#re-mark"/></svg>
+      <div class="text" style="font-size:38px;letter-spacing:0.06em">Re:alize</div>
+    </div>
+
+    <div class="hero-tag">A Community for Self-realization</div>
+
+    <h1>
+      自立しよう、<br>
+      <span class="accent">自分の足で立つ</span>と、<br>
+      <strong>気持ちいい。</strong>
+    </h1>
+
+    <p class="hero-sub">
+      Re:alizeは、自分の理想を実現するために、<br>
+      己を創り直す半年間のコミュニティです。
+    </p>
+    <p class="hero-meaning">
+      Realize <span class="sep">×</span> Re:start
+    </p>
+
+    <div class="hero-stat">
+      <div class="hero-stat-item">
+        <div class="hero-stat-num">99.62<span class="hero-stat-unit">%</span></div>
+        <div class="hero-stat-label">Weekly Report</div>
+      </div>
+      <div class="hero-stat-item">
+        <div class="hero-stat-num">3<span class="hero-stat-unit">期</span></div>
+        <div class="hero-stat-label">Operated</div>
+      </div>
+      <div class="hero-stat-item">
+        <div class="hero-stat-num">70<span class="hero-stat-unit">名+</span></div>
+        <div class="hero-stat-label">Members</div>
+      </div>
+    </div>
+
+    <a href="#cta-link" class="cta-btn primary">参加を検討する</a>
+    <span class="cta-note">※ 第4期 募集準備中</span>
+  </div>
+</header>
+
+<!-- ============== QUOTE ============== -->
+<section class="quote-block" style="padding:88px 24px">
+  <svg class="quote-logo"><use href="#re-mark"/></svg>
+  <p class="quote-text">
+    諦めるのは、いつだって<br>
+    自分が降りた時だけ。
+  </p>
+  <span class="quote-attr">— REALIZE PHILOSOPHY —</span>
+</section>
+
+<!-- ============== STORY ============== -->
+<section class="story">
+  <div class="wrap-narrow">
+    <div class="section-label">FOR YOU</div>
+    <h2 class="section-title">こんな自分、<br>思い当たりませんか。</h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">意志が弱いんじゃない。<br>続けるための仕組みを、まだ手に入れていないだけ。</p>
+    <ul class="story-list">
+      <li>1人だと、目標に向き合えない。</li>
+      <li>目標の立て方・管理が、よくわからない。</li>
+      <li>目標を達成できた経験が、あまりない。</li>
+      <li>習慣にすることが、なによりも苦手。</li>
+    </ul>
+    <p class="story-bottom">
+      ひとつでも当てはまるなら、<br>
+      Re:alizeは<span class="em">あなたのため</span>のコミュニティです。
+    </p>
+  </div>
+</section>
+
+<!-- ============== FUTURE ============== -->
+<section class="future">
+  <div class="wrap-narrow">
+    <div class="section-label">WHAT YOU GET</div>
+    <h2 class="section-title">半年後、<br>4つの自分に出会える。</h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">参加者が口を揃えて語る、Re:alize体験後の変化。</p>
+    <div class="future-list">
+      <div class="future-item">
+        <div class="future-num">01</div>
+        <div>
+          <h3>みんなで定期的に、目標に向き合える</h3>
+          <p>一人では諦めがちな目標も、仲間がいれば続く。「次の月曜までに」が、自然と力になります。</p>
+        </div>
+      </div>
+      <div class="future-item">
+        <div class="future-num">02</div>
+        <div>
+          <h3>自分に合った目標設定・管理を、マスターできる</h3>
+          <p>OKRシートで「ぼんやりした願い」を「今週、何をするか」まで分解する技術が身につきます。</p>
+        </div>
+      </div>
+      <div class="future-item">
+        <div class="future-num">03</div>
+        <div>
+          <h3>目標達成できる自分に、なれる</h3>
+          <p>3期通算、月間最高達成率1000%超の実績も。「達成したことがない」が、「達成できる」に変わる半年です。</p>
+        </div>
+      </div>
+      <div class="future-item">
+        <div class="future-num">04</div>
+        <div>
+          <h3>習慣にしたいことを、習慣にできる</h3>
+          <p>毎週のリズムが、いつしか体に染み込んでいく。「夢にまで週報が出る」ほどの定着力です。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== QUOTE 2 ============== -->
+<section class="quote-block" style="padding:88px 24px">
+  <svg class="quote-logo"><use href="#re-mark"/></svg>
+  <p class="quote-text">
+    ゲームオーバーになるのは<br>
+    時間切れと、自分からの離脱だけ。
+  </p>
+  <span class="quote-attr">— REALIZE PHILOSOPHY —</span>
+</section>
+
+<!-- ============== SYSTEM ============== -->
+<section class="system">
+  <div class="wrap">
+    <div class="section-label">THE SYSTEM</div>
+    <h2 class="section-title">続いてしまう仕組み、<br><span class="em">3本の柱。</span></h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">気合いではなく、構造で続ける。<br>Re:alizeの設計は、ただそれだけ。</p>
+
+    <div class="pillar">
+      <div class="pillar-visual">
+        <div class="pillar-visual-num">01</div>
+        <div class="pillar-visual-label">— WEEKLY REPORT —</div>
+      </div>
+      <div class="pillar-text">
+        <span class="pillar-num">PILLAR I</span>
+        <h3>毎週の<span class="em">目標報告・チェック</span></h3>
+        <p>毎週決まった曜日、目標に向けての進捗を一行ずつ報告。続けるためのリズムが、こうして自然と生まれます。OKRシートの指標の置き方には、運営からフィードバックも。「今週も出来なかった」が、ちゃんと前進に変わる仕組みです。</p>
+        <p class="pillar-feat">— 毎週月曜 23:59 締切 ／ 報告は5分 ／ 指標改善アドバイス付き</p>
+      </div>
+    </div>
+
+    <div class="pillar reverse">
+      <div class="pillar-text">
+        <span class="pillar-num">PILLAR II</span>
+        <h3>毎月の<span class="em">振返り MTG</span></h3>
+        <p>月に一度、参加メンバー全員でオンライン会議。上手くいっている人のやり方や事例をシェアしあい、達成上手になるチャンスを増やします。代表・清水からも、毎月「いまここで聞きたかった」テーマをひとつ共有。</p>
+        <p class="pillar-feat">— 定例会 ／ おしゃべり会 ／ もくもく作業会 ／ 月に複数回のオンライン接点</p>
+      </div>
+      <div class="pillar-visual">
+        <div class="pillar-visual-num">02</div>
+        <div class="pillar-visual-label">— MONTHLY MEETING —</div>
+      </div>
+    </div>
+
+    <div class="pillar">
+      <div class="pillar-visual">
+        <div class="pillar-visual-num">03</div>
+        <div class="pillar-visual-label">— COMMUNITY —</div>
+      </div>
+      <div class="pillar-text">
+        <span class="pillar-num">PILLAR III</span>
+        <h3>半年間の<span class="em">専用コミュニティ</span></h3>
+        <p>半年間、目標達成のためのフォローコミュニティへご招待。ひとりではなく、みんなで目標を追いかける環境がそこにあります。いつでも励まし合い、相談し合える仲間ができる。Re:alizeの本当の価値は、ここにあります。</p>
+        <p class="pillar-feat">— 専用 LINE グループ ／ 挫折してもOKの文化 ／ 月1「嬉しかったこと」共有</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== KPI ============== -->
+<section class="kpi">
+  <div class="wrap">
+    <div class="section-label">RESULTS</div>
+    <h2 class="section-title">数字でみる、<br>Re:alize の実績。</h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">3期にわたって運営し続けた、その軌跡。</p>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-num">99.62<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">週報提出率</div>
+        <div class="kpi-desc">前半3ヶ月、参加者ほぼ全員が完走</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">72.7<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">達成率90%超</div>
+        <div class="kpi-desc">3期参加者の約7割が目標の9割超を達成</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">1000<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">最高達成率</div>
+        <div class="kpi-desc">目標の10倍を達成した参加者も</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">3<span class="kpi-unit">期</span></div>
+        <div class="kpi-label">継続運営</div>
+        <div class="kpi-desc">第4期 募集準備中</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== MI（ミー育成セクション） ============== -->
+<section class="mi">
+  <div class="wrap">
+    <div class="section-label">YOUR COMPANION</div>
+    <h2 class="section-title">
+      育成ゲームをしながら、<br>
+      <span class="em">目標達成</span>できる。
+    </h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">
+      OKRシートの達成度に応じて、<br>
+      あなただけのキャラクター「ミー」が育っていきます。
+    </p>
+
+    <div class="mi-grid">
+      <!-- Stage 1: たまご（公開） -->
+      <div class="mi-card">
+        <div class="mi-svg-wrap">
+          <svg viewBox="0 0 200 200" width="120" height="120" class="svg-content">
+            <ellipse cx="100" cy="180" rx="42" ry="5" fill="#000" opacity="0.10"/>
+            <path d="M 100 30 C 60 30 54 100 54 132 C 54 166 72 180 100 180 C 128 180 146 166 146 132 C 146 100 140 30 100 30 Z" fill="#dcd5c8" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+            <ellipse cx="83" cy="78" rx="9" ry="16" fill="#fff" opacity="0.6"/>
+            <ellipse cx="93" cy="56" rx="4" ry="6" fill="#fff" opacity="0.78"/>
+          </svg>
+        </div>
+        <span class="mi-label">STAGE 01</span>
+        <div class="mi-name">たまご</div>
+      </div>
+
+      <!-- Stage 2-5: モザイク（お楽しみ） -->
+      <div class="mi-card">
+        <div class="mi-svg-wrap locked">
+          <svg viewBox="0 0 200 200" width="120" height="120" class="svg-content">
+            <ellipse cx="100" cy="172" rx="50" ry="5" fill="#000" opacity="0.12"/>
+            <path d="M 100 102 C 62 102 58 118 58 132 C 58 154 78 166 100 166 C 122 166 142 154 142 132 C 142 118 138 102 100 102 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round"/>
+            <circle cx="100" cy="138" r="9" fill="#f5b8c2"/>
+          </svg>
+        </div>
+        <span class="mi-label">STAGE 02</span>
+        <div class="mi-name locked">??????</div>
+      </div>
+
+      <div class="mi-card">
+        <div class="mi-svg-wrap locked">
+          <svg viewBox="0 0 200 200" width="120" height="120" class="svg-content">
+            <ellipse cx="100" cy="172" rx="52" ry="5" fill="#000" opacity="0.12"/>
+            <path d="M 100 90 C 50 90 42 108 42 124 C 42 152 74 166 100 166 C 126 166 158 152 158 124 C 158 108 150 90 100 90 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.3" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="mi-label">STAGE 03</span>
+        <div class="mi-name locked">??????</div>
+      </div>
+
+      <div class="mi-card">
+        <div class="mi-svg-wrap locked">
+          <svg viewBox="0 0 200 200" width="120" height="120" class="svg-content">
+            <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.12"/>
+            <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="mi-label">STAGE 04</span>
+        <div class="mi-name locked">??????</div>
+      </div>
+
+      <div class="mi-card">
+        <div class="mi-svg-wrap locked">
+          <svg viewBox="0 0 200 200" width="120" height="120" class="svg-content">
+            <defs>
+              <linearGradient id="mi-rb" x1="0" y1="0.3" x2="1" y2="0.7">
+                <stop offset="0%" stop-color="#f5a8a8"/><stop offset="36%" stop-color="#f5e4a0"/>
+                <stop offset="72%" stop-color="#a8c8e8"/><stop offset="100%" stop-color="#d4a8e8"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.12"/>
+            <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="url(#mi-rb)" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="mi-label">STAGE 05</span>
+        <div class="mi-name locked">??????</div>
+      </div>
+    </div>
+
+    <p class="mi-tagline">育成ゲームをしながら、目標達成できる</p>
+
+    <div class="mi-bottom">
+      <span class="gift">YOUR EXCLUSIVE GIFT</span>
+      <h3>
+        コンプリートすると<span class="em">…？</span><br>
+        何が起こるかは、お楽しみに。
+      </h3>
+      <p>
+        参加者全員に、<strong style="color:var(--leaf-deep)">あなただけの専用サイト</strong>をプレゼント。<br>
+        OKRシートの達成度に連動して、キャラ「ミー」が成長します。<br>
+        コンプリートした方だけが受け取れる、特別なご褒美もご用意しています。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============== OKR ============== -->
+<section class="okr">
+  <div class="wrap-narrow">
+    <div class="section-label">THE METHOD</div>
+    <h2 class="section-title">OKRシートで<br><span class="em">「願い」を「進捗」</span>に変える。</h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">ぼんやりした「いつかこうなりたい」を、<br>「今週、何回やる」まで分解する。</p>
+    <div class="okr-list">
+      <div class="okr-step">
+        <div class="okr-step-num">01<span class="okr-step-tag">SET A GOAL</span></div>
+        <div>
+          <h4>大きな目標を1つ、決める</h4>
+          <p>例「2028年に100日間、海外旅行に行く」。叶ったら最高、と思える具体的なゴールを1つ。</p>
+        </div>
+      </div>
+      <div class="okr-step">
+        <div class="okr-step-num">02<span class="okr-step-tag">DEFINE KRs</span></div>
+        <div>
+          <h4>3つのKR（Key Results）に分解</h4>
+          <p>例「①健康管理 ②ワーホリ準備 ③視野を広げる」。ゴール達成のための3本柱を設定。</p>
+        </div>
+      </div>
+      <div class="okr-step">
+        <div class="okr-step-num">03<span class="okr-step-tag">WEEKLY ACTION</span></div>
+        <div>
+          <h4>各KRに、週次のサブ目標</h4>
+          <p>例「週2回ジム／毎日日記／週1新しい人に会う」。CHA（チャレンジ）とCOM（コミット）の2段階で。</p>
+        </div>
+      </div>
+      <div class="okr-step">
+        <div class="okr-step-num">04<span class="okr-step-tag">REVIEW</span></div>
+        <div>
+          <h4>毎週、達成率と振り返りを記入</h4>
+          <p>「今週の結果／今週のタスク／今週の振り返り」を3行で。これだけで半年で26週ぶんの記録に。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== QUOTE 3 ============== -->
+<section class="quote-block">
+  <svg class="quote-logo"><use href="#re-mark"/></svg>
+  <p class="quote-text">
+    一番ひどい事実にこそ、<br>
+    一番の成長が眠っている。
+  </p>
+  <span class="quote-attr">— WORKSHOP RULE —</span>
+</section>
+
+<!-- ============== RULES ============== -->
+<section class="rules">
+  <div class="wrap">
+    <div class="section-label">CULTURE</div>
+    <h2 class="section-title">Re:alizeの<br><span class="em">2つのお作法。</span></h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">これがあるから、誰一人として置いていかれません。</p>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <h3>I &nbsp; アウトプット ＋ 自己開示</h3>
+        <ul>
+          <li><strong>「一番ひどい事実」</strong>にこそ、成長のチャンス</li>
+          <li>成功も失敗も、誰かの成功のタネ。アウトプットが成長を加速</li>
+          <li>自分から開示するから、相手も開示する</li>
+          <li>誰かの挑戦を笑う人がいたら、代表が必ず注意します</li>
+        </ul>
+      </div>
+      <div class="rule-card">
+        <h3>II &nbsp; 雰囲気づくりのルール</h3>
+        <ul>
+          <li><strong>褒める ／ 反応する ／ 率先してチャレンジ</strong></li>
+          <li>発言は Short・Simple・Straight</li>
+          <li>ネガティブは「どうすれば〜？」と課題に変換</li>
+          <li>上手くいかないのは、あなたではなく "課題" のせい</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== VOICES ============== -->
+<section class="voices">
+  <div class="wrap-narrow">
+    <div class="section-label">VOICES</div>
+    <h2 class="section-title">参加した方々の、<br>半年後の言葉。</h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">同じ「目標が続かない」から始まった、それぞれの物語。</p>
+    <div class="voice-list">
+      <div class="voice-item">
+        <p class="voice-q">入る前は、自分のことがあまり好きじゃありませんでした。今も「大好き」とまではいかないけど、頑張れている自分を、けっこう気に入ってる、ぐらいになれました。</p>
+        <p class="voice-who"><span class="voice-meta">体型 ／ 習慣</span>40代・北海道</p>
+      </div>
+      <div class="voice-item">
+        <p class="voice-q">数値化することで、モヤモヤしていたことがスッキリして、「やればいいだけなんだ」って気づくことができました。</p>
+        <p class="voice-who"><span class="voice-meta">習慣 ／ 思考</span>50代・北海道</p>
+      </div>
+      <div class="voice-item">
+        <p class="voice-q">記憶にある限り、人生で1日も継続できたことがなかったのに、1日も欠かさず30日継続できた。これは人生で初めてのことです。</p>
+        <p class="voice-who"><span class="voice-meta">習慣化</span>40代・千葉</p>
+      </div>
+      <div class="voice-item">
+        <p class="voice-q">うじうじ悩まなくなったのも成長と感じます。最終的に好きな物を買ったり、お友達とランチしたり、出かける機会も増えました。</p>
+        <p class="voice-who"><span class="voice-meta">看護師 ／ 働き方</span>30代・神奈川</p>
+      </div>
+      <div class="voice-item">
+        <p class="voice-q">勇気を出して自己開示して、良かったと思える環境に感謝です。ここにいる皆さんが優しすぎて、泣きそうになります。</p>
+        <p class="voice-who"><span class="voice-meta">SNS ／ 発信</span>20代・東京</p>
+      </div>
+      <div class="voice-item">
+        <p class="voice-q">諦めたのではなく、「今の自分、これからの自分に必要なものを考えてみた」結果でした。続けるって、こういうことなんだと思います。</p>
+        <p class="voice-who"><span class="voice-meta">物販 ／ 資格</span>30代・東京</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SCHEDULE ============== -->
+<section class="schedule">
+  <div class="wrap-narrow">
+    <div class="section-label">SCHEDULE</div>
+    <h2 class="section-title">半年間の、<br>おおまかな流れ。</h2>
+    <span class="section-divider"></span>
+    <p class="section-lead">毎月1回の定例＋自由参加のおしゃべり会・作業会。</p>
+    <div class="schedule-list">
+      <div class="schedule-row">
+        <div class="schedule-when">Month 01</div>
+        <div class="schedule-what">
+          <h4>キックオフ ＋ 目標設計</h4>
+          <p>OKRシートを一緒に作成。半年の目標と週次タスクまで分解する初回MTG。</p>
+        </div>
+      </div>
+      <div class="schedule-row">
+        <div class="schedule-when">Month 02</div>
+        <div class="schedule-what">
+          <h4>習慣定着期</h4>
+          <p>週次報告が体に染み込む時期。雰囲気づくり・自己開示の文化が育つ。</p>
+        </div>
+      </div>
+      <div class="schedule-row">
+        <div class="schedule-when">Month 03</div>
+        <div class="schedule-what">
+          <h4>前半総括 ＋ 軌道修正</h4>
+          <p>3ヶ月の振り返り。目標を変えても、立て直してもOK。「諦めなければ勝ち」。</p>
+        </div>
+      </div>
+      <div class="schedule-row">
+        <div class="schedule-when">Month 04</div>
+        <div class="schedule-what">
+          <h4>異常値ワーク</h4>
+          <p>自分の中の「変態性＝強み」を発見。3つの問いを通じて言語化していく。</p>
+        </div>
+      </div>
+      <div class="schedule-row">
+        <div class="schedule-when">Month 05</div>
+        <div class="schedule-what">
+          <h4>ラストスパート</h4>
+          <p>残された日数で、できる最大限を仲間と一緒に。「あと50日」のチカラ。</p>
+        </div>
+      </div>
+      <div class="schedule-row">
+        <div class="schedule-when">Month 06</div>
+        <div class="schedule-what">
+          <h4>完走 MTG ＋ 皆勤賞発表</h4>
+          <p>半年の総括。変わった自分を確認し、次の半年への一歩を決める。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FAQ ============== -->
+<section class="faq">
+  <div class="wrap-narrow">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">よくあるご質問</h2>
+    <span class="section-divider"></span>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">本当に続けられるか、不安です。</div>
+        <div class="faq-a">大丈夫です。3期、参加された方の多くが「最初は不安だった」と言っていました。途中で休んだ週があっても、目標を途中で変えても、戻ってこられる仕組みになっています。ゲームオーバーになるのは「時間切れ」か「自分からの離脱」だけ。時間切れなら、また始めればOKです。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">目標がまだ、はっきり決まっていません。</div>
+        <div class="faq-a">むしろ、それが普通です。キックオフMTGで、ご自身の目標を一緒に言語化していきます。「なんとなくこうなりたい」を「今週、これをやる」まで一緒に分解するのが、最初の1ヶ月のお仕事です。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">仕事や育児で、時間が取れるか心配です。</div>
+        <div class="faq-a">必須の時間は、週に5分の報告と、月1回のオンライン定例会（21:00-22:00）だけです。3期では、育児中・介護中・体調を崩されていた方も、最後まで参加されています。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">他の参加者の目には、私の弱音や未達も触れますか？</div>
+        <div class="faq-a">はい、共有する設計です。けれど、これまでに「批判」や「圧力」の起きたことは一度もありません。「もし人の開示を笑う人がいたら、必ず注意します」と運営から明言されているからです。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">人見知りで、グループが苦手です。</div>
+        <div class="faq-a">大丈夫です。発言は強制されません。週次報告は「書くだけ」で完結します。読むことから始めて、慣れてきたタイミングで少しずつ参加が増えていく方が、これまでも多くいらっしゃいました。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">どんな目標でも対象になりますか？</div>
+        <div class="faq-a">はい。収入・体重・資格・SNS・家族関係・生活習慣・学習・起業など、これまで参加された方の目標は多岐にわたります。ここでは、どんな目標も受け入れられます。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CTA BLOCK ============== -->
+<section class="cta-block" id="cta-link">
+  <div class="cta-inner">
+    <div class="section-label">START</div>
+    <h2>
+      6ヶ月後、<br>
+      <span class="em">続いている自分</span>に、<br>
+      会いに行く。
+    </h2>
+    <p class="lead">
+      「申し込んでみようかな」という気持ちは、たいてい数日で消えてしまいます。<br>
+      その小さな気持ちを、ここで一度だけ、立ち止まって受け取ってください。
+    </p>
+    <a href="#" class="cta-btn primary">参加を検討する・ご相談する</a>
+    <span class="cta-note">to entry form ›</span>
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer>
+  <div class="brand-mark">
+    <svg width="56" height="56"><use href="#re-mark"/></svg>
+  </div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:0.32em;color:var(--leaf-deep);margin-bottom:12px">Re:alize</div>
+  <div class="slogan">— 自立しよう、自分の足で立つと気持ちいい —</div>
+  <div class="info">相互応援型 目標達成コミュニティ ／ Operated by Merone Inc.</div>
+  <div class="copy">Copyright © 2026 Merone Inc. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
