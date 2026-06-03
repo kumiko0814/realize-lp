@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>育成失敗ルート ｜ おやじミー 5段階</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Yu Gothic","YuGothic","游ゴシック","Hiragino Kaku Gothic ProN",sans-serif;
+  background:linear-gradient(180deg,#f5f2ed 0%,#ece8e0 60%);
+  color:#1a1a1a;min-height:100vh;padding:40px 20px;line-height:1.7;
+}
+.head{text-align:center;margin-bottom:32px}
+.head .logo{font-family:"Cormorant Garamond",serif;font-size:24px;letter-spacing:0.3em;color:#8a6e5c;font-weight:600}
+.head h1{font-size:18px;margin-top:8px;letter-spacing:0.1em}
+.head .warn{
+  display:inline-block;
+  font-size:11px;color:#8a4a3a;background:#f0d6cc;
+  padding:6px 18px;border-radius:999px;margin-top:14px;letter-spacing:0.15em;
+}
+.head p{font-size:12px;color:#5a5a5a;margin-top:10px}
+.grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:#fff;border:1px solid #d8d2c5;border-radius:18px;padding:18px 14px;text-align:center}
+.stage-num{
+  display:inline-block;font-family:"Cormorant Garamond",serif;
+  font-size:11px;letter-spacing:0.3em;color:#8a6e5c;
+  border:1px solid #8a6e5c;padding:3px 10px;border-radius:999px;margin-bottom:10px;
+}
+.arena{
+  width:100%;height:200px;
+  background:linear-gradient(180deg,#f5ede2 0%,#e8ddc8 100%);
+  border:1px solid #d8d2c5;border-radius:14px;
+  position:relative;overflow:hidden;margin-bottom:10px;
+}
+.arena::after{
+  content:"";position:absolute;left:10%;right:10%;bottom:14px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(80,68,55,0.22) 20%,rgba(80,68,55,0.22) 80%,transparent);
+}
+.walker{position:absolute;bottom:0;left:50%;width:190px;height:190px;margin-left:-95px}
+.bouncer{width:100%;height:100%;animation:slouch 3s ease-in-out infinite}
+.walker svg{width:100%;height:100%;display:block}
+.walker.sway{animation:sway 5s ease-in-out infinite}
+.walker.drift{animation:drift 8s ease-in-out infinite}
+
+@keyframes slouch{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes drift{
+  0%{transform:translateX(-12%)}
+  50%{transform:translateX(12%)}
+  100%{transform:translateX(-12%)}
+}
+
+.name{font-size:14px;font-weight:700;letter-spacing:0.05em;margin-top:4px}
+.cond{font-size:11px;color:#5a5a5a;letter-spacing:0.05em;margin-top:4px}
+.foot{text-align:center;margin-top:30px;font-size:11px;color:#5a5a5a;letter-spacing:0.1em}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="logo">Re:alize</div>
+  <h1>育成失敗ルート ｜ おやじミー 5段階</h1>
+  <div class="warn">⚠ 達成率が低いと、こちらのルートへ…</div>
+  <p>たまごっち「おやじっち」インスパイアの戒めキャラ。可愛さの代わりに哀愁。</p>
+</div>
+
+<div class="grid">
+
+  <!-- 01 ひび卵 -->
+  <div class="card">
+    <span class="stage-num">STAGE 01</span>
+    <div class="arena">
+      <div class="walker sway">
+        <div class="bouncer">
+          <svg viewBox="0 0 200 200">
+            <ellipse cx="100" cy="180" rx="42" ry="5" fill="#000" opacity="0.18"/>
+            <!-- 黒ずんだ卵 -->
+            <path d="M 100 30 C 60 30 54 100 54 132 C 54 166 72 180 100 180 C 128 180 146 166 146 132 C 146 100 140 30 100 30 Z" fill="#bdb4a6" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+            <!-- 斑点 -->
+            <circle cx="75" cy="100" r="4" fill="#8a7a68" opacity="0.55"/>
+            <circle cx="120" cy="80" r="3" fill="#8a7a68" opacity="0.55"/>
+            <circle cx="115" cy="135" r="5" fill="#8a7a68" opacity="0.55"/>
+            <circle cx="80" cy="148" r="3" fill="#8a7a68" opacity="0.55"/>
+            <!-- ひび割れ -->
+            <path d="M 85 60 L 90 70 L 86 78 L 92 88" stroke="#5b554d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 130 110 L 134 120 L 128 130" stroke="#5b554d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- ヨダレ的シミ -->
+            <ellipse cx="100" cy="170" rx="14" ry="3" fill="#8a6e5c" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="name">ひび卵</div>
+    <div class="cond">なんか嫌な予感が…</div>
+  </div>
+
+  <!-- 02 おやじベイビー -->
+  <div class="card">
+    <span class="stage-num">STAGE 02</span>
+    <div class="arena">
+      <div class="walker">
+        <div class="bouncer">
+          <svg viewBox="0 0 200 200">
+            <ellipse cx="100" cy="170" rx="42" ry="4" fill="#000" opacity="0.15"/>
+            <!-- ボディ（ぽっこり気味、くすんだ色） -->
+            <path d="M 100 102 C 62 102 58 118 58 132 C 58 156 78 168 100 168 C 122 168 142 156 142 132 C 142 118 138 102 100 102 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- ぽっこりお腹 -->
+            <ellipse cx="100" cy="140" rx="28" ry="20" fill="#c4baa6"/>
+            <!-- ハゲた頭部分（ピンク） -->
+            <ellipse cx="100" cy="106" rx="22" ry="6" fill="#e8baa6"/>
+            <!-- サイドの髪 -->
+            <path d="M 74 100 Q 74 88 86 92" fill="#3a342d" stroke="#3a342d" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 126 100 Q 126 88 114 92" fill="#3a342d" stroke="#3a342d" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- 耳（小さく下がり気味） -->
+            <path d="M 72 108 L 70 96 L 84 104 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 128 108 L 130 96 L 116 104 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- ジト目（半開き） -->
+            <path d="M 82 124 L 92 124" stroke="#3a342d" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 108 124 L 118 124" stroke="#3a342d" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="87" cy="125" r="1.5" fill="#3a342d"/>
+            <circle cx="113" cy="125" r="1.5" fill="#3a342d"/>
+            <!-- ヨダレ -->
+            <ellipse cx="100" cy="142" rx="2.5" ry="5" fill="#a8c4d4" opacity="0.85"/>
+            <!-- おしゃぶり（垂れてる） -->
+            <circle cx="100" cy="148" r="7" fill="#c4baa6" stroke="#3a342d" stroke-width="1.8"/>
+            <!-- 短い手足 -->
+            <ellipse cx="74" cy="162" rx="7" ry="4" fill="#a89e8c" stroke="#3a342d" stroke-width="2.2"/>
+            <ellipse cx="92" cy="164" rx="7" ry="4" fill="#a89e8c" stroke="#3a342d" stroke-width="2.2"/>
+            <ellipse cx="108" cy="164" rx="7" ry="4" fill="#a89e8c" stroke="#3a342d" stroke-width="2.2"/>
+            <ellipse cx="126" cy="162" rx="7" ry="4" fill="#a89e8c" stroke="#3a342d" stroke-width="2.2"/>
+            <!-- しっぽ短い -->
+            <path d="M 140 138 Q 152 134 148 124" stroke="#3a342d" stroke-width="2.5" fill="#a89e8c" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="name">おやじベイビー</div>
+    <div class="cond">既に風格が出始める</div>
+  </div>
+
+  <!-- 03 あんよ期おじ -->
+  <div class="card">
+    <span class="stage-num">STAGE 03</span>
+    <div class="arena">
+      <div class="walker drift">
+        <div class="bouncer">
+          <svg viewBox="0 0 200 200">
+            <ellipse cx="100" cy="172" rx="52" ry="5" fill="#000" opacity="0.15"/>
+            <!-- ボディ（中サイズ、くすみ） -->
+            <path d="M 100 90 C 50 90 42 108 42 124 C 42 152 74 166 100 166 C 126 166 158 152 158 124 C 158 108 150 90 100 90 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.3" stroke-linejoin="round"/>
+            <!-- ぽっこりお腹 -->
+            <ellipse cx="100" cy="130" rx="34" ry="24" fill="#c4baa6"/>
+            <!-- ハゲた頭頂 -->
+            <ellipse cx="100" cy="96" rx="28" ry="8" fill="#e8baa6"/>
+            <!-- ハイライト（テカリ） -->
+            <ellipse cx="93" cy="94" rx="7" ry="2.5" fill="#fff" opacity="0.55"/>
+            <!-- サイド髪（薄め） -->
+            <path d="M 70 96 Q 68 80 84 86" fill="#3a342d" stroke="#3a342d" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 130 96 Q 132 80 116 86" fill="#3a342d" stroke="#3a342d" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- 残りの髪一本（チョンマゲっぽく） -->
+            <path d="M 100 88 L 100 80" stroke="#3a342d" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- 耳（垂れ気味） -->
+            <path d="M 64 100 L 60 86 L 80 96 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 136 100 L 140 86 L 120 96 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- ジト目（下まぶた強調） -->
+            <path d="M 78 118 L 90 118" stroke="#3a342d" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M 110 118 L 122 118" stroke="#3a342d" stroke-width="3.2" stroke-linecap="round"/>
+            <circle cx="84" cy="120" r="1.8" fill="#3a342d"/>
+            <circle cx="116" cy="120" r="1.8" fill="#3a342d"/>
+            <!-- 下まぶたのクマ -->
+            <path d="M 78 124 Q 84 127 90 124" stroke="#8a6e5c" stroke-width="1.5" fill="none" opacity="0.7"/>
+            <path d="M 110 124 Q 116 127 122 124" stroke="#8a6e5c" stroke-width="1.5" fill="none" opacity="0.7"/>
+            <!-- 鼻 -->
+            <ellipse cx="100" cy="128" rx="3" ry="2.2" fill="#8a6e5c"/>
+            <!-- 口（への字） -->
+            <path d="M 93 134 Q 100 132 107 134" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- ちょっとヒゲ -->
+            <path d="M 88 137 Q 86 140 84 142" stroke="#3a342d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M 112 137 Q 114 140 116 142" stroke="#3a342d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- 短い手足 -->
+            <ellipse cx="62" cy="162" rx="9" ry="5" fill="#a89e8c" stroke="#3a342d" stroke-width="2.5"/>
+            <ellipse cx="84" cy="164" rx="9" ry="5" fill="#a89e8c" stroke="#3a342d" stroke-width="2.5"/>
+            <ellipse cx="116" cy="164" rx="9" ry="5" fill="#a89e8c" stroke="#3a342d" stroke-width="2.5"/>
+            <ellipse cx="138" cy="162" rx="9" ry="5" fill="#a89e8c" stroke="#3a342d" stroke-width="2.5"/>
+            <!-- しっぽ垂れ -->
+            <path d="M 158 134 Q 174 134 172 148" stroke="#3a342d" stroke-width="3" fill="#a89e8c" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="name">よちよちおじ</div>
+    <div class="cond">既におじさん化が進行</div>
+  </div>
+
+  <!-- 04 おやじミー -->
+  <div class="card">
+    <span class="stage-num">STAGE 04</span>
+    <div class="arena">
+      <div class="walker">
+        <div class="bouncer">
+          <svg viewBox="0 0 200 200">
+            <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.18"/>
+            <!-- ボディ（標準サイズ、くすみ） -->
+            <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+            <!-- ぽっこりお腹 -->
+            <ellipse cx="100" cy="124" rx="48" ry="34" fill="#c4baa6"/>
+            <!-- ヘソマーク -->
+            <circle cx="100" cy="138" r="2.5" fill="#8a6e5c"/>
+            <!-- ハゲた頭頂（広範囲） -->
+            <ellipse cx="100" cy="78" rx="36" ry="12" fill="#e8baa6"/>
+            <!-- テカリ -->
+            <ellipse cx="92" cy="74" rx="10" ry="3" fill="#fff" opacity="0.6"/>
+            <ellipse cx="115" cy="80" rx="3" ry="1" fill="#fff" opacity="0.7"/>
+            <!-- サイド髪 -->
+            <path d="M 64 80 Q 60 60 84 72" fill="#3a342d" stroke="#3a342d" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 136 80 Q 140 60 116 72" fill="#3a342d" stroke="#3a342d" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- ちょん毛 -->
+            <path d="M 100 74 Q 98 64 102 60 Q 104 64 100 72" fill="#3a342d"/>
+            <!-- 耳（下がり気味） -->
+            <path d="M 56 88 L 50 72 L 76 84 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 144 88 L 150 72 L 124 84 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- ジト目 -->
+            <path d="M 72 106 L 88 106" stroke="#3a342d" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M 112 106 L 128 106" stroke="#3a342d" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="80" cy="109" r="2.2" fill="#3a342d"/>
+            <circle cx="120" cy="109" r="2.2" fill="#3a342d"/>
+            <!-- 下まぶたクマ（濃いめ） -->
+            <path d="M 70 114 Q 80 118 90 114" stroke="#8a6e5c" stroke-width="1.8" fill="none" opacity="0.8"/>
+            <path d="M 110 114 Q 120 118 130 114" stroke="#8a6e5c" stroke-width="1.8" fill="none" opacity="0.8"/>
+            <!-- 鼻（赤らみ） -->
+            <ellipse cx="100" cy="120" rx="5" ry="3.5" fill="#c4866e"/>
+            <!-- カイゼルひげ（左右にカール） -->
+            <path d="M 92 126 Q 78 128 70 122 Q 76 134 88 130" fill="#3a342d" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M 108 126 Q 122 128 130 122 Q 124 134 112 130" fill="#3a342d" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- 口（への字） -->
+            <path d="M 92 132 Q 100 128 108 132" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- ネクタイ（だらり） -->
+            <path d="M 100 156 L 95 158 L 100 178 L 105 158 Z" fill="#8a4a3a" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M 95 155 L 105 155 L 100 162 Z" fill="#8a4a3a" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- 短い手足 -->
+            <ellipse cx="50" cy="166" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
+            <ellipse cx="74" cy="170" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
+            <ellipse cx="126" cy="170" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
+            <ellipse cx="150" cy="166" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
+            <!-- しっぽ垂れ -->
+            <path d="M 178 116 Q 196 124 188 144" stroke="#3a342d" stroke-width="3.5" fill="#a89e8c" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- 汗マーク -->
+            <path d="M 36 50 Q 32 58 38 60 Q 42 58 38 50 Z" fill="#7eb8e0" opacity="0.7" stroke="#3a7aa8" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="name">おやじミー</div>
+    <div class="cond">完全におじさん化／カイゼルひげ＋ネクタイ</div>
+  </div>
+
+  <!-- 05 仙人おじ -->
+  <div class="card">
+    <span class="stage-num">STAGE 05</span>
+    <div class="arena">
+      <div class="walker">
+        <div class="bouncer">
+          <svg viewBox="0 0 200 200">
+            <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.2"/>
+            <!-- ボディ（標準、ややくすみ強め） -->
+            <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="#988e7c" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+            <!-- ぽっこりお腹 -->
+            <ellipse cx="100" cy="124" rx="48" ry="34" fill="#b4ab98"/>
+            <circle cx="100" cy="138" r="2.5" fill="#8a6e5c"/>
+            <!-- 完全ハゲ -->
+            <ellipse cx="100" cy="76" rx="42" ry="14" fill="#e8baa6"/>
+            <!-- テカリ最大 -->
+            <ellipse cx="92" cy="72" rx="14" ry="4" fill="#fff" opacity="0.7"/>
+            <ellipse cx="118" cy="80" rx="5" ry="1.5" fill="#fff" opacity="0.8"/>
+            <!-- 耳（垂れ） -->
+            <path d="M 56 92 L 50 76 L 76 88 Z" fill="#988e7c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M 144 92 L 150 76 L 124 88 Z" fill="#988e7c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- 老眼鏡 -->
+            <circle cx="80" cy="108" r="11" fill="none" stroke="#3a342d" stroke-width="2.5"/>
+            <circle cx="120" cy="108" r="11" fill="none" stroke="#3a342d" stroke-width="2.5"/>
+            <line x1="91" y1="108" x2="109" y2="108" stroke="#3a342d" stroke-width="2.5"/>
+            <!-- 眼鏡のレンズキラリ -->
+            <line x1="74" y1="103" x2="78" y2="100" stroke="#fff" stroke-width="1.5" opacity="0.85"/>
+            <line x1="114" y1="103" x2="118" y2="100" stroke="#fff" stroke-width="1.5" opacity="0.85"/>
+            <!-- 眠そうな目（眼鏡の下） -->
+            <path d="M 75 108 L 85 108" stroke="#3a342d" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M 115 108 L 125 108" stroke="#3a342d" stroke-width="2.8" stroke-linecap="round"/>
+            <circle cx="80" cy="110" r="1.5" fill="#3a342d"/>
+            <circle cx="120" cy="110" r="1.5" fill="#3a342d"/>
+            <!-- 鼻 -->
+            <ellipse cx="100" cy="120" rx="5" ry="3.5" fill="#c4866e"/>
+            <!-- 白い長いヒゲ（仙人風） -->
+            <path d="M 88 128 Q 84 138 80 150 Q 84 158 88 152 Q 92 145 92 134" fill="#e8e2d6" stroke="#5b554d" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M 112 128 Q 116 138 120 150 Q 116 158 112 152 Q 108 145 108 134" fill="#e8e2d6" stroke="#5b554d" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- 中央ひげ -->
+            <path d="M 96 130 Q 95 145 96 160 Q 100 162 104 160 Q 105 145 104 130" fill="#e8e2d6" stroke="#5b554d" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- 口（小さく） -->
+            <path d="M 96 132 Q 100 130 104 132" stroke="#3a342d" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <!-- ガウン襟 -->
+            <path d="M 76 158 L 100 168 L 124 158 L 122 172 L 78 172 Z" fill="#5b554d" stroke="#3a342d" stroke-width="2" stroke-linejoin="round"/>
+            <!-- 手足 -->
+            <ellipse cx="50" cy="166" rx="10" ry="6" fill="#988e7c" stroke="#3a342d" stroke-width="2.8"/>
+            <ellipse cx="150" cy="166" rx="10" ry="6" fill="#988e7c" stroke="#3a342d" stroke-width="2.8"/>
+            <!-- 杖 -->
+            <line x1="166" y1="62" x2="172" y2="170" stroke="#8a6e5c" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="167" cy="60" r="6" fill="#d4a574" stroke="#8a6e5c" stroke-width="2"/>
+            <!-- ため息マーク -->
+            <text x="40" y="50" font-family="Cormorant Garamond" font-size="20" font-style="italic" fill="#5b554d" opacity="0.6">…</text>
+            <text x="50" y="38" font-family="Cormorant Garamond" font-size="16" font-style="italic" fill="#5b554d" opacity="0.5">…</text>
+            <!-- しっぽ垂れ -->
+            <path d="M 178 124 Q 196 132 186 156" stroke="#3a342d" stroke-width="3.5" fill="#988e7c" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="name">仙人おじ</div>
+    <div class="cond">最終形／白ヒゲ＋老眼鏡＋杖</div>
+  </div>
+
+</div>
+
+<div class="foot">
+  「もうちょっと頑張ったら、可愛いミーに戻れるよ…」と言われる戒めキャラ
+</div>
+
+</body>
+</html>
