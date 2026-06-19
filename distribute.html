@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re:alize ｜ テスト配布パネル（運営用）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;--sub:#5a5a5a;--mute:#8b8278;
+  --bg:#fffaf6;--card:#fff;--line:#ece5d8;
+  --accent:#c25b3f;--leaf:#7a9070;--leaf-deep:#5a7050;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Yu Gothic","YuGothic",sans-serif;
+  background:var(--bg);color:var(--ink);
+  line-height:1.7;letter-spacing:0.04em;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;padding:32px 24px 64px}
+.head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 24px;background:#fff;border:1px solid var(--line);
+  border-radius:18px;margin-bottom:24px;
+}
+.logo{font-family:"Cormorant Garamond",serif;font-size:20px;letter-spacing:0.25em;color:var(--leaf-deep);font-weight:600}
+.tag{font-size:11px;color:var(--accent);letter-spacing:0.2em;background:#fdf2f4;padding:4px 12px;border-radius:999px}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px 28px;margin-bottom:18px}
+h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
+.sub{font-size:12px;color:var(--mute);margin-bottom:18px;line-height:1.85}
+
+.gen-row{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:14px;align-items:end}
+.gen-row label{display:block;font-size:11px;color:var(--mute);letter-spacing:0.15em;margin-bottom:6px}
+.gen-row input{
+  width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+  font-family:inherit;font-size:14px;outline:none;
+}
+.gen-row input:focus{border-color:var(--accent)}
+.btn{
+  background:var(--leaf-deep);color:#fff;border:none;padding:12px 24px;
+  font-family:inherit;font-size:13px;font-weight:600;letter-spacing:0.1em;
+  border-radius:10px;cursor:pointer;transition:all 0.25s;white-space:nowrap;
+}
+.btn:hover{background:var(--leaf);transform:translateY(-1px)}
+.btn.copy{background:var(--accent)}
+.btn.copy:hover{background:#a64626}
+
+.url-display{
+  background:#fdf6f3;border:1px solid #f0e5dc;border-radius:10px;
+  padding:14px 16px;font-family:"SF Mono","Menlo",monospace;
+  font-size:12px;word-break:break-all;color:var(--ink);margin:14px 0;
+}
+.tmpl-box{
+  background:#fdfaf6;border:1px solid var(--line);border-radius:10px;
+  padding:18px 20px;font-size:13px;line-height:1.95;
+  white-space:pre-wrap;font-family:"Yu Gothic",sans-serif;
+  color:var(--ink);margin:10px 0;letter-spacing:0.04em;
+}
+
+.member-list{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;
+}
+@media(max-width:720px){.member-list{grid-template-columns:1fr}}
+.member-row{
+  display:flex;justify-content:space-between;align-items:center;
+  background:#fdf6f3;border:1px solid #f0e5dc;border-radius:8px;
+  padding:10px 14px;font-size:12px;
+}
+.member-row .name{font-weight:600}
+.member-row .id{color:var(--mute);font-family:"SF Mono","Menlo",monospace;font-size:10px;letter-spacing:0.05em}
+
+.link-buttons{display:flex;gap:8px;align-items:center}
+.btn-mini{
+  background:#fff;border:1px solid var(--line);color:var(--ink);
+  font-family:inherit;font-size:10px;padding:4px 10px;
+  border-radius:6px;cursor:pointer;transition:all 0.2s;letter-spacing:0.06em;
+}
+.btn-mini:hover{border-color:var(--accent);color:var(--accent)}
+.btn-mini.copy{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-mini.copy:hover{background:#a64626}
+
+.section-divider{
+  height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);
+  margin:32px 0 20px;
+}
+
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--leaf-deep);color:#fff;padding:12px 24px;
+  border-radius:999px;font-size:13px;letter-spacing:0.1em;
+  box-shadow:0 8px 28px rgba(0,0,0,0.2);
+  opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:1000;
+}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="head">
+    <div class="logo">Re:alize</div>
+    <div class="tag">TEST DISTRIBUTION PANEL</div>
+  </header>
+
+  <!-- URL GENERATOR -->
+  <section class="card">
+    <h2>① 個別URLジェネレーター</h2>
+    <p class="sub">参加者の名前（英字推奨）を入力すると、その人だけの専用URLとLINE送付テンプレが出ます。</p>
+
+    <div class="gen-row">
+      <div>
+        <label>参加者の英字ID（例：mizutani, saeki, kanami）</label>
+        <input id="userInput" placeholder="mizutani" oninput="updateUrl()"/>
+      </div>
+      <button class="btn" onclick="updateUrl()">URL生成</button>
+    </div>
+
+    <div>
+      <label style="font-size:11px;color:var(--mute);letter-spacing:0.15em;display:block;margin-bottom:6px">使い方説明ページ（最初に送る）</label>
+      <div class="url-display" id="welcomeUrl">—</div>
+    </div>
+    <div>
+      <label style="font-size:11px;color:var(--mute);letter-spacing:0.15em;display:block;margin-bottom:6px">マイページ（直接アクセスもOK）</label>
+      <div class="url-display" id="dashboardUrl">—</div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn copy" onclick="copyUrl('welcome')">使い方URLをコピー</button>
+      <button class="btn copy" onclick="copyUrl('dashboard')">マイページURLをコピー</button>
+    </div>
+  </section>
+
+  <!-- LINE TEMPLATE -->
+  <section class="card">
+    <h2>② LINE送付テンプレ（コピペでそのまま使える）</h2>
+    <p class="sub">参加者個別LINEに、このまま送ってください。URLは上のIDで自動で埋まります。</p>
+
+    <div class="tmpl-box" id="lineTmpl">参加者IDを入れると、ここにテンプレが出ます</div>
+    <button class="btn copy" onclick="copyTmpl()">テンプレをコピー</button>
+  </section>
+
+  <!-- MEMBER LIST -->
+  <section class="card">
+    <h2>③ 既存参加者リスト（3期メンバー）</h2>
+    <p class="sub">既存OKRシートの参加者一覧。各人のIDからURLを生成済み。</p>
+    <div class="member-list" id="memberList"></div>
+  </section>
+
+  <!-- TEST ACCOUNTS -->
+  <section class="card">
+    <h2>④ お試し用URL（くみこ・翔ちゃん用）</h2>
+    <p class="sub">テスト動作確認用。誰でも使えるサンプル。</p>
+    <div class="member-list">
+      <div class="member-row">
+        <div>
+          <div class="name">くみこ（テスト）</div>
+          <div class="id">u=kumiko-test</div>
+        </div>
+        <div class="link-buttons">
+          <button class="btn-mini" onclick="openUrl('kumiko-test','welcome')">説明</button>
+          <button class="btn-mini" onclick="openUrl('kumiko-test','dashboard')">開く</button>
+          <button class="btn-mini copy" onclick="copyMember('kumiko-test')">📋</button>
+        </div>
+      </div>
+      <div class="member-row">
+        <div>
+          <div class="name">翔ちゃん（テスト）</div>
+          <div class="id">u=sho-test</div>
+        </div>
+        <div class="link-buttons">
+          <button class="btn-mini" onclick="openUrl('sho-test','welcome')">説明</button>
+          <button class="btn-mini" onclick="openUrl('sho-test','dashboard')">開く</button>
+          <button class="btn-mini copy" onclick="copyMember('sho-test')">📋</button>
+        </div>
+      </div>
+      <div class="member-row">
+        <div>
+          <div class="name">ゲスト（誰でも）</div>
+          <div class="id">u=guest</div>
+        </div>
+        <div class="link-buttons">
+          <button class="btn-mini" onclick="openUrl('guest','welcome')">説明</button>
+          <button class="btn-mini" onclick="openUrl('guest','dashboard')">開く</button>
+          <button class="btn-mini copy" onclick="copyMember('guest')">📋</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- HELP -->
+  <section class="card">
+    <h2>テスト配布の進め方（推奨）</h2>
+    <ol style="padding-left:24px;font-size:13px;line-height:2;color:var(--sub)">
+      <li>まず <strong>「④ お試し用URL」</strong> で動作確認（くみこ＆翔ちゃんで触る）</li>
+      <li>気になる調整があれば、その場でフィードバック</li>
+      <li>OKなら <strong>「③ 既存参加者リスト」</strong> から数人にテスト配布（5〜10名くらい）</li>
+      <li>1週間で「使いやすい？」「迷った？」を回収</li>
+      <li>反応見て、本配布 or 追加機能（グラフ／カウントダウン）開発の判断</li>
+    </ol>
+  </section>
+
+</div>
+
+<div class="toast" id="toast">コピーしました ✓</div>
+
+<script>
+const BASE = location.origin + location.pathname.replace('distribute.html','');
+
+const MEMBERS = [
+  {name:'水谷萌', id:'mizutani'},
+  {name:'佐伯真由美', id:'saeki'},
+  {name:'宇野瞳（HITOMI）', id:'hitomi'},
+  {name:'堂佛聡子', id:'dobutsu'},
+  {name:'森恵子（もりけいこ）', id:'mori'},
+  {name:'大山可奈子（かなこ）', id:'oyama'},
+  {name:'小倉可奈未（Kanami）', id:'kanami'},
+  {name:'石川愛子（ちゅん太郎）', id:'chuntaro'},
+  {name:'福島Butt尚子', id:'fukushima'},
+  {name:'牧野優子', id:'makino'},
+  {name:'宮田佳菜子（kana）', id:'kana'},
+  {name:'北澤実果子（Kitazawa）', id:'kitazawa'},
+  {name:'岩田佳子', id:'iwata'},
+  {name:'湯浅郁子（いくさん）', id:'iku'},
+  {name:'石原あさみ', id:'ishihara'},
+  {name:'米本恵美子（のの）', id:'nono'},
+  {name:'原田惇子（はらだあつこ）', id:'harada'},
+  {name:'田原まり子', id:'tahara'},
+  {name:'上鶴清美（きよみ）', id:'kiyomi'},
+  {name:'園田泰葉', id:'sonoda'},
+  {name:'岡野潤子（JUNKO）', id:'junko'},
+  {name:'池田駿人', id:'ikeda'},
+  {name:'上田ひかる', id:'ueda'}
+];
+
+function buildUrl(slug, page){
+  if(!slug) return '';
+  return BASE + page + '.html?u=' + encodeURIComponent(slug);
+}
+
+function updateUrl(){
+  const slug = document.getElementById('userInput').value.trim();
+  if(!slug){
+    document.getElementById('welcomeUrl').textContent = '—';
+    document.getElementById('dashboardUrl').textContent = '—';
+    document.getElementById('lineTmpl').textContent = '参加者IDを入れると、ここにテンプレが出ます';
+    return;
+  }
+  const welcomeUrl = buildUrl(slug, 'welcome');
+  const dashboardUrl = buildUrl(slug, 'dashboard');
+  document.getElementById('welcomeUrl').textContent = welcomeUrl;
+  document.getElementById('dashboardUrl').textContent = dashboardUrl;
+  document.getElementById('lineTmpl').textContent =
+`〜さん、お疲れさまです🌿
+
+Re:alizeの目標管理サイト、テスト配布させてください！
+
+ミーというキャラクターが、毎週の進捗に応じて育っていきます。
+（達成率が低いと、おやじ化していくのでお気をつけて…！笑）
+
+🟢 まず使い方の説明はこちら
+${welcomeUrl}
+
+🟡 マイページ（毎週ここに進捗を入力）
+${dashboardUrl}
+
+最初に「目標を編集／設定する」から、ご自身の大目標とKRを入れてみてください。
+わからないことあれば気軽に教えてくださいね☺️`;
+}
+
+function copyUrl(type){
+  const slug = document.getElementById('userInput').value.trim();
+  if(!slug){ showToast('参加者IDを入れてください'); return; }
+  const url = type === 'welcome' ? buildUrl(slug,'welcome') : buildUrl(slug,'dashboard');
+  navigator.clipboard.writeText(url);
+  showToast('URLをコピーしました ✓');
+}
+
+function copyTmpl(){
+  const tmpl = document.getElementById('lineTmpl').textContent;
+  if(tmpl.startsWith('参加者ID')){ showToast('参加者IDを入れてください'); return; }
+  navigator.clipboard.writeText(tmpl);
+  showToast('LINEテンプレをコピーしました ✓');
+}
+
+function copyMember(slug){
+  navigator.clipboard.writeText(buildUrl(slug, 'welcome'));
+  showToast('使い方URLをコピーしました ✓');
+}
+
+function openUrl(slug, page){
+  window.open(buildUrl(slug, page), '_blank');
+}
+
+let toastTimer;
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toast.classList.remove('show'), 2000);
+}
+
+// Render member list
+const list = document.getElementById('memberList');
+MEMBERS.forEach(m => {
+  const row = document.createElement('div');
+  row.className = 'member-row';
+  row.innerHTML = `
+    <div>
+      <div class="name">${m.name}</div>
+      <div class="id">u=${m.id}</div>
+    </div>
+    <div class="link-buttons">
+      <button class="btn-mini" onclick="openUrl('${m.id}','welcome')">説明</button>
+      <button class="btn-mini" onclick="openUrl('${m.id}','dashboard')">開く</button>
+      <button class="btn-mini copy" onclick="copyMember('${m.id}')">📋</button>
+    </div>
+  `;
+  list.appendChild(row);
+});
+</script>
+
+</body>
+</html>

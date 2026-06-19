@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re:alize ｜ あなただけの目標管理サイトへようこそ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;--sub:#5a5a5a;--mute:#8b8278;
+  --bg:#fffaf6;--card:#fff;--line:#ece5d8;
+  --accent:#c25b3f;--accent-deep:#a64626;
+  --leaf:#7a9070;--leaf-deep:#5a7050;
+  --pink:#e8b6bc;--pink-light:#fdf2f4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Yu Gothic","YuGothic","游ゴシック",sans-serif;
+  background:linear-gradient(180deg,#fffaf3 0%,#fdeede 100%);
+  color:var(--ink);line-height:1.85;letter-spacing:0.05em;
+  min-height:100vh;-webkit-font-smoothing:antialiased;font-feature-settings:"palt";
+}
+.wrap{max-width:720px;margin:0 auto;padding:48px 24px 80px}
+@media(max-width:720px){.wrap{padding:32px 20px 64px}}
+
+/* HERO */
+.hero{text-align:center;margin-bottom:56px}
+.logo{
+  font-family:"Cormorant Garamond",serif;
+  font-size:36px;letter-spacing:0.25em;
+  color:var(--leaf-deep);font-weight:600;margin-bottom:14px;
+}
+.welcome{
+  display:inline-block;font-family:"Cormorant Garamond",serif;
+  font-style:italic;font-size:13px;letter-spacing:0.32em;
+  color:var(--accent);background:var(--pink-light);
+  padding:6px 22px;border-radius:999px;margin-bottom:24px;
+}
+h1{
+  font-family:"Yu Mincho","游明朝",serif;
+  font-size:28px;font-weight:500;line-height:1.65;
+  letter-spacing:0.06em;margin-bottom:20px;
+}
+h1 .em{color:var(--leaf-deep);font-weight:600}
+.lead{font-size:14px;color:var(--sub);line-height:2.1;letter-spacing:0.08em}
+
+/* CARD */
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:20px;padding:36px 32px;margin-bottom:20px;
+}
+@media(max-width:720px){.card{padding:28px 24px}}
+
+/* STEPS */
+.step{
+  display:grid;grid-template-columns:64px 1fr;gap:24px;
+  padding:20px 0;border-bottom:1px solid #f5eee2;align-items:start;
+}
+.step:last-child{border-bottom:none}
+@media(max-width:720px){.step{grid-template-columns:1fr;gap:8px}}
+.step-num{
+  font-family:"Cormorant Garamond",serif;
+  font-size:42px;color:var(--accent);font-weight:500;line-height:1;
+}
+.step-num small{
+  display:block;font-size:10px;letter-spacing:0.3em;
+  color:var(--mute);margin-top:6px;font-style:italic;
+}
+.step h3{font-size:16px;font-weight:700;margin-bottom:10px;letter-spacing:0.05em}
+.step p{font-size:13.5px;color:var(--sub);line-height:2;letter-spacing:0.04em}
+.step .tip{
+  background:#fff8f0;border-left:3px solid var(--pink);
+  padding:10px 14px;font-size:12px;color:var(--sub);
+  margin-top:12px;border-radius:0 8px 8px 0;
+}
+
+/* CHARS PREVIEW */
+.chars{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0;
+}
+@media(max-width:720px){.chars{gap:10px}}
+.char-side{
+  background:#fdfaf6;border:1px solid var(--line);
+  border-radius:14px;padding:16px;text-align:center;
+}
+.char-side.fail{background:#f5ede2;border-color:#d8c8b0}
+.char-tag{
+  display:inline-block;font-family:"Cormorant Garamond",serif;
+  font-style:italic;font-size:10px;letter-spacing:0.25em;
+  padding:3px 12px;border-radius:999px;margin-bottom:8px;
+}
+.char-side.success .char-tag{background:var(--accent);color:#fff}
+.char-side.fail .char-tag{background:#8a6e5c;color:#fff}
+.char-svg{width:90px;height:90px;margin:6px auto}
+.char-name{font-size:12px;font-weight:700;margin-bottom:4px}
+.char-desc{font-size:10px;color:var(--mute);letter-spacing:0.05em}
+
+/* CTA */
+.cta-box{text-align:center;padding:48px 24px;background:#fff;border-radius:24px;border:1px solid var(--line);margin-top:32px}
+.cta-box h2{
+  font-family:"Yu Mincho",serif;font-size:20px;font-weight:500;
+  margin-bottom:24px;letter-spacing:0.06em;line-height:1.75;
+}
+.cta-box h2 .em{color:var(--leaf-deep);font-weight:600}
+.cta-btn{
+  display:inline-block;background:var(--accent);color:#fff;
+  font-family:inherit;font-size:14px;font-weight:700;letter-spacing:0.18em;
+  padding:18px 48px;border-radius:999px;text-decoration:none;
+  transition:all 0.3s;box-shadow:0 6px 20px rgba(194,91,63,0.25);
+}
+.cta-btn:hover{background:var(--accent-deep);transform:translateY(-2px)}
+.cta-note{display:block;font-size:11px;color:var(--mute);margin-top:14px;letter-spacing:0.1em;font-family:"Cormorant Garamond",serif;font-style:italic}
+
+/* FAQ */
+.faq-item{padding:18px 0;border-bottom:1px dashed var(--line)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;padding-left:24px;position:relative}
+.faq-q::before{content:"Q.";position:absolute;left:0;top:-2px;color:var(--accent);font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600}
+.faq-a{font-size:12.5px;color:var(--sub);line-height:1.95;padding-left:24px}
+
+footer{text-align:center;font-size:11px;color:var(--mute);margin-top:48px;letter-spacing:0.1em}
+footer .serif{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--leaf);margin-bottom:6px;display:block}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="logo">Re:alize</div>
+    <div class="welcome">FOR YOU</div>
+    <h1><span class="em">あなただけの</span><br>目標管理サイトへ、ようこそ。</h1>
+    <p class="lead">
+      毎週、ちょっとの数字を入れるだけ。<br>
+      キャラクター「ミー」が一緒に半年間、伴走します。
+    </p>
+  </div>
+
+  <!-- STEPS -->
+  <div class="card">
+    <div class="step">
+      <div class="step-num">01<small>SET YOUR GOAL</small></div>
+      <div>
+        <h3>最初に「目標を設定」する</h3>
+        <p>
+          サイトを開いたら、まずは <strong>「目標を編集／設定する」</strong> を開いて、自分の大目標と KR（達成軸）を入れていきます。
+        </p>
+        <div class="tip">
+          📌 例：大目標「2028年に100日間 海外旅行に行く」／ KR1「健康管理」／ サブ「毎日1時間運動 CHA:45 COM:25」<br>
+          ＊ CHA = チャレンジ目標（理想） ／ COM = コミット目標（最低ライン）
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">02<small>WEEKLY INPUT</small></div>
+      <div>
+        <h3>毎週月曜の夜、5分だけ進捗を入力</h3>
+        <p>
+          サイトを開いて <strong>「今週の振り返り」</strong> に、今週何回できたかをポチッと数字で入れるだけ。「今週の進捗を保存して、ミーを育てる」を押すと、自動でキャラが反応します。
+        </p>
+        <div class="tip">
+          📌 ゼロでも構いません。空欄＝0として計算されます。<br>
+          📌 体調・育児・仕事の事情で休んだ週も、堂々と 0 で送信してOK。
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">03<small>WATCH MI GROW</small></div>
+      <div>
+        <h3>ミーが育っていく姿を見届ける</h3>
+        <p>
+          達成度が高ければ、ミーは <strong>たまご → 子猫 → 大人 → レインボー</strong> と成長します。<br>
+          逆に未達が続くと…？ こちらは見てのお楽しみ。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARS -->
+  <div class="card">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:8px;letter-spacing:0.06em;text-align:center">2つのルートがあります</h3>
+    <p style="font-size:12px;color:var(--mute);text-align:center;margin-bottom:8px">達成率に応じて、左 or 右に育ちます</p>
+    <div class="chars">
+      <div class="char-side success">
+        <span class="char-tag">SUCCESS</span>
+        <svg class="char-svg" viewBox="0 0 200 200">
+          <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.12"/>
+          <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+          <path d="M 100 96 C 64 96 56 114 56 128 C 56 154 80 168 100 168 C 120 168 144 154 144 128 C 144 114 136 96 100 96 Z" fill="#e8e2d6"/>
+          <path d="M 56 82 L 52 62 L 78 80 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round"/>
+          <path d="M 144 82 L 148 62 L 122 80 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round"/>
+          <path d="M 60 79 L 56 67 L 75 78 Z" fill="#f0b6c0"/>
+          <path d="M 140 79 L 144 67 L 125 78 Z" fill="#f0b6c0"/>
+          <circle cx="80" cy="104" r="4.5" fill="#3a342d"/>
+          <circle cx="120" cy="104" r="4.5" fill="#3a342d"/>
+          <path d="M 96 118 L 100 122 L 104 118 Z" fill="#3a342d"/>
+          <path d="M 94 126 Q 100 128 106 126" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <ellipse cx="60" cy="120" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.85"/>
+          <ellipse cx="140" cy="120" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.85"/>
+          <ellipse cx="50" cy="166" rx="11" ry="6" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+          <ellipse cx="80" cy="168" rx="11" ry="6" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+          <ellipse cx="120" cy="168" rx="11" ry="6" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+          <ellipse cx="150" cy="166" rx="11" ry="6" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
+          <path d="M 176 112 Q 198 100 188 76" stroke="#3a342d" stroke-width="3.5" fill="#c2bbb0" stroke-linejoin="round"/>
+        </svg>
+        <div class="char-name">ミー（順調ルート）</div>
+        <div class="char-desc">続けるとレインボーへ</div>
+      </div>
+      <div class="char-side fail">
+        <span class="char-tag">FAIL</span>
+        <svg class="char-svg" viewBox="0 0 200 200">
+          <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.18"/>
+          <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
+          <ellipse cx="100" cy="124" rx="48" ry="34" fill="#c4baa6"/>
+          <circle cx="100" cy="138" r="2.5" fill="#8a6e5c"/>
+          <ellipse cx="100" cy="78" rx="36" ry="12" fill="#e8baa6"/>
+          <ellipse cx="92" cy="74" rx="10" ry="3" fill="#fff" opacity="0.6"/>
+          <path d="M 64 80 Q 60 60 84 72" fill="#3a342d" stroke="#3a342d" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M 136 80 Q 140 60 116 72" fill="#3a342d" stroke="#3a342d" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M 100 74 Q 98 64 102 60 Q 104 64 100 72" fill="#3a342d"/>
+          <path d="M 56 88 L 50 72 L 76 84 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round"/>
+          <path d="M 144 88 L 150 72 L 124 84 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round"/>
+          <path d="M 72 106 L 88 106" stroke="#3a342d" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M 112 106 L 128 106" stroke="#3a342d" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="80" cy="109" r="2.2" fill="#3a342d"/>
+          <circle cx="120" cy="109" r="2.2" fill="#3a342d"/>
+          <ellipse cx="100" cy="120" rx="5" ry="3.5" fill="#c4866e"/>
+          <path d="M 92 126 Q 78 128 70 122 Q 76 134 88 130" fill="#3a342d" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M 108 126 Q 122 128 130 122 Q 124 134 112 130" fill="#3a342d" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M 92 132 Q 100 128 108 132" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M 100 156 L 95 158 L 100 178 L 105 158 Z" fill="#8a4a3a" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
+          <ellipse cx="50" cy="166" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
+          <ellipse cx="74" cy="170" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
+          <ellipse cx="126" cy="170" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
+          <ellipse cx="150" cy="166" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
+        </svg>
+        <div class="char-name">おやじ（未達ルート）</div>
+        <div class="char-desc">達成すれば、また戻れる</div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--mute);text-align:center;margin-top:14px;letter-spacing:0.06em">⚠ 直近4週の達成度合いで判定。達成し始めると、ちゃんとミーに戻ります。</p>
+  </div>
+
+  <!-- FAQ -->
+  <div class="card">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;letter-spacing:0.06em">よくある質問</h3>
+    <div class="faq-item">
+      <div class="faq-q">他の人に進捗を見られたりしますか？</div>
+      <div class="faq-a">いいえ。記録はあなたのブラウザの中にだけ保存されます。運営にも他の参加者にも見られません。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">スマホとPCで同じ記録が見られますか？</div>
+      <div class="faq-a">いまのテスト版は、開いた端末ごとに記録が分かれます。最初に決めた端末（スマホ or PC）で続けて使うのがおすすめです。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">途中で目標を変えてもいいですか？</div>
+      <div class="faq-a">もちろん。「目標を編集／設定する」からいつでも書き換え可能。Re:alizeでは「目標を変えてもOK」が文化です。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">入力を忘れた週があったらどうなりますか？</div>
+      <div class="faq-a">大丈夫です。0として扱われるだけ。気づいたタイミングで戻って入力もできます。</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h2>準備はOK？<br><span class="em">マイページ</span>を開いてみましょう。</h2>
+    <a href="dashboard.html" class="cta-btn" id="goDashboard">マイページを開く →</a>
+    <span class="cta-note">— あなたとミーの半年間がはじまります —</span>
+  </div>
+
+  <footer>
+    <span class="serif">— Re:alize Test Version —</span>
+    Operated by Merone Inc. ／ Copyright © 2026
+  </footer>
+
+</div>
+
+<script>
+// URLパラメータがあればdashboardにも引き継ぐ
+const params = new URLSearchParams(location.search);
+if(params.has('u')){
+  document.getElementById('goDashboard').href = 'dashboard.html?u=' + encodeURIComponent(params.get('u'));
+}
+</script>
+
+</body>
+</html>

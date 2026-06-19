@@ -273,6 +273,32 @@ body{
   cursor:pointer;margin-left:8px;transition:all 0.2s;
 }
 .reset-btn:hover{border-color:var(--accent);color:var(--accent)}
+.help-link{
+  display:inline-block;font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:12px;color:var(--accent);margin-left:14px;letter-spacing:0.1em;
+}
+.help-link:hover{text-decoration:underline}
+
+/* ===== ONBOARDING ===== */
+.onboard{
+  background:linear-gradient(135deg,#fff8f0 0%,#fce8eb 100%);
+  border:1px solid #f0d6cc;border-radius:18px;
+  padding:24px 28px;margin-bottom:18px;
+  display:flex;gap:20px;align-items:flex-start;
+}
+@media(max-width:720px){.onboard{flex-direction:column;gap:14px;padding:20px}}
+.onboard-icon{
+  font-size:32px;flex-shrink:0;line-height:1;
+}
+.onboard h4{font-size:14px;font-weight:700;margin-bottom:8px;letter-spacing:0.06em;color:var(--accent)}
+.onboard p{font-size:12.5px;line-height:1.95;color:var(--ink);margin-bottom:10px}
+.onboard p strong{color:var(--accent-deep)}
+.onboard .ob-close{
+  background:transparent;border:1px solid var(--line);color:var(--mute);
+  font-family:inherit;font-size:11px;padding:5px 14px;border-radius:999px;
+  cursor:pointer;letter-spacing:0.1em;margin-top:6px;
+}
+.onboard .ob-close:hover{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -290,6 +316,21 @@ body{
       <span id="weekLabel">— Week 1 / 26 —</span>
     </div>
   </header>
+
+  <!-- ONBOARDING (初回のみ表示) -->
+  <div class="onboard" id="onboardBox" style="display:none">
+    <div class="onboard-icon">🌱</div>
+    <div style="flex:1">
+      <h4>はじめまして！ まずは目標を設定してね</h4>
+      <p>
+        画面を下にスクロールすると <strong>「目標を編集／設定する」</strong> のセクションがあります。<br>
+        ① 大目標を1つ ② KR（達成軸）を最大3つ ③ 各KRに具体的なサブ目標 を入れてみてください。<br>
+        全部入れたら、次の月曜から <strong>「今週の振り返り」</strong> に数字を入れていきましょう。
+      </p>
+      <button class="ob-close" onclick="closeOnboard()">わかった！ 始める →</button>
+      <a href="welcome.html" class="help-link" style="margin-left:8px">使い方をもう一度見る →</a>
+    </div>
+  </div>
 
   <!-- HERO -->
   <section class="hero-card" id="heroCard">
@@ -378,6 +419,7 @@ body{
   <footer class="footer-msg">
     <span class="serif">— You are not alone. —</span>
     Re:alize ｜ あなたの記録はこのブラウザにだけ保存されています
+    <a href="welcome.html" class="help-link">使い方を見る</a>
     <button class="reset-btn" id="resetBtn">記録をリセット</button>
   </footer>
 
@@ -1032,6 +1074,21 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 bindKREdit();
 render();
+
+// ===== ONBOARDING =====
+// 初回起動（履歴が空）の場合のみ表示
+const onboardKey = 're_alize_v2_onboard_' + userKey;
+function maybeShowOnboard(){
+  const dismissed = localStorage.getItem(onboardKey) === '1';
+  if(dismissed) return;
+  if(hasAnyEntry()) return;
+  document.getElementById('onboardBox').style.display = 'flex';
+}
+function closeOnboard(){
+  localStorage.setItem(onboardKey, '1');
+  document.getElementById('onboardBox').style.display = 'none';
+}
+maybeShowOnboard();
 </script>
 
 </body>
