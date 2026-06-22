@@ -598,7 +598,7 @@ function makeSlug(name){
 
 function getDashboardUrl(){
   const name = nameInput.value.trim() || 'guest';
-  return 'dashboard.html?u=' + makeSlug(name) + '&name=' + encodeURIComponent(name);
+  return 'dashboard.html?u=' + makeSlug(name) + '&name=' + encodeURIComponent(name) + '&demo=1';
 }
 
 function startExperience(){

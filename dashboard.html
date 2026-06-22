@@ -279,6 +279,49 @@ body{
 }
 .help-link:hover{text-decoration:underline}
 
+/* ===== DEMO PANEL ===== */
+.demo-panel{
+  background:linear-gradient(135deg,#fffbe6 0%,#fff4d6 100%);
+  border:1px solid #f0d77a;border-radius:18px;
+  padding:28px 26px 22px;margin-bottom:20px;position:relative;
+}
+.demo-panel::before{
+  content:"⚡ DEMO MODE";position:absolute;top:-11px;left:24px;
+  background:#d4a574;color:#fff;font-size:11px;letter-spacing:0.22em;
+  padding:4px 14px;border-radius:999px;font-weight:600;
+}
+.demo-panel h3{
+  font-size:14px;font-weight:700;margin-bottom:8px;color:#8a6e1c;letter-spacing:0.06em;
+}
+.demo-panel .lead{
+  font-size:12px;color:#a67a26;margin-bottom:18px;line-height:1.85;letter-spacing:0.04em;
+}
+.demo-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:720px){.demo-buttons{grid-template-columns:1fr}}
+.demo-btn{
+  background:#fff;border:1.5px solid #d4a574;color:#8a6e1c;
+  font-family:inherit;font-size:12.5px;font-weight:600;letter-spacing:0.04em;
+  padding:14px 16px;border-radius:12px;cursor:pointer;
+  transition:all 0.25s;text-align:left;line-height:1.55;
+}
+.demo-btn:hover{background:#d4a574;color:#fff;border-color:#a67a26}
+.demo-btn .label{
+  display:block;font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:10.5px;color:#a67a26;margin-bottom:5px;letter-spacing:0.15em;font-weight:500;
+}
+.demo-btn:hover .label{color:#fff}
+.demo-btn.warn{border-color:#8a6e5c;color:#5b4a3a}
+.demo-btn.warn .label{color:#8a6e5c}
+.demo-btn.warn:hover{background:#8a6e5c;color:#fff;border-color:#5b4a3a}
+.demo-btn.reset{border-color:#c25b3f;color:#c25b3f;text-align:center}
+.demo-btn.reset .label{color:#c25b3f}
+.demo-btn.reset:hover{background:#c25b3f;color:#fff;border-color:#a64626}
+.demo-note{
+  font-size:10.5px;color:#a87a26;margin-top:14px;letter-spacing:0.05em;
+  padding-top:10px;border-top:1px dashed #e8c87a;
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+}
+
 /* ===== BADGES ===== */
 .badge-grid{
   display:grid;grid-template-columns:repeat(6,1fr);gap:10px;
@@ -406,6 +449,35 @@ body{
       <span id="weekLabel">— Week 1 / 26 —</span>
     </div>
   </header>
+
+  <!-- DEMO PANEL (?demo=1 のとき表示) -->
+  <div class="demo-panel" id="demoPanel" style="display:none">
+    <h3>⚡ 早送りで全機能を体験する</h3>
+    <p class="lead">ボタンを押すと、進捗が自動入力されて週が進みます。<br>バッジ獲得→おやじ化→卒業証書まで、一気に体験できます。</p>
+    <div class="demo-buttons">
+      <button class="demo-btn" onclick="demoSimulate(5, 1.0)">
+        <span class="label">+ 1 MONTH (SUCCESS)</span>
+        5週分を高達成で入力 → バッジ1個獲得
+      </button>
+      <button class="demo-btn warn" onclick="demoSimulate(5, 0.15)">
+        <span class="label">+ 1 MONTH (FAIL)</span>
+        5週分を低達成で入力 → おやじ化を見る
+      </button>
+      <button class="demo-btn" onclick="demoSimulate(26, 1.0)">
+        <span class="label">⚡ 26 WEEKS (SUCCESS)</span>
+        一気に半年完走 → 卒業証書まで
+      </button>
+      <button class="demo-btn warn" onclick="demoSimulate(26, 0.10)">
+        <span class="label">⚡ 26 WEEKS (FAIL)</span>
+        一気に半年低達成 → 仙人おじ＋全「頑張りましょう」
+      </button>
+    </div>
+    <button class="demo-btn reset" style="width:100%;margin-top:10px" onclick="demoReset()">
+      <span class="label">↩ RESET</span>
+      記録を全部消して最初から
+    </button>
+    <div class="demo-note">※ このパネルは ?demo=1 を含むURLでのみ表示／本配布時は出ません</div>
+  </div>
 
   <!-- ONBOARDING (初回のみ表示) -->
   <div class="onboard" id="onboardBox" style="display:none">
@@ -1455,6 +1527,72 @@ function closeOnboard(){
   document.getElementById('onboardBox').style.display = 'none';
 }
 maybeShowOnboard();
+
+// ===== DEMO MODE =====
+const isDemoMode = params.get('demo') === '1';
+if(isDemoMode){
+  document.getElementById('demoPanel').style.display = 'block';
+  // demoモードの時はonboardingを隠す（重複表示を避ける）
+  document.getElementById('onboardBox').style.display = 'none';
+}
+
+// nameパラメータがあれば自動セット
+const nameParam = params.get('name');
+if(nameParam && !state.userName){
+  state.userName = nameParam;
+  saveState(state);
+  document.getElementById('userNameInput').value = nameParam;
+}
+
+function demoSimulate(weekCount, achieveRatio){
+  // 目標が未設定なら、デフォルトをセット
+  if(state.krs.length === 0 || state.krs.every(kr => kr.subs.every(s => !s.name || !s.cha))){
+    state.goal = state.goal || '2027年に100日間 海外旅行に行く';
+    state.krs = JSON.parse(JSON.stringify(DEFAULT_KRS));
+  }
+  if(!state.userName) state.userName = nameParam || 'デモ';
+
+  const startWeek = state.currentWeek;
+  const remainingWeeks = TOTAL_WEEKS - startWeek + 1;
+  const realWeekCount = Math.min(weekCount, remainingWeeks);
+  const targetWeek = startWeek + realWeekCount - 1;
+
+  state.krs.forEach(kr => kr.subs.forEach(sub => {
+    if(!sub.cha) return;
+    if(!sub.history) sub.history = [];
+    const weeklyTarget = sub.cha / TOTAL_WEEKS;
+    for(let w = startWeek - 1; w < targetWeek; w++){
+      while(sub.history.length <= w) sub.history.push(0);
+      const baseVal = weeklyTarget * achieveRatio;
+      // 軽くランダム性を加える（±15%）
+      const randomized = baseVal * (0.85 + Math.random() * 0.3);
+      sub.history[w] = Math.round(randomized * 10) / 10;
+    }
+  }));
+
+  const prevWeek = state.currentWeek;
+  state.currentWeek = Math.min(TOTAL_WEEKS, targetWeek + 1);
+  saveState(state);
+
+  // 月またぎ判定でバッジ自動付与
+  const newBadge = maybeAwardMonthlyBadges(prevWeek, state.currentWeek);
+  render();
+
+  if(newBadge){
+    setTimeout(()=>showBadgeModal(newBadge), 600);
+  }
+}
+
+function demoReset(){
+  if(!confirm('記録を全部リセットして、最初から始める？')) return;
+  localStorage.removeItem(storageKey);
+  localStorage.removeItem(onboardKey);
+  state = loadState();
+  state.currentWeek = 1;
+  if(nameParam) state.userName = nameParam;
+  saveState(state);
+  render();
+}
 </script>
 
 </body>
