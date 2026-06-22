@@ -279,6 +279,96 @@ body{
 }
 .help-link:hover{text-decoration:underline}
 
+/* ===== BADGES ===== */
+.badge-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:10px;
+}
+@media(max-width:720px){.badge-grid{grid-template-columns:repeat(3,1fr);gap:8px}}
+.badge-item{
+  background:#fff;border:1px solid var(--line-soft);border-radius:14px;
+  padding:14px 8px 12px;text-align:center;cursor:pointer;
+  transition:all 0.25s;position:relative;
+}
+.badge-item.locked{opacity:0.35;cursor:default}
+.badge-item.locked:hover{transform:none}
+.badge-item:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft)}
+.badge-svg-wrap{width:80px;height:80px;margin:0 auto 8px;position:relative}
+.badge-svg-wrap svg{width:100%;height:100%;display:block}
+.badge-month{
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:11px;letter-spacing:0.2em;color:var(--mute);
+  display:block;margin-bottom:4px;
+}
+.badge-rank{font-size:10px;font-weight:600;color:var(--ink);letter-spacing:0.04em}
+.badge-rank.gold{color:#a67a26}
+.badge-rank.pink{color:#c4536e}
+.badge-rank.light{color:#a87a86}
+.badge-rank.white{color:var(--mute)}
+.badge-item.locked .badge-rank{color:var(--mute)}
+.grad-btn-wrap{margin-top:20px;text-align:center}
+.grad-btn{
+  display:inline-block;background:linear-gradient(135deg,#f5d77a 0%,#e8b6bc 50%,#a67a26 100%);
+  color:#fff;font-family:"Yu Mincho","游明朝",serif;font-size:14px;font-weight:600;
+  letter-spacing:0.2em;padding:16px 36px;border-radius:999px;text-decoration:none;
+  box-shadow:0 6px 24px rgba(166,122,38,0.25);transition:all 0.3s;
+}
+.grad-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(166,122,38,0.35)}
+.grad-btn.locked{
+  background:#f0e8e0;color:var(--mute);box-shadow:none;cursor:default;
+  pointer-events:none;
+}
+
+/* ===== MODAL ===== */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(60,40,30,0.55);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-bg.show{display:flex;animation:fadeIn 0.4s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  background:linear-gradient(180deg,#fffaf3 0%,#fef0f2 100%);
+  border-radius:24px;padding:48px 36px 36px;max-width:480px;width:100%;
+  position:relative;text-align:center;overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,0.25);
+  animation:popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes popIn{from{transform:scale(0.6);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-sakura{
+  position:absolute;color:#f0a6b8;opacity:0.7;pointer-events:none;
+  animation:sakuraFall 6s linear infinite;font-size:18px;
+}
+@keyframes sakuraFall{
+  0%{transform:translateY(-30px) rotate(0deg);opacity:0}
+  10%{opacity:0.8}
+  90%{opacity:0.8}
+  100%{transform:translateY(480px) rotate(360deg);opacity:0}
+}
+.modal-badge-wrap{width:160px;height:160px;margin:0 auto 16px;position:relative}
+.modal-badge-wrap svg{width:100%;height:100%}
+.modal-title{
+  font-family:"Yu Mincho","游明朝",serif;font-size:20px;font-weight:600;
+  margin-bottom:6px;letter-spacing:0.08em;color:var(--ink);
+}
+.modal-sub{
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:12px;color:var(--mute);letter-spacing:0.25em;margin-bottom:24px;
+}
+.modal-message{
+  background:rgba(255,255,255,0.65);border-radius:14px;
+  padding:24px 22px;font-size:13.5px;line-height:2.15;
+  text-align:left;color:var(--ink);white-space:pre-wrap;
+  letter-spacing:0.04em;margin-bottom:24px;
+  border:1px solid rgba(232,182,188,0.4);
+}
+.modal-close{
+  background:var(--accent);color:#fff;border:none;
+  font-family:inherit;font-size:13px;font-weight:600;letter-spacing:0.18em;
+  padding:14px 32px;border-radius:999px;cursor:pointer;
+  transition:all 0.25s;
+}
+.modal-close:hover{background:var(--accent-deep)}
+
 /* ===== ONBOARDING ===== */
 .onboard{
   background:linear-gradient(135deg,#fff8f0 0%,#fce8eb 100%);
@@ -415,6 +505,35 @@ body{
     </div>
     <div class="history-grid" id="historyGrid"></div>
   </section>
+
+  <!-- MONTHLY BADGES -->
+  <section class="card">
+    <div class="card-head">
+      <div class="card-title">マンスリーバッジ 🌸</div>
+      <div class="card-meta">毎月の頑張りに、桜の証を</div>
+    </div>
+    <p class="card-sub">1ヶ月ごとに、その月の達成度に応じた桜のバッジが届きます。6ヶ月すべて集めると、卒業証書が開きます。</p>
+    <div class="badge-grid" id="badgeGrid"></div>
+    <div class="grad-btn-wrap">
+      <a href="#" class="grad-btn locked" id="gradLink">卒業証書を開く（6ヶ月達成後）</a>
+    </div>
+  </section>
+
+  <!-- MODAL -->
+  <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <span class="modal-sakura" style="left:10%;top:0;animation-delay:0s">🌸</span>
+      <span class="modal-sakura" style="left:30%;top:0;animation-delay:1.2s">🌸</span>
+      <span class="modal-sakura" style="left:60%;top:0;animation-delay:2.4s">🌸</span>
+      <span class="modal-sakura" style="left:85%;top:0;animation-delay:3.6s">🌸</span>
+      <span class="modal-sakura" style="left:48%;top:0;animation-delay:4.8s">🌸</span>
+      <div class="modal-badge-wrap" id="modalBadge"></div>
+      <div class="modal-title" id="modalTitle">バッジ</div>
+      <div class="modal-sub" id="modalSub">— MONTHLY BADGE —</div>
+      <div class="modal-message" id="modalMessage"></div>
+      <button class="modal-close" onclick="closeModal()">ありがとう ✕</button>
+    </div>
+  </div>
 
   <footer class="footer-msg">
     <span class="serif">— You are not alone. —</span>
@@ -987,12 +1106,19 @@ function saveWeek(){
     while(sub.history.length <= w) sub.history.push(0);
     sub.history[w] = val;
   });
+  const prevWeek = state.currentWeek;
   // advance week
   if(state.currentWeek < TOTAL_WEEKS) state.currentWeek++;
   saveState(state);
   triggerPop();
+  // 月またぎでバッジ発行
+  const newBadge = maybeAwardMonthlyBadges(prevWeek, state.currentWeek);
   render();
-  alert('今週のぶん、保存しました！ ミーがどう変化したかチェック ✨');
+  if(newBadge){
+    setTimeout(()=>showBadgeModal(newBadge), 600);
+  } else {
+    alert('今週のぶん、保存しました！ ミーがどう変化したかチェック ✨');
+  }
 }
 
 function triggerPop(){
@@ -1071,6 +1197,246 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   state = loadState();
   render();
 });
+
+/* ============================================================
+   BADGES — マンスリーバッジ＆メッセージ生成
+   ============================================================ */
+
+// 月数 = ceil(week / 4.33), 26週 → 6ヶ月
+function getMonthOfWeek(week){
+  return Math.min(6, Math.max(1, Math.ceil(week / (TOTAL_WEEKS / 6))));
+}
+
+// その月の週範囲 (1-indexed, 両端含む)
+function getMonthWeekRange(month){
+  const weeksPerMonth = TOTAL_WEEKS / 6;  // 約4.33
+  const start = Math.floor((month - 1) * weeksPerMonth) + 1;
+  const end = month === 6 ? TOTAL_WEEKS : Math.floor(month * weeksPerMonth);
+  return { start, end };
+}
+
+// その月の達成率を集計
+function calcMonthRatio(month){
+  const range = getMonthWeekRange(month);
+  let totalRatio = 0, count = 0;
+  state.krs.forEach(kr => kr.subs.forEach(sub => {
+    if(!sub.cha) return;
+    const hist = sub.history || [];
+    let monthSum = 0;
+    for(let w = range.start - 1; w < range.end && w < hist.length; w++){
+      monthSum += parseFloat(hist[w]) || 0;
+    }
+    const monthlyTarget = sub.cha / 6;
+    const ratio = monthlyTarget > 0 ? monthSum / monthlyTarget : 0;
+    totalRatio += ratio;
+    count++;
+  }));
+  return count > 0 ? totalRatio / count : 0;
+}
+
+// 月末スナップショット
+function takeMonthSnapshot(month){
+  const range = getMonthWeekRange(month);
+  return {
+    goal: state.goal || '',
+    krs: state.krs.map(kr => ({
+      name: kr.name,
+      subs: kr.subs.filter(s=>s.name).map(sub => {
+        const hist = sub.history || [];
+        let monthSum = 0;
+        for(let w = range.start - 1; w < range.end && w < hist.length; w++){
+          monthSum += parseFloat(hist[w]) || 0;
+        }
+        return { name: sub.name, cha: sub.cha, com: sub.com, monthSum };
+      })
+    })).filter(kr => kr.subs.length > 0)
+  };
+}
+
+const RANKS = [
+  { key:'gold',  label:'大変良くできました', threshold:0.80, fill:'#fef2c8', stroke:'#d4a574', glow:'#f5d77a' },
+  { key:'pink',  label:'良くできました',     threshold:0.60, fill:'#fde0e7', stroke:'#d68aa0', glow:'#f0a6b8' },
+  { key:'light', label:'頑張りました',       threshold:0.40, fill:'#fdeef0', stroke:'#e8b6bc', glow:'#fde0e7' },
+  { key:'white', label:'頑張りましょう',     threshold:0.00, fill:'#ffffff', stroke:'#d8c8c5', glow:'#f5eee2' }
+];
+
+function decideRank(ratio){
+  for(const r of RANKS){
+    if(ratio >= r.threshold) return r;
+  }
+  return RANKS[RANKS.length - 1];
+}
+
+// 桜バッジSVG（ランク別）
+function buildBadgeSVG(rank, month){
+  const monthLabel = month + 'ヶ月目';
+  const petalGrad = `
+    <radialGradient id="petalG-${rank.key}-${month}" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="${rank.fill}"/>
+      <stop offset="100%" stop-color="${rank.glow}"/>
+    </radialGradient>
+  `;
+  const petals = [0,72,144,216,288].map(deg => `
+    <g transform="rotate(${deg} 100 100)">
+      <path d="M 100 100 C 86 76 86 36 100 22 C 114 36 114 76 100 100 Z"
+        fill="url(#petalG-${rank.key}-${month})" stroke="${rank.stroke}" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M 100 30 L 100 90" stroke="${rank.stroke}" stroke-width="0.8" opacity="0.4" fill="none"/>
+    </g>
+  `).join('');
+  return `
+    <svg viewBox="0 0 200 200">
+      <defs>${petalGrad}</defs>
+      ${petals}
+      <circle cx="100" cy="100" r="32" fill="${rank.fill}" stroke="${rank.stroke}" stroke-width="1.5"/>
+      <circle cx="100" cy="100" r="32" fill="#ffffff" opacity="0.4"/>
+      <text x="100" y="94" text-anchor="middle" font-family="Yu Mincho, serif" font-size="9" fill="#8a4a3a" letter-spacing="0.5">${rank.label.slice(0,5)}</text>
+      <text x="100" y="106" text-anchor="middle" font-family="Yu Mincho, serif" font-size="9" fill="#8a4a3a" letter-spacing="0.5">${rank.label.slice(5)}</text>
+      <text x="100" y="120" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="8" fill="#a64626" letter-spacing="1">Month ${month}</text>
+    </svg>
+  `;
+}
+
+// 簡易シャッフル
+function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// メッセージ生成（約300字）
+function generateMonthlyMessage(month, rank, snapshot){
+  const name = (state.userName || '').trim() || 'あなた';
+  const krNames = [];
+  snapshot.krs.forEach(kr => {
+    kr.subs.forEach(s => {
+      if(s.name && krNames.length < 2) krNames.push(s.name);
+    });
+  });
+  const krList = krNames.length > 0 ? `「${krNames.join('」「')}」` : '';
+  const remaining = 6 - month;
+
+  // ランク別の褒め本文
+  let body;
+  if(rank.key === 'gold'){
+    body = krList
+      ? `${krList}に、忙しい毎日の中でしっかり時間を作って向き合われている姿、心から尊敬します。\n\n数字以上に、ご自身で決めたことを「続けた」という事実こそが、何よりの財産。この${month}ヶ月、本当にお疲れさまでした。`
+      : `今月のあなたの取り組み、見ていて心から尊敬します。数字以上に、決めたことを「続けた」事実こそが、何よりの財産。この${month}ヶ月、本当にお疲れさまでした。`;
+  } else if(rank.key === 'pink'){
+    body = krList
+      ? `${krList}、無理しすぎず、でもちゃんと前に進まれている姿、本当に素敵です。\n\n完璧を目指さずに「続ける」ことが、半年の旅では一番の強さになります。今月のペースを、自分で褒めてあげてくださいね。`
+      : `無理しすぎず、でもちゃんと前に進んでいる姿、素敵です。完璧を目指さずに「続ける」ことが、半年の旅では一番の強さに。今月のペースを、自分で褒めてあげて。`;
+  } else if(rank.key === 'light'){
+    body = krList
+      ? `${krList}、忙しさの中でも数字を1つでも残せたこと、それ自体がすごいことです。\n\n小さな一歩でも、積み重ねが半年後の景色を変えていきます。今月、止まらずに歩んだあなたを、ちゃんと褒めましょう。`
+      : `忙しさの中でも、進めようとした時間そのものが立派な前進です。小さな一歩でも、積み重ねが半年後の景色を変えていきます。今月の自分を褒めてあげてください。`;
+  } else {
+    body = krList
+      ? `${krList}、今月はゆっくりのペースだったかもしれません。\n\nでも、こうしてサイトを開き、自分と向き合おうとした時間がもう、立派なスタートです。来月、1つでも進めば、それで充分。あなたのペースで大丈夫。`
+      : `今月はゆっくりだったかもしれません。でも、自分と向き合おうとした時間そのものが、もう立派なスタート。来月、1つでも進めば、それで充分。あなたのペースで大丈夫。`;
+  }
+
+  const intro = `${name}さん、${month}ヶ月目、本当にお疲れさまでした🌸\n\n`;
+  let outro;
+  if(month === 6){
+    outro = `\n\n半年間、本当によく頑張りました。\nあなたの旅は、ここから先もずっと続いていきます🌷`;
+  } else if(remaining === 1){
+    outro = `\n\nいよいよ最終月。あと1ヶ月、あなたのペースで歩み切りましょう🌷`;
+  } else if(remaining <= 2){
+    outro = `\n\n残り${remaining}ヶ月、ラストスパート。ご自身のペースで進みましょう🌷`;
+  } else if(month === 3){
+    outro = `\n\n半年の折り返し地点。ここまで歩いた自分を、ちゃんと祝ってあげてください🌷`;
+  } else {
+    outro = `\n\n残り${remaining}ヶ月、まだまだこれから。あなたのペースで進みましょう🌷`;
+  }
+
+  return intro + body + outro;
+}
+
+function maybeAwardMonthlyBadges(prevWeek, newWeek){
+  if(!state.badges) state.badges = {};
+  const prevMonth = getMonthOfWeek(prevWeek);
+  const newMonth = getMonthOfWeek(newWeek);
+  let lastAwarded = null;
+  // 月をまたいだ場合、過ぎた月のバッジを発行
+  if(newMonth > prevMonth){
+    for(let m = prevMonth; m < newMonth; m++){
+      if(!state.badges[m]) lastAwarded = awardBadge(m);
+    }
+  }
+  // 最終週(26)に到達した場合、6月分も発行
+  if(newWeek >= TOTAL_WEEKS && !state.badges[6]){
+    lastAwarded = awardBadge(6);
+  }
+  saveState(state);
+  return lastAwarded;
+}
+
+function awardBadge(month){
+  const ratio = calcMonthRatio(month);
+  const rank = decideRank(ratio);
+  const snapshot = takeMonthSnapshot(month);
+  const message = generateMonthlyMessage(month, rank, snapshot);
+  const badge = {
+    month, ratio, rankKey: rank.key, rankLabel: rank.label,
+    message, snapshot,
+    awardedAt: new Date().toISOString().slice(0,10)
+  };
+  state.badges[month] = badge;
+  return badge;
+}
+
+function renderBadges(){
+  const grid = document.getElementById('badgeGrid');
+  grid.innerHTML = '';
+  const badges = state.badges || {};
+  const currentMonth = getMonthOfWeek(state.currentWeek);
+  for(let m = 1; m <= 6; m++){
+    const item = document.createElement('div');
+    const badge = badges[m];
+    const locked = !badge;
+    item.className = 'badge-item' + (locked ? ' locked' : '');
+    const rank = badge ? RANKS.find(r => r.key === badge.rankKey) : RANKS[3];
+    item.innerHTML = `
+      <div class="badge-svg-wrap">${buildBadgeSVG(rank, m)}</div>
+      <span class="badge-month">Month ${m}</span>
+      <div class="badge-rank ${rank.key}">${locked ? (m === currentMonth ? '今月達成中' : '未獲得') : rank.label}</div>
+    `;
+    if(!locked){
+      item.addEventListener('click', () => showBadgeModal(badge));
+    }
+    grid.appendChild(item);
+  }
+  // 卒業証書ボタン
+  const allCollected = [1,2,3,4,5,6].every(m => badges[m]);
+  const gradLink = document.getElementById('gradLink');
+  if(allCollected){
+    gradLink.classList.remove('locked');
+    gradLink.href = 'graduation.html?u=' + encodeURIComponent(userKey);
+    gradLink.textContent = '🎓 卒業証書を開く →';
+  } else {
+    gradLink.classList.add('locked');
+    gradLink.href = '#';
+    const left = 6 - Object.keys(badges).length;
+    gradLink.textContent = `卒業証書（あと ${left} つのバッジで開く）`;
+  }
+}
+
+function showBadgeModal(badge){
+  const rank = RANKS.find(r => r.key === badge.rankKey);
+  document.getElementById('modalBadge').innerHTML = buildBadgeSVG(rank, badge.month);
+  document.getElementById('modalTitle').textContent = `${badge.month}ヶ月目 ／ ${rank.label}`;
+  document.getElementById('modalSub').textContent = `— MONTH ${badge.month} BADGE —`;
+  document.getElementById('modalMessage').textContent = badge.message;
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('show');
+}
+
+// render() の最後にバッジレンダリング
+const originalRender = render;
+render = function(){
+  originalRender();
+  renderBadges();
+};
 
 bindKREdit();
 render();
