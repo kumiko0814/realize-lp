@@ -929,6 +929,62 @@ const OJI_SVG = [
 const MI_NAMES = ['たまご','生まれたて','あんよ期','大人ミー','レインボーミー'];
 const OJI_NAMES = ['ひび卵','おやじベイビー','よちよちおじ','おやじミー','仙人おじ'];
 
+/* ============================================================
+   MBTI連動 10種類の固有動物（Phase 0）
+   ============================================================ */
+
+// MBTI → 動物キー
+const MBTI_TO_ANIMAL = {
+  'ENFP':'neko','ESFP':'neko',
+  'INFP':'usagi','ISFP':'usagi',
+  'INFJ':'panda','ENFJ':'panda',
+  'INTJ':'fukurou','INTP':'fukurou',
+  'ENTJ':'kitsune','ENTP':'kitsune',
+  'ESTJ':'shibainu','ESFJ':'shibainu',
+  'ISTJ':'risu',
+  'ISFJ':'hamster',
+  'ISTP':'penguin','ESTP':'penguin'
+};
+
+// 動物 → 日本語名
+const ANIMAL_NAME = {
+  neko:'ねこ',usagi:'うさぎ',panda:'パンダ',fukurou:'フクロウ',
+  kitsune:'キツネ',shibainu:'シバイヌ',risu:'リス',hamster:'ハムスター',
+  penguin:'ペンギン'
+};
+
+// 動物 → 役職
+const ANIMAL_ROLE = {
+  neko:'遊び人 / 商人',usagi:'吟遊詩人 / 踊り子',panda:'預言者 / 僧侶',
+  fukurou:'大賢者 / 魔法使い',kitsune:'軍師 / 占い師',shibainu:'戦士 / 聖女',
+  risu:'武闘家',hamster:'薬師',penguin:'忍者 / 勇者'
+};
+
+// 動物SVG（preview_10kittens.htmlで採用された16x16ドットの最終版）
+const ANIMAL_SVG = {
+  neko: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="2" y="1" width="1" height="1" fill="#c45a8e"/><rect x="2" y="2" width="2" height="1" fill="#c45a8e"/><rect x="2" y="3" width="3" height="1" fill="#f78ac0"/><rect x="13" y="1" width="1" height="1" fill="#c45a8e"/><rect x="12" y="2" width="2" height="1" fill="#c45a8e"/><rect x="11" y="3" width="3" height="1" fill="#f78ac0"/><rect x="3" y="2" width="1" height="1" fill="#e63d6a"/><rect x="12" y="2" width="1" height="1" fill="#e63d6a"/><rect x="2" y="4" width="12" height="6" fill="#f78ac0"/><rect x="3" y="3" width="10" height="1" fill="#f78ac0"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="6" width="1" height="1" fill="#fff"/><rect x="11" y="6" width="1" height="1" fill="#fff"/><rect x="7" y="8" width="2" height="1" fill="#e63d6a"/><rect x="6" y="9" width="1" height="1" fill="#c45a8e"/><rect x="9" y="9" width="1" height="1" fill="#c45a8e"/><rect x="7" y="9" width="2" height="1" fill="#c45a8e"/><rect x="0" y="7" width="2" height="1" fill="#c45a8e"/><rect x="14" y="7" width="2" height="1" fill="#c45a8e"/><rect x="0" y="8" width="2" height="1" fill="#c45a8e"/><rect x="14" y="8" width="2" height="1" fill="#c45a8e"/><rect x="3" y="10" width="10" height="3" fill="#f78ac0"/><rect x="3" y="13" width="2" height="2" fill="#f78ac0"/><rect x="6" y="13" width="2" height="2" fill="#f78ac0"/><rect x="11" y="13" width="2" height="2" fill="#f78ac0"/><rect x="13" y="9" width="1" height="2" fill="#f78ac0"/><rect x="14" y="7" width="1" height="3" fill="#f78ac0"/><rect x="15" y="6" width="1" height="2" fill="#f78ac0"/></svg>`,
+  usagi: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="4" y="0" width="2" height="5" fill="#fff"/><rect x="10" y="0" width="2" height="5" fill="#fff"/><rect x="5" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="10" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="2" y="5" width="12" height="7" fill="#fff"/><rect x="3" y="4" width="10" height="1" fill="#fff"/><rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#f6a0c4"/><rect x="3" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg>`,
+  panda: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="8" fill="#fff"/><rect x="3" y="3" width="10" height="1" fill="#fff"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="6" width="1" height="1" fill="#fff"/><rect x="11" y="6" width="1" height="1" fill="#fff"/><rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/><rect x="3" y="12" width="3" height="2" fill="#0e0e1a"/><rect x="10" y="12" width="3" height="2" fill="#0e0e1a"/></svg>`,
+  fukurou: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="2" y="3" width="12" height="9" fill="#a87132"/><rect x="4" y="5" width="3" height="3" fill="#fff"/><rect x="9" y="5" width="3" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#ffd644"/><rect x="7" y="9" width="2" height="1" fill="#c89a1a"/><rect x="3" y="10" width="2" height="2" fill="#6a4a1f" opacity="0.5"/><rect x="11" y="10" width="2" height="2" fill="#6a4a1f" opacity="0.5"/><rect x="5" y="12" width="2" height="2" fill="#ffd644"/><rect x="9" y="12" width="2" height="2" fill="#ffd644"/></svg>`,
+  kitsune: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="2" y="0" width="1" height="1" fill="#c25b3f"/><rect x="2" y="1" width="2" height="1" fill="#e6814a"/><rect x="2" y="2" width="3" height="1" fill="#e6814a"/><rect x="2" y="3" width="3" height="1" fill="#e6814a"/><rect x="13" y="0" width="1" height="1" fill="#c25b3f"/><rect x="12" y="1" width="2" height="1" fill="#e6814a"/><rect x="11" y="2" width="3" height="1" fill="#e6814a"/><rect x="11" y="3" width="3" height="1" fill="#e6814a"/><rect x="3" y="2" width="1" height="2" fill="#fff"/><rect x="12" y="2" width="1" height="2" fill="#fff"/><rect x="2" y="4" width="12" height="4" fill="#e6814a"/><rect x="3" y="8" width="10" height="2" fill="#e6814a"/><rect x="5" y="10" width="6" height="1" fill="#e6814a"/><rect x="4" y="8" width="8" height="2" fill="#fff"/><rect x="5" y="10" width="6" height="1" fill="#fff"/><rect x="4" y="6" width="2" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="1" fill="#0e0e1a"/><rect x="5" y="7" width="1" height="1" fill="#fff"/><rect x="10" y="7" width="1" height="1" fill="#fff"/><rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/><rect x="3" y="11" width="6" height="3" fill="#e6814a"/><rect x="3" y="13" width="6" height="1" fill="#fff"/><rect x="3" y="14" width="2" height="1" fill="#c25b3f"/><rect x="7" y="14" width="2" height="1" fill="#c25b3f"/><rect x="9" y="10" width="2" height="2" fill="#e6814a"/><rect x="11" y="9" width="3" height="3" fill="#e6814a"/><rect x="13" y="11" width="2" height="3" fill="#e6814a"/><rect x="12" y="14" width="3" height="1" fill="#e6814a"/><rect x="13" y="13" width="2" height="2" fill="#fff"/><rect x="12" y="14" width="3" height="1" fill="#fff"/></svg>`,
+  shibainu: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="3" y="2" width="2" height="3" fill="#c89455"/><rect x="11" y="2" width="2" height="3" fill="#c89455"/><rect x="2" y="4" width="12" height="7" fill="#c89455"/><rect x="4" y="8" width="8" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/><rect x="6" y="10" width="1" height="1" fill="#e63d6a"/><rect x="9" y="10" width="1" height="1" fill="#e63d6a"/><rect x="3" y="11" width="2" height="3" fill="#c89455"/><rect x="11" y="11" width="2" height="3" fill="#c89455"/><rect x="12" y="3" width="2" height="3" fill="#a07840"/></svg>`,
+  risu: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="2" y="0" width="1" height="1" fill="#6a4a1f"/><rect x="2" y="1" width="2" height="2" fill="#a87132"/><rect x="8" y="0" width="1" height="1" fill="#6a4a1f"/><rect x="8" y="1" width="2" height="2" fill="#a87132"/><rect x="3" y="2" width="1" height="1" fill="#fcd5a3"/><rect x="9" y="2" width="1" height="1" fill="#fcd5a3"/><rect x="2" y="3" width="8" height="5" fill="#a87132"/><rect x="1" y="6" width="2" height="2" fill="#c89455"/><rect x="9" y="6" width="2" height="2" fill="#c89455"/><rect x="3" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="4" y="5" width="1" height="1" fill="#fff"/><rect x="8" y="5" width="1" height="1" fill="#fff"/><rect x="5" y="7" width="2" height="1" fill="#e63d6a"/><rect x="5" y="8" width="1" height="1" fill="#5a1a1a"/><rect x="6" y="8" width="1" height="1" fill="#5a1a1a"/><rect x="3" y="9" width="6" height="4" fill="#a87132"/><rect x="4" y="10" width="4" height="3" fill="#fcd5a3"/><rect x="5" y="11" width="2" height="2" fill="#a87132"/><rect x="5" y="9" width="2" height="2" fill="#6a4a1f"/><rect x="5" y="9" width="2" height="1" fill="#3a2a14"/><rect x="3" y="13" width="2" height="2" fill="#a87132"/><rect x="7" y="13" width="2" height="2" fill="#a87132"/><rect x="10" y="2" width="3" height="2" fill="#a87132"/><rect x="11" y="1" width="4" height="2" fill="#a87132"/><rect x="12" y="0" width="3" height="2" fill="#a87132"/><rect x="13" y="2" width="3" height="3" fill="#a87132"/><rect x="13" y="5" width="3" height="3" fill="#a87132"/><rect x="12" y="8" width="3" height="3" fill="#a87132"/><rect x="11" y="11" width="3" height="2" fill="#a87132"/><rect x="10" y="13" width="2" height="1" fill="#a87132"/><rect x="14" y="3" width="1" height="2" fill="#6a4a1f"/><rect x="14" y="6" width="1" height="2" fill="#6a4a1f"/><rect x="13" y="9" width="1" height="2" fill="#6a4a1f"/></svg>`,
+  hamster: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="3" y="1" width="2" height="2" fill="#c89a55"/><rect x="11" y="1" width="2" height="2" fill="#c89a55"/><rect x="3" y="2" width="2" height="1" fill="#f6a0c4"/><rect x="11" y="2" width="2" height="1" fill="#f6a0c4"/><rect x="3" y="3" width="10" height="6" fill="#ffd644"/><rect x="2" y="4" width="12" height="5" fill="#ffd644"/><rect x="0" y="6" width="3" height="3" fill="#fff5b8"/><rect x="13" y="6" width="3" height="3" fill="#fff5b8"/><rect x="0" y="7" width="2" height="2" fill="#fce4a0"/><rect x="14" y="7" width="2" height="2" fill="#fce4a0"/><rect x="4" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="5" width="1" height="1" fill="#fff"/><rect x="11" y="5" width="1" height="1" fill="#fff"/><rect x="7" y="7" width="2" height="1" fill="#f6a0c4"/><rect x="7" y="8" width="1" height="1" fill="#c45a8e"/><rect x="8" y="8" width="1" height="1" fill="#c45a8e"/><rect x="2" y="9" width="12" height="5" fill="#ffd644"/><rect x="3" y="10" width="10" height="4" fill="#fff5b8"/><rect x="2" y="13" width="2" height="1" fill="#c89a55"/><rect x="6" y="13" width="2" height="1" fill="#c89a55"/><rect x="8" y="13" width="2" height="1" fill="#c89a55"/><rect x="12" y="13" width="2" height="1" fill="#c89a55"/><rect x="13" y="9" width="2" height="1" fill="#fcd5a3"/></svg>`,
+  penguin: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="3" y="2" width="10" height="11" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="9" fill="#0e0e1a"/><rect x="4" y="6" width="8" height="6" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#e6814a"/><rect x="1" y="6" width="2" height="3" fill="#0e0e1a"/><rect x="13" y="6" width="2" height="3" fill="#0e0e1a"/><rect x="4" y="13" width="3" height="2" fill="#e6814a"/><rect x="9" y="13" width="3" height="2" fill="#e6814a"/></svg>`,
+  tamago: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%;image-rendering:pixelated"><rect x="6" y="2" width="4" height="1" fill="#fff"/><rect x="5" y="3" width="6" height="1" fill="#fff"/><rect x="4" y="4" width="8" height="2" fill="#fff"/><rect x="3" y="6" width="10" height="5" fill="#fff"/><rect x="4" y="11" width="8" height="2" fill="#fff"/><rect x="5" y="13" width="6" height="1" fill="#fff"/><rect x="6" y="5" width="1" height="1" fill="#f6a0c4"/><rect x="9" y="6" width="1" height="1" fill="#f6a0c4"/><rect x="5" y="8" width="1" height="1" fill="#f6a0c4"/><rect x="10" y="9" width="1" height="1" fill="#f6a0c4"/><rect x="7" y="10" width="1" height="1" fill="#f6a0c4"/><rect x="9" y="12" width="1" height="1" fill="#f6a0c4"/><rect x="8" y="4" width="1" height="1" fill="#ffd644"/><rect x="4" y="9" width="1" height="1" fill="#ffd644"/><rect x="11" y="7" width="1" height="1" fill="#ffd644"/><rect x="6" y="12" width="1" height="1" fill="#ffd644"/><rect x="11" y="6" width="1" height="5" fill="#e8d6c8" opacity="0.5"/><rect x="12" y="7" width="1" height="3" fill="#e8d6c8" opacity="0.5"/><rect x="5" y="4" width="2" height="1" fill="#fffce0"/><rect x="4" y="5" width="1" height="2" fill="#fffce0"/><rect x="7" y="7" width="2" height="1" fill="#c25b3f"/><rect x="8" y="8" width="1" height="1" fill="#c25b3f"/><rect x="7" y="9" width="1" height="1" fill="#c25b3f"/><rect x="7" y="11" width="1" height="1" fill="#c25b3f"/></svg>`
+};
+
+// quest.htmlのlocalStorageからMBTIを読み取る
+function getMBTIFromQuest(){
+  const questKey = 're_alize_quest_' + userKey;
+  const raw = localStorage.getItem(questKey);
+  if(!raw) return null;
+  try {
+    const d = JSON.parse(raw);
+    return d.mbti || null;
+  } catch(e){ return null; }
+}
+
 const MOOD_SUCCESS = {
   start: 'まずは目標をセットして、毎週進捗を入力しよう。',
   low: 'スタートしたばかり！この調子で次の週も。',
@@ -1088,20 +1144,30 @@ function render(){
   else if(route === 'fail') walker.classList.add(stage === 2 ? 'mode-drift' : 'mode-static');
   else walker.classList.add(stage >= 2 ? 'mode-walk' : 'mode-bounce');
 
-  // SVG
-  const svgList = route === 'fail' ? OJI_SVG : MI_SVG;
-  const nameList = route === 'fail' ? OJI_NAMES : MI_NAMES;
-  document.getElementById('kittenSvg').innerHTML = svgList[stage];
-  document.getElementById('kittenName').textContent = nameList[stage];
-
-  // labels
+  // SVG（MBTI連動 Phase 0）
+  const mbti = getMBTIFromQuest();
+  const animal = mbti ? MBTI_TO_ANIMAL[mbti] : null;
   const stageNum = String(stage + 1).padStart(2, '0');
-  document.getElementById('stageLabel').textContent = `STAGE ${stageNum} — ${nameList[stage]}`;
   const badge = document.getElementById('routeBadge');
+
   if(route === 'fail'){
+    // 失敗 → おやじ化（既存5段階）
+    document.getElementById('kittenSvg').innerHTML = OJI_SVG[stage];
+    document.getElementById('kittenName').textContent = OJI_NAMES[stage];
+    document.getElementById('stageLabel').textContent = `STAGE ${stageNum} — ${OJI_NAMES[stage]}`;
     badge.textContent = 'WARNING — おじ化進行中';
+  } else if(animal){
+    // MBTI診断済み → 固有動物
+    document.getElementById('kittenSvg').innerHTML = ANIMAL_SVG[animal];
+    document.getElementById('kittenName').textContent = ANIMAL_NAME[animal];
+    document.getElementById('stageLabel').textContent = `★ ${mbti} — ${ANIMAL_ROLE[animal]}`;
+    badge.textContent = `SUCCESS — ${ANIMAL_NAME[animal]}と旅中`;
   } else {
-    badge.textContent = 'SUCCESS — 順調';
+    // MBTI未診断 → たまご（quest.htmlへ誘導）
+    document.getElementById('kittenSvg').innerHTML = ANIMAL_SVG['tamago'];
+    document.getElementById('kittenName').textContent = '？？？';
+    document.getElementById('stageLabel').textContent = `UNDIAGNOSED — ふしぎなたまご`;
+    badge.textContent = 'QUEST — MBTI診断でキャラ決定';
   }
 
   // mood
