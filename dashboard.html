@@ -279,6 +279,30 @@ body{
 }
 .help-link:hover{text-decoration:underline}
 
+/* ===== DEMO PLACEHOLDER ===== */
+.demo-placeholder-box{
+  text-align:center;
+  padding:56px 32px;
+  background:linear-gradient(135deg,#fffbe6 0%,#fff4d6 100%);
+  border:2px dashed #d4a574;
+  border-radius:18px;
+}
+.demo-placeholder-box .ph-icon{
+  font-size:40px;margin-bottom:14px;line-height:1;
+}
+.demo-placeholder-box .ph-text{
+  font-family:"Yu Mincho",serif;
+  font-size:18px;font-weight:600;color:#8a6e1c;
+  margin-bottom:16px;letter-spacing:0.06em;line-height:1.7;
+}
+.demo-placeholder-box .ph-text strong{
+  color:#a64626;background:rgba(255,255,255,0.7);padding:2px 8px;border-radius:6px;
+}
+.demo-placeholder-box .ph-sub{
+  font-size:12.5px;color:#a87a26;line-height:1.95;letter-spacing:0.04em;
+  max-width:480px;margin:0 auto;
+}
+
 /* ===== DEMO PANEL ===== */
 .demo-panel{
   background:linear-gradient(135deg,#fffbe6 0%,#fff4d6 100%);
@@ -1099,7 +1123,10 @@ function renderWeeklyInputs(){
 }
 
 function renderKREdit(){
+  // demoモード時はプレースホルダー表示なのでスキップ
+  if(typeof isDemoMode !== 'undefined' && isDemoMode) return;
   const list = document.getElementById('krEditList');
+  if(!list) return;
   document.getElementById('goalInput').value = state.goal || '';
   list.innerHTML = '';
   state.krs.forEach((kr, krIdx) => {
@@ -1286,6 +1313,8 @@ document.getElementById('goalInput').addEventListener('input', e => {
 document.getElementById('userNameInput').addEventListener('input', e => {
   state.userName = e.target.value;
   saveState(state);
+  // demoモード時はプレースホルダーの名前もリアルタイム更新
+  if(isDemoMode) renderDemoPlaceholder();
 });
 
 document.getElementById('krEditHead').addEventListener('click', () => {
@@ -1564,6 +1593,29 @@ if(isDemoMode){
   document.getElementById('demoPanel').style.display = 'block';
   // demoモードの時はonboardingを隠す（重複表示を避ける）
   document.getElementById('onboardBox').style.display = 'none';
+  // 「目標を編集／設定する」をプレースホルダーに差し替え
+  renderDemoPlaceholder();
+  // アコーディオンを開いた状態に＋クリック無効化
+  document.getElementById('krEditHead').classList.add('open');
+  document.getElementById('krEditBody').classList.add('open');
+  document.getElementById('krEditHead').style.cursor = 'default';
+  document.getElementById('krEditHead').style.pointerEvents = 'none';
+}
+
+function renderDemoPlaceholder(){
+  if(!isDemoMode) return;
+  const displayName = ((state.userName || params.get('name') || 'あなた').trim()) || 'あなた';
+  const body = document.getElementById('krEditBody');
+  body.innerHTML = `
+    <div class="demo-placeholder-box">
+      <div class="ph-icon">📝</div>
+      <p class="ph-text">ここに <strong>${escapeHtml(displayName)}さん</strong> の目標を入れます！</p>
+      <p class="ph-sub">
+        本入会後、大目標を1つ、KR（達成軸）を最大3つ、各KRに具体的なサブ目標を最大3つ設定できます。<br>
+        各サブ目標には <strong>CHA（チャレンジ目標数値）</strong> と <strong>COM（コミット目標数値）</strong> を入力します。
+      </p>
+    </div>
+  `;
 }
 
 // nameパラメータがあれば自動セット
