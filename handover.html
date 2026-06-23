@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re:alize 制作ナレッジ ｜ 引き継ぎ書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;--sub:#5a5a5a;--mute:#8b8278;
+  --bg:#fffaf6;--card:#fff;--line:#ece5d8;--line-soft:#f5eee2;
+  --accent:#c25b3f;--accent-deep:#a64626;
+  --leaf:#7a9070;--leaf-deep:#5a7050;
+  --pink:#e8b6bc;--pink-soft:#fce4e6;--pink-light:#fdf2f4;
+  --gold:#c9a574;--gold-deep:#a67a26;
+  --code-bg:#f5efe7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Yu Gothic","YuGothic","游ゴシック","Hiragino Kaku Gothic ProN",sans-serif;
+  color:var(--ink);background:var(--bg);
+  font-size:14px;line-height:1.95;letter-spacing:0.05em;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"palt";
+}
+.wrap{max-width:880px;margin:0 auto;padding:64px 32px 96px}
+@media(max-width:720px){.wrap{padding:40px 20px 64px}}
+
+/* HEADER */
+.head{text-align:center;margin-bottom:64px;padding-bottom:40px;border-bottom:1px solid var(--line)}
+.head .meta{
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:12px;letter-spacing:0.3em;color:var(--mute);margin-bottom:14px;
+}
+.head h1{
+  font-family:"Yu Mincho",serif;font-size:32px;font-weight:500;
+  letter-spacing:0.08em;line-height:1.6;margin-bottom:14px;
+}
+.head h1 .em{color:var(--leaf-deep);font-weight:600}
+.head .sub{font-size:13px;color:var(--sub);letter-spacing:0.08em;margin-bottom:18px;line-height:2}
+.head .info{
+  display:inline-block;background:var(--card);border:1px solid var(--line);
+  padding:14px 24px;border-radius:10px;font-size:12px;color:var(--mute);
+  letter-spacing:0.06em;line-height:1.9;
+}
+.head .info strong{color:var(--ink);font-weight:600}
+
+/* TOC */
+.toc{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:24px 28px;margin-bottom:48px;
+}
+.toc h3{font-size:12px;letter-spacing:0.3em;color:var(--mute);margin-bottom:14px;font-family:"Cormorant Garamond",serif;font-style:italic}
+.toc ol{padding-left:20px;font-size:13px;line-height:2.1}
+.toc a{color:var(--ink);text-decoration:none;transition:color 0.2s}
+.toc a:hover{color:var(--accent)}
+.toc li{padding:2px 0}
+
+/* SECTION */
+section{margin-bottom:64px}
+section h2{
+  font-family:"Yu Mincho",serif;font-size:22px;font-weight:600;
+  letter-spacing:0.06em;line-height:1.6;margin-bottom:8px;
+  padding-bottom:14px;border-bottom:2px solid var(--leaf-deep);
+  display:flex;align-items:baseline;gap:14px;
+}
+section h2 .num{
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:14px;color:var(--leaf);letter-spacing:0.2em;font-weight:500;
+}
+section .lead{
+  font-size:13px;color:var(--sub);margin:18px 0 28px;
+  line-height:2;letter-spacing:0.06em;
+}
+
+h3{
+  font-size:15px;font-weight:700;margin:32px 0 12px;letter-spacing:0.06em;
+  color:var(--leaf-deep);
+  padding-left:14px;border-left:3px solid var(--leaf);
+}
+h4{font-size:13.5px;font-weight:700;margin:18px 0 8px;letter-spacing:0.05em;color:var(--ink)}
+
+p{margin-bottom:14px}
+
+ul,ol{padding-left:22px;margin-bottom:16px}
+ul li,ol li{margin-bottom:6px;line-height:1.95}
+
+strong{color:var(--accent-deep);font-weight:700}
+em{color:var(--leaf-deep);font-style:normal;font-weight:600}
+
+/* BOX */
+.box{
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:24px 26px;margin:18px 0;
+}
+.box.warn{background:#fff8f0;border-color:#f0d6cc}
+.box.note{background:var(--pink-light);border-color:#f0d6dc}
+.box.good{background:#f5f9f0;border-color:#cde0c8}
+.box .label{
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:10.5px;letter-spacing:0.32em;color:var(--accent);
+  margin-bottom:10px;
+}
+.box.good .label{color:var(--leaf-deep)}
+.box.warn .label{color:var(--accent)}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:18px 0}
+@media(max-width:720px){.grid-2{grid-template-columns:1fr}}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+@media(max-width:720px){.grid-3{grid-template-columns:1fr}}
+
+/* COLOR PALETTE */
+.color-row{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 24px}
+.color-chip{
+  display:flex;flex-direction:column;align-items:center;
+  min-width:96px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:12px 8px;
+}
+.color-swatch{width:48px;height:48px;border-radius:8px;margin-bottom:6px;border:1px solid rgba(0,0,0,0.08)}
+.color-name{font-size:10.5px;font-weight:700;letter-spacing:0.04em}
+.color-hex{font-size:10px;color:var(--mute);font-family:monospace;margin-top:2px}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12.5px}
+th,td{padding:10px 12px;border:1px solid var(--line);text-align:left;vertical-align:top;line-height:1.85}
+th{background:var(--line-soft);font-weight:700;color:var(--ink)}
+td.em{color:var(--accent-deep);font-weight:600}
+
+/* QUOTE */
+.quote{
+  background:#fdf6f3;border-left:3px solid var(--accent);
+  padding:14px 18px;margin:14px 0;font-size:13px;line-height:1.95;
+  color:var(--ink);border-radius:0 6px 6px 0;
+}
+.quote::before{content:"〝 ";color:var(--accent);font-size:18px;font-family:serif}
+
+/* CODE / KEY */
+code{
+  background:var(--code-bg);padding:2px 8px;border-radius:4px;
+  font-family:"SF Mono","Menlo",monospace;font-size:11.5px;color:var(--accent-deep);
+}
+
+/* NG */
+.ng{color:#a64626;font-weight:600}
+.ok{color:var(--leaf-deep);font-weight:600}
+
+/* FOOTER */
+footer{
+  margin-top:80px;padding-top:32px;border-top:1px solid var(--line);
+  text-align:center;font-size:11px;color:var(--mute);letter-spacing:0.1em;
+}
+footer .serif{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--leaf);margin-bottom:6px;display:block}
+
+/* PRINT */
+@media print{
+  body{background:#fff}
+  .wrap{padding:20px;max-width:none}
+  section{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="head">
+    <div class="meta">— PROJECT HANDOVER —</div>
+    <h1>Re:alize 制作で見えた<br><span class="em">「30代女性向けプロジェクト」</span>のつくり方</h1>
+    <p class="sub">他イベント・他プロジェクトでゲームやサイトを作るときの<br>「考え方／トンマナ／ターゲット理解」の再利用ナレッジ</p>
+    <div class="info">
+      <strong>対象</strong>：Re:cheフロント／Famm／SHE／ABCash 等、30代女性向けの新規企画<br>
+      <strong>引き継ぎ範囲</strong>：くみこのオーダー傾向／NG／トンマナ／顧客理解／使った素材／再利用可能パーツ
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>— TABLE OF CONTENTS —</h3>
+    <ol>
+      <li><a href="#sec1">プロジェクト概要（Re:alize でつくったもの）</a></li>
+      <li><a href="#sec2">ターゲット理解（30代女性のリアル）</a></li>
+      <li><a href="#sec3">顧客が無意識に求めていたもの</a></li>
+      <li><a href="#sec4">くみこの指示の出し方パターン</a></li>
+      <li><a href="#sec5">トンマナ（色／フォント／NG）</a></li>
+      <li><a href="#sec6">エモーショナル演出の組み立て方</a></li>
+      <li><a href="#sec7">送ったデータ／参照素材リスト</a></li>
+      <li><a href="#sec8">再利用できる構成パターン</a></li>
+      <li><a href="#sec9">次プロジェクトへの「初手」テンプレ</a></li>
+    </ol>
+  </div>
+
+  <!-- ============= SEC 1 ============= -->
+  <section id="sec1">
+    <h2><span class="num">01</span>プロジェクト概要</h2>
+    <p class="lead">Re:alize（半年間の目標達成コミュニティ）向けに、LP・体験フロー・参加者マイページ・キャラ育成・卒業証書・ミニRPGまで一気通貫で構築。配布もGitHub Pagesで公開済み。</p>
+
+    <h3>つくった9ページ＋1ゲーム</h3>
+    <div class="grid-2">
+      <div class="box">
+        <div class="label">— 表側（参加者・興味層）—</div>
+        <ul style="font-size:12.5px;margin:0">
+          <li><strong>index.html</strong>：LP（メイン）</li>
+          <li><strong>intro.html</strong>：体験フロー（名前入力＋4セクション説明）</li>
+          <li><strong>welcome.html</strong>：使い方ガイド</li>
+          <li><strong>dashboard.html</strong>：マイページ（OKR入力＋キャラ＋バッジ）</li>
+          <li><strong>graduation.html</strong>：卒業証書</li>
+          <li><strong>ijouchi.html</strong>：異常値の森RPG（ファミコン風ミニゲーム）</li>
+        </ul>
+      </div>
+      <div class="box">
+        <div class="label">— 裏側（運営・確認用）—</div>
+        <ul style="font-size:12.5px;margin:0">
+          <li><strong>distribute.html</strong>：配布パネル（URL/LINEテンプレ自動生成）</li>
+          <li><strong>preview_kittens.html</strong>：ミー5段階プレビュー</li>
+          <li><strong>preview_oji.html</strong>：おやじ5段階プレビュー</li>
+          <li><strong>preview_compare.html</strong>：ミーvsおやじ比較</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>機能の階層構造</h3>
+    <div class="box note">
+      <pre style="font-size:11.5px;line-height:1.9;color:var(--ink);margin:0;font-family:'SF Mono',monospace;white-space:pre-wrap">LP（index）
+  ↓
+体験フロー（intro：名前入力→4セクション）
+  ↓
+マイページ（dashboard）
+  ├─ 毎週の OKR 進捗入力
+  ├─ キャラ育成（ミー or おやじ 分岐）
+  ├─ マンスリーバッジ（4ランクの桜）＋300字褒めメッセージ
+  ├─ デモ早送りボタン（?demo=1 のときだけ表示）
+  ├─ 異常値の森RPG（ijouchi.html）への導線
+  └─ 卒業証書（graduation.html）への導線（6ヶ月達成解放）</pre>
+    </div>
+  </section>
+
+  <!-- ============= SEC 2 ============= -->
+  <section id="sec2">
+    <h2><span class="num">02</span>ターゲット理解</h2>
+    <p class="lead">Re:alizeでも、Re:cheでもFammでもSHEでも、根っこのペルソナはほぼ共通。<strong>30代女性／子育てor副業or自己実現志向／「変わりたいけど続かない」</strong>に苦しむ層。</p>
+
+    <h3>ペルソナの最大公約数</h3>
+    <table>
+      <tr><th>属性</th><td>25〜45歳女性／会社員 or ママ or 副業者／関東・関西＋地方都市</td></tr>
+      <tr><th>悩みの根</th><td class="em">「目標が続かない」「自分だけ取り残されている気がする」「子育てや仕事で自分の時間が消える」</td></tr>
+      <tr><th>動機の根</th><td class="em">「いまのままじゃ嫌」「ちゃんと変わりたい」「自分を取り戻したい」</td></tr>
+      <tr><th>刺さる言葉</th><td>「一人じゃない」「あなたのペースで」「続けるって、こういうことなんだ」「無理しなくていい」</td></tr>
+      <tr><th>嫌う言葉</th><td><span class="ng">「絶対」「今だけ」「先着」「人生変える」「お金を増やしましょう」</span> ← 圧と煽り</td></tr>
+      <tr><th>動く瞬間</th><td>共感→「これ私のことだ」と感じた時。数字より物語。<strong>仲間がいる安心感</strong>がトリガー</td></tr>
+      <tr><th>離脱する瞬間</th><td>圧力／プレッシャー／「やらなきゃ」感／個別性のなさ／達成至上主義</td></tr>
+    </table>
+
+    <h3>世代ノスタルジア</h3>
+    <div class="box good">
+      <div class="label">— 30代女性に効く「懐かしさ」—</div>
+      <ul>
+        <li><strong>ファミコン／レトロゲーム</strong>：ドラクエ・FF・ポケモン世代（小〜中学生体験）</li>
+        <li><strong>たまごっち</strong>：育成ゲームの原点／「サボると変なキャラ化」の文脈</li>
+        <li><strong>セーラームーン／少女漫画</strong>：桜・キラキラ・ピンク・変身要素</li>
+        <li><strong>シール・スタンプカード</strong>：集める達成感</li>
+        <li><strong>卒業式／文集</strong>：エモーショナルな別れ／証書</li>
+      </ul>
+      <p style="margin-top:10px;font-size:12px;color:var(--sub)">→ 「異常値の森RPG」「卒業証書」「マンスリーバッジ」はこの層を狙い撃ち</p>
+    </div>
+  </section>
+
+  <!-- ============= SEC 3 ============= -->
+  <section id="sec3">
+    <h2><span class="num">03</span>顧客が無意識に求めていたもの</h2>
+    <p class="lead">「機能リスト」を求めているのではなく、<strong>「自分のために作られた感」</strong>と<strong>「やってる自分が誇らしい感」</strong>を求めている。これは Re:alize でも Famm でも SHE でも共通。</p>
+
+    <h3>5つの隠れニーズ</h3>
+    <div class="grid-2">
+      <div class="box">
+        <div class="label">— ① 個別性 —</div>
+        <p style="font-size:12.5px">「あなただけの専用サイト」「あなたの名前入りの〇〇」<br>名前を入れたら全部の文言が自分宛になる演出。</p>
+      </div>
+      <div class="box">
+        <div class="label">— ② 物語感 —</div>
+        <p style="font-size:12.5px">単なる管理ツールじゃなく、<strong>キャラと一緒に冒険する</strong>体験。育つ／成長する／戻れる。</p>
+      </div>
+      <div class="box">
+        <div class="label">— ③ 達成可視化 —</div>
+        <p style="font-size:12.5px">バッジ・スタンプ・木が育つ・キャラの進化。<strong>小さな達成が積み上がって見える</strong>仕掛け。</p>
+      </div>
+      <div class="box">
+        <div class="label">— ④ 仲間感 —</div>
+        <p style="font-size:12.5px">「ひとりじゃない」を構造で示す。LINEグループ／おしゃべり会／月1MTG／皆勤賞。</p>
+      </div>
+      <div class="box">
+        <div class="label">— ⑤ 卒業感 —</div>
+        <p style="font-size:12.5px">最終的に「やり遂げた自分」を讃える証。<strong>卒業証書／印刷可能／印鑑風スタンプ</strong>。</p>
+      </div>
+      <div class="box">
+        <div class="label">— ⑥ 戻れる安心 —</div>
+        <p style="font-size:12.5px">サボってもおじ化するだけ→達成すれば戻れる。<strong>「失敗してもやり直せる」を構造で保証</strong>。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= SEC 4 ============= -->
+  <section id="sec4">
+    <h2><span class="num">04</span>くみこの指示の出し方パターン</h2>
+    <p class="lead">過去のやり取りから、くみこが好む / 嫌う指示のパターンを抽出。次プロジェクトでは、これに沿った提案・確認・実装フローで進めるとスムーズ。</p>
+
+    <h3>くみこが喜ぶ進め方</h3>
+    <div class="box good">
+      <ul style="margin:0">
+        <li><strong>「OK！実装する」と即動く</strong>：迷ったり確認しすぎない。autopilot的に進めて、後で見せる方が満足度高い</li>
+        <li><strong>スクショで方向性を示す</strong>：参考画像が来たら、それに忠実に再現する（勝手なデフォルメ厳禁）</li>
+        <li><strong>結論→根拠→次の一手</strong>：3行で済むことを長文化しない</li>
+        <li><strong>HTML成果物で見せる</strong>：md単体は NG。ブラウザでパッと開けるものを必ず用意</li>
+        <li><strong>選択肢を出す時は推奨案を最初に</strong>：「A/B/Cどっち？」より「Aがおすすめ、理由はXXX。やる？」</li>
+        <li><strong>勝手に改変しない</strong>：「ここを直して」と言われた箇所以外は触らない。改変するなら明示する</li>
+      </ul>
+    </div>
+
+    <h3>くみこが怒る・がっかりするパターン</h3>
+    <div class="box warn">
+      <ul style="margin:0">
+        <li><span class="ng">AI絵文字を使う</span>（🌿✨🌟⭐💕🌸の植物・キラキラ系）</li>
+        <li><span class="ng">スクショ参考を渡したのに、自己流デフォルメで仕上げる</span>（くみこは「これに似せて」と言ったら忠実に）</li>
+        <li><span class="ng">確認しすぎる</span>：「進めていい？」を連発すると進まない</li>
+        <li><span class="ng">分析の長文</span>：「分かりやすく」「結論先出し」と何度も指示あり</li>
+        <li><span class="ng">md単品納品</span>：「何していいか分からない」状態になる</li>
+        <li><span class="ng">指示範囲外の改変</span>：「ここを直して」以外を触ると怒る</li>
+        <li><span class="ng">対外資料で個人名（くみこ／森川）</span>：必ず「弊社」に統一</li>
+      </ul>
+    </div>
+
+    <h3>典型的なやり取りリズム</h3>
+    <table>
+      <tr><th>くみこの一言</th><th>意図</th><th>こちらの返し方</th></tr>
+      <tr><td>「面白そう、作れる？」</td><td>方向性確認＋GO待ち</td><td>「できる。XX方向で進めるよ。」→着手</td></tr>
+      <tr><td>「ダメ！」「ぜんぜんダメ！」</td><td>本気の不満／参考を見てない</td><td>謝罪→参考スクショ再確認→ゼロから作り直す</td></tr>
+      <tr><td>スクショ＋短い指示</td><td>これに似せて</td><td>スクショに忠実再現。自己流NG</td></tr>
+      <tr><td>「いっそ〇〇無くして！」</td><td>判断確定／即削除</td><td>「了解、削除する」即実行</td></tr>
+      <tr><td>「最高！」「OK！」</td><td>方向性確定／そのまま進む</td><td>次のステップへ自然に進める</td></tr>
+      <tr><td>「これでテスト配布する」</td><td>本番投入のサイン</td><td>配布用パッケージ／テンプレ／URL一覧を用意</td></tr>
+    </table>
+  </section>
+
+  <!-- ============= SEC 5 ============= -->
+  <section id="sec5">
+    <h2><span class="num">05</span>トンマナ</h2>
+    <p class="lead">Meroneブランドガイドラインをベースに、Re:alizeで使った再利用可能パレット。</p>
+
+    <h3>メインパレット</h3>
+    <div class="color-row">
+      <div class="color-chip"><div class="color-swatch" style="background:#fffaf6"></div><div class="color-name">背景</div><div class="color-hex">#fffaf6</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#1a1a1a"></div><div class="color-name">本文</div><div class="color-hex">#1a1a1a</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#5a5a5a"></div><div class="color-name">サブ</div><div class="color-hex">#5a5a5a</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#ece5d8"></div><div class="color-name">罫線</div><div class="color-hex">#ece5d8</div></div>
+    </div>
+
+    <h3>アクセント</h3>
+    <div class="color-row">
+      <div class="color-chip"><div class="color-swatch" style="background:#c25b3f"></div><div class="color-name">Terracotta</div><div class="color-hex">#c25b3f</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#7a9070"></div><div class="color-name">Leaf</div><div class="color-hex">#7a9070</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#5a7050"></div><div class="color-name">Leaf Deep</div><div class="color-hex">#5a7050</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#e8b6bc"></div><div class="color-name">Coral Pink</div><div class="color-hex">#e8b6bc</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#fce4e6"></div><div class="color-name">Pink Soft</div><div class="color-hex">#fce4e6</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#c9a574"></div><div class="color-name">Gold</div><div class="color-hex">#c9a574</div></div>
+    </div>
+
+    <h3>フォント</h3>
+    <div class="grid-3">
+      <div class="box">
+        <div class="label">— 本文 —</div>
+        <p style="font-size:13px"><strong>游ゴシック</strong><br><code>"Yu Gothic","YuGothic","游ゴシック","Hiragino Kaku Gothic ProN",sans-serif</code></p>
+      </div>
+      <div class="box">
+        <div class="label">— 見出し —</div>
+        <p style="font-size:13px;font-family:'Yu Mincho',serif"><strong>游明朝</strong>（ここぞの見出し）<br><code>"Yu Mincho","游明朝",serif</code></p>
+      </div>
+      <div class="box">
+        <div class="label">— 英字／装飾 —</div>
+        <p style="font-size:13px;font-family:'Cormorant Garamond',serif;font-style:italic"><strong>Cormorant Garamond</strong>（イタリック・大文字）</p>
+      </div>
+    </div>
+
+    <h3>NG リスト（絶対やらない）</h3>
+    <div class="box warn">
+      <ul style="margin:0">
+        <li><span class="ng">AI絵文字</span>：🌿🌱✨🌟⭐💕🌸（植物・キラキラ系。控えめに使うなら🌸🌷くらい）</li>
+        <li><span class="ng">純赤 #ff0000系</span>：危機感はTerracotta #c25b3f で表現</li>
+        <li><span class="ng">3色以上のグラデ</span>：シンプルに2色まで</li>
+        <li><span class="ng">フォントサイズ巨大</span>：ヒーロー以外で18pt超え禁止</li>
+        <li><span class="ng">煽り言葉</span>：「まだ」「無断」「ラスト」「先着」「今しかない」「人生変わる」</li>
+        <li><span class="ng">対外資料での個人名</span>：「くみこ」「森川」は必ず「弊社」</li>
+      </ul>
+    </div>
+
+    <h3>トーン3軸</h3>
+    <table>
+      <tr><th>軸</th><th>説明</th></tr>
+      <tr><td class="em">上質</td><td>派手装飾・脅し色・煽りフレーズ禁止。余白で見せる</td></tr>
+      <tr><td class="em">静謐</td><td>余白広め、行間1.7〜2.0、文字詰め込み禁止</td></tr>
+      <tr><td class="em">親密</td><td>上から目線NG。「隣に座って一緒に数字を見ている」語り口</td></tr>
+    </table>
+  </section>
+
+  <!-- ============= SEC 6 ============= -->
+  <section id="sec6">
+    <h2><span class="num">06</span>エモーショナル演出の組み立て方</h2>
+    <p class="lead">Re:alizeで効いた演出パターン。次プロジェクトでも構造ごと持っていける。</p>
+
+    <h3>① 名前を入れた瞬間、ページ全体が「自分用」に変わる</h3>
+    <div class="quote">名前を入力すると、卒業証書プレビュー／褒めメッセージサンプル／最終CTAすべてに「〇〇さん」が入る。<br>「これ私のだ」感がワクワクと購買意欲をブーストする。</div>
+
+    <h3>② キャラ育成の二択分岐</h3>
+    <div class="quote">頑張ると <strong>可愛いミー</strong>、サボると <strong>おやじ化</strong>。<br>「失敗しても戻れる」設計が安心感に。<br>たまごっちの育成失敗キャラ文脈で30代女性に刺さる。</div>
+
+    <h3>③ マンスリーバッジ＋自動褒めメッセージ</h3>
+    <div class="quote">毎月、4ランクの桜バッジを自動付与。<br>同時に <strong>名前・取り組んだKR名・残月数を自動差し込み</strong> した300字の褒め文が降ってくる。<br>「これ、誰かに見てもらえた」感が継続のフックに。</div>
+
+    <h3>④ 卒業証書（最終ご褒美）</h3>
+    <div class="quote">6ヶ月全達成で解放される本物っぽい証書。<br>金縁＋桜＋印鑑風スタンプ＋桜舞う背景アニメ＋印刷／PDF保存対応。<br><strong>「印刷して飾れる」</strong>がエモーショナルのトリガー。</div>
+
+    <h3>⑤ ファミコン風RPG（懐かしさで距離感ゼロ）</h3>
+    <div class="quote">30代女性 ＝ 小〜中学生でファミコン世代。<br>ピクセルアート＋ドット効果音風表現＋ドラクエ風メッセージウィンドウで<strong>「無意識に懐かしい」</strong>を引き出す。</div>
+
+    <h3>⑥ デモ早送りボタン（営業時に即体験させる）</h3>
+    <div class="quote">本来26週分の入力が必要な体験を、<strong>ボタン1つで完走シミュレート</strong>。<br>営業時に「百聞は一見にしかず」で見せられる。<br><code>?demo=1</code> URLパラメータで切り替え／本番には出さない。</div>
+  </section>
+
+  <!-- ============= SEC 7 ============= -->
+  <section id="sec7">
+    <h2><span class="num">07</span>送ったデータ／参照素材</h2>
+    <p class="lead">Re:alize制作中にくみこから渡された／参照したデータ。次プロジェクトでも同種の情報があれば最初に集める。</p>
+
+    <h3>📂 ローカルファイル（くみこのMac）</h3>
+    <ul>
+      <li><strong>~/Downloads/[LINE] Re_alize_202501〜06のトーク.txt</strong>（1期トーク履歴）</li>
+      <li><strong>~/Downloads/[LINE] Re_alize_202507-12のトーク.txt</strong>（2期）</li>
+      <li><strong>~/Downloads/[LINE]Realize第3期_202601-06.txt</strong>（3期）</li>
+    </ul>
+    <p style="font-size:12px;color:var(--mute)">※ 参加者のリアル発言・異常値ワーク回答・卒業時の感想などの宝庫</p>
+
+    <h3>📊 Google スプレッドシート</h3>
+    <ul>
+      <li><strong>OKR達成度シート</strong>：1pbxSPkGik_M-AgYU-IZi5LlVYsewUfOA5jHIQUo09CQ<br>→ F列=CHA達成率、G列=COM達成率の構造を踏襲</li>
+      <li><strong>参加者まとめシート</strong>：1zP4oQ8LrVW5lpGKacZkXSqD-opJVNl8IrCjMuL_mBZY<br>→ 各期の参加者リスト・提出率・最高達成率</li>
+    </ul>
+
+    <h3>🖼 Google Drive スライド</h3>
+    <ul>
+      <li><strong>Re:alize スライドフォルダ</strong>：1TevUSLGHqHPoGkaT4FHo93H3BdWAXHnb<br>→ 各月の定例MTG資料（キックオフ／継続力／異常値ワーク／結論ワーク等）</li>
+      <li>サービススローガン「自立しよう、自分の足で立つと気持ちいい」</li>
+      <li>3本柱（毎週報告／毎月MTG／専用コミュニティ）</li>
+      <li>「Realize × Re:start」のネーミング</li>
+    </ul>
+
+    <h3>🎨 ビジュアル参考</h3>
+    <ul>
+      <li><strong>公式ロゴ</strong>：葉ハート＋ドット円弧（青緑→黄緑グラデ）</li>
+      <li><strong>Pusheen</strong>：ミーのプロポーション参考（横長ボディ・短足・三角耳・縦楕円M縞）</li>
+      <li><strong>たまごっち</strong>：おやじキャラの育成失敗系</li>
+      <li><strong>ファミコンRPG</strong>：ドラクエ風メッセージウィンドウ／ピクセルアート</li>
+    </ul>
+
+    <h3>📈 数値（実績データ）</h3>
+    <div class="box note">
+      <ul style="margin:0">
+        <li><strong>週報提出率：99.62%</strong>（前半3ヶ月）</li>
+        <li><strong>達成率90%超：72.7%</strong>（3期参加者）</li>
+        <li><strong>最高達成率：1000%</strong>（目標の10倍）</li>
+        <li>のべ70名以上が3期にわたって参加</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============= SEC 8 ============= -->
+  <section id="sec8">
+    <h2><span class="num">08</span>再利用できる構成パターン</h2>
+    <p class="lead">Re:alizeで作った構造のうち、他プロジェクトに「ガワだけ差し替え」で使い回せるもの。</p>
+
+    <h3>パターンA：LP → 体験 → マイページ の3層フロー</h3>
+    <table>
+      <tr><th>層</th><th>役割</th><th>再利用ポイント</th></tr>
+      <tr><td>LP</td><td>世界観を魅せる</td><td>白＋アクセント1色＋上質タイポ／引用ブロック／実績数字</td></tr>
+      <tr><td>体験フロー</td><td>名前を入れて4セクションスクロール</td><td>HERO（名入力）→ 機能01〜04 → 最終CTA の構造を流用</td></tr>
+      <tr><td>マイページ</td><td>localStorage で記録</td><td>サーバー不要・追加コストゼロ・40名以上配布可能</td></tr>
+    </table>
+
+    <h3>パターンB：キャラ二択分岐</h3>
+    <p>SVG キャラを <strong>SUCCESS版／FAIL版</strong> の2セット用意 → 達成度合いに応じて切替表示。<br>キャラはなんでもOK（猫／犬／植物／キノコ／鳥／お弁当）。世界観に合わせて差し替え。</p>
+
+    <h3>パターンC：マンスリーバッジ＋自動メッセージ</h3>
+    <ul>
+      <li>期間を N ヶ月に分割（Re:alizeは6ヶ月）</li>
+      <li>各月の達成率で 4 ランクに分岐（80% / 60% / 40% / それ未満）</li>
+      <li>ランク別にバッジSVG＋自動メッセージテンプレ（名前・KR名・残月数差し込み）</li>
+      <li>達成度の snapshot を保存して目標変更にも対応</li>
+    </ul>
+
+    <h3>パターンD：卒業証書</h3>
+    <p>金縁＋四隅装飾＋名前＋本文＋6ヶ月分のバッジ列＋印鑑風スタンプ＋桜舞う背景＋印刷対応。<br><strong>「卒業証書」は何度でも他プロジェクトで使える鉄板</strong>。色を変えるだけ。</p>
+
+    <h3>パターンE：ファミコン風ミニゲーム</h3>
+    <ul>
+      <li>16×10タイルマップ（CSS Grid + 絶対配置）</li>
+      <li>主人公SVG（16×16 ピクセル）＋宝箱5つ</li>
+      <li>矢印キー/WASD/Dパッド対応</li>
+      <li>ドラクエ風メッセージウィンドウ＋自由記述</li>
+      <li>クリア時に「LEVEL UP！」演出＋レポート生成</li>
+      <li>5問の質問内容を差し替えるだけで <strong>あらゆる診断・自己分析ゲーム</strong> が作れる</li>
+    </ul>
+
+    <h3>パターンF：運営用配布パネル</h3>
+    <p>参加者IDを入れると <strong>個別URL自動生成＋LINEテンプレ自動生成</strong>。<br>40〜100名規模の配布に対応。テスト配布フローを最初から組み込めばスムーズ。</p>
+  </section>
+
+  <!-- ============= SEC 9 ============= -->
+  <section id="sec9">
+    <h2><span class="num">09</span>次プロジェクトへの「初手」テンプレ</h2>
+    <p class="lead">他イベントでサイトやゲームを依頼された時、最初の30分でやるべきこと。</p>
+
+    <h3>初手チェックリスト</h3>
+    <div class="box good">
+      <ol style="margin:0">
+        <li>くみこから渡される素材を確認（スプシ／スライド／LINEログ／ロゴ画像）</li>
+        <li>ターゲット確認：30代女性か？子育て中／副業／自己実現志向どれが主軸か？</li>
+        <li>体験の山場を決める：何で感動させたい？（卒業証書？レベルアップ？？コンプリート？）</li>
+        <li>キャラ要素を入れるか決める：必要なら2分岐（成功／失敗）の設計を最初に固める</li>
+        <li>配布規模を確認：誰に何人配るか？／個別URL要るか？／LINEで配るか？</li>
+        <li>GitHub Pages 無料デプロイ前提で設計（サーバー不要）</li>
+        <li>localStorage で記録持つ／本人だけ見える設計を基本に</li>
+      </ol>
+    </div>
+
+    <h3>最初に必ず作るべき3点セット</h3>
+    <table>
+      <tr><th>1</th><td><strong>LP</strong>（白ベース＋Terracotta or Leaf アクセント＋実績数字＋引用ブロック）</td></tr>
+      <tr><th>2</th><td><strong>体験フロー</strong>（名前入力＋3〜4セクション説明＋最終CTA）</td></tr>
+      <tr><th>3</th><td><strong>マイページ</strong>（個別URL＋localStorage＋進捗可視化）</td></tr>
+    </table>
+
+    <h3>くみこへの最初の問いかけテンプレ</h3>
+    <div class="quote">これ、Re:alize方式で作れる。30代女性に刺さる構造があるから流用しよう。<br>確認させて：<br>① ターゲットは Re:alize と同じ層？<br>② 期間は何ヶ月？（バッジ数を決めるため）<br>③ 体験の山場は何にする？（卒業証書？／キャラ完成？／コンプリート？）<br>④ 配布はLINEで個別URL方式？それともパスワード付き？<br>これがあれば、当日中に LP＋体験フロー＋マイページ の3点セット出すよ。</div>
+
+    <h3>避けるべき罠</h3>
+    <div class="box warn">
+      <ul style="margin:0">
+        <li>くみこの指示の前に「素材集まってから動こう」と思って遅らせる → <strong>NG</strong>。先に作りながら指示を待つ</li>
+        <li>「AI絵文字を使えば華やか」 → <strong>NG</strong>。一発で「ダサい」判定</li>
+        <li>独自の解釈で素材をデフォルメ → <strong>NG</strong>。スクショ・ロゴ画像は忠実再現</li>
+        <li>提案を長文化 → <strong>NG</strong>。3行で済むなら3行で。「やる？」で締める</li>
+        <li>確認しすぎ → <strong>NG</strong>。「OK、こう進める」と先に動いて、見せて、調整する</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span class="serif">— Re:alize Project Handover ／ for the next 30s女性向け project —</span>
+    Operated by Merone Inc. ／ Copyright © 2026
+  </footer>
+
+</div>
+
+</body>
+</html>
