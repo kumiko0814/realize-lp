@@ -121,8 +121,8 @@ footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-al
     <p class="sub">MBTI診断結果に応じて、参加者ごとに育つ動物が変わる設計案</p>
   </div>
 
-  <!-- ============ HD版（PS1風）プレビュー ============ -->
-  <section>
+  <!-- ============ HD版（PS1風）プレビュー [REMOVED] ============ -->
+  <section style="display:none">
     <h2><span class="num">00</span>HD版プレビュー（PS1風・代表3匹）</h2>
     <p class="lead">解像度を上げて、各キャラの特徴がはっきり分かる描き込みに。これでOKなら残り7匹も同じクオリティで作る。</p>
 
@@ -373,27 +373,52 @@ footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-al
 
   <!-- ============ 10種類 一覧 ============ -->
   <section>
-    <h2><span class="num">01</span>10種類の相棒（旧版／低解像度）</h2>
+    <h2><span class="num">01</span>10種類の相棒（成体）</h2>
     <p class="lead">それぞれが「強みの軸」に対応。あなたのMBTI結果で、どの相棒と旅するかが決まる。</p>
 
     <div class="kit-grid">
-      <!-- 1. ねこ -->
+      <!-- 1. ねこ（特徴強調版） -->
       <div class="kit-card">
         <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
-          <rect x="3" y="2" width="2" height="2" fill="#c45a8e"/>
-          <rect x="11" y="2" width="2" height="2" fill="#c45a8e"/>
-          <rect x="3" y="3" width="1" height="1" fill="#f78ac0"/>
-          <rect x="12" y="3" width="1" height="1" fill="#f78ac0"/>
-          <rect x="2" y="4" width="12" height="7" fill="#f78ac0"/>
+          <!-- 三角耳（尖り強調） -->
+          <rect x="2" y="1" width="1" height="1" fill="#c45a8e"/>
+          <rect x="2" y="2" width="2" height="1" fill="#c45a8e"/>
+          <rect x="2" y="3" width="3" height="1" fill="#f78ac0"/>
+          <rect x="13" y="1" width="1" height="1" fill="#c45a8e"/>
+          <rect x="12" y="2" width="2" height="1" fill="#c45a8e"/>
+          <rect x="11" y="3" width="3" height="1" fill="#f78ac0"/>
+          <!-- 耳内側 -->
+          <rect x="3" y="2" width="1" height="1" fill="#e63d6a"/>
+          <rect x="12" y="2" width="1" height="1" fill="#e63d6a"/>
+          <!-- 顔（丸い） -->
+          <rect x="2" y="4" width="12" height="6" fill="#f78ac0"/>
           <rect x="3" y="3" width="10" height="1" fill="#f78ac0"/>
-          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="7" y="8" width="1" height="1" fill="#e63d6a"/>
-          <rect x="8" y="8" width="1" height="1" fill="#e63d6a"/>
-          <rect x="3" y="11" width="2" height="2" fill="#f78ac0"/>
-          <rect x="7" y="11" width="2" height="2" fill="#f78ac0"/>
-          <rect x="11" y="11" width="2" height="2" fill="#f78ac0"/>
-          <rect x="13" y="6" width="1" height="3" fill="#f78ac0"/>
+          <!-- ぱっちりお目目（大きく） -->
+          <rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="5" y="6" width="1" height="1" fill="#fff"/>
+          <rect x="11" y="6" width="1" height="1" fill="#fff"/>
+          <!-- ピンクの鼻 -->
+          <rect x="7" y="8" width="2" height="1" fill="#e63d6a"/>
+          <!-- W字の口（猫らしさ） -->
+          <rect x="6" y="9" width="1" height="1" fill="#c45a8e"/>
+          <rect x="9" y="9" width="1" height="1" fill="#c45a8e"/>
+          <rect x="7" y="9" width="2" height="1" fill="#c45a8e"/>
+          <!-- ヒゲ -->
+          <rect x="0" y="7" width="2" height="1" fill="#c45a8e"/>
+          <rect x="14" y="7" width="2" height="1" fill="#c45a8e"/>
+          <rect x="0" y="8" width="2" height="1" fill="#c45a8e"/>
+          <rect x="14" y="8" width="2" height="1" fill="#c45a8e"/>
+          <!-- 体 -->
+          <rect x="3" y="10" width="10" height="3" fill="#f78ac0"/>
+          <!-- 足 -->
+          <rect x="3" y="13" width="2" height="2" fill="#f78ac0"/>
+          <rect x="6" y="13" width="2" height="2" fill="#f78ac0"/>
+          <rect x="11" y="13" width="2" height="2" fill="#f78ac0"/>
+          <!-- 曲がったしっぽ -->
+          <rect x="13" y="9" width="1" height="2" fill="#f78ac0"/>
+          <rect x="14" y="7" width="1" height="3" fill="#f78ac0"/>
+          <rect x="15" y="6" width="1" height="2" fill="#f78ac0"/>
         </svg>
         <div class="kit-name">ねこ</div>
         <div class="kit-role">— 遊び人 / 商人 —</div>
@@ -466,22 +491,49 @@ footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-al
         <div class="kit-trait">深い洞察と知性。本質を見抜き、未来を読む</div>
       </div>
 
-      <!-- 5. キツネ -->
+      <!-- 5. キツネ（特徴強調版） -->
       <div class="kit-card">
         <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
-          <rect x="2" y="2" width="2" height="3" fill="#e6814a"/>
-          <rect x="12" y="2" width="2" height="3" fill="#e6814a"/>
-          <rect x="3" y="3" width="1" height="1" fill="#fff"/>
-          <rect x="12" y="3" width="1" height="1" fill="#fff"/>
-          <rect x="2" y="4" width="12" height="7" fill="#e6814a"/>
-          <rect x="4" y="9" width="8" height="2" fill="#fff"/>
-          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="7" y="8" width="2" height="1" fill="#0e0e1a"/>
-          <rect x="3" y="11" width="2" height="2" fill="#e6814a"/>
-          <rect x="11" y="11" width="2" height="2" fill="#e6814a"/>
-          <rect x="13" y="4" width="2" height="6" fill="#e6814a"/>
-          <rect x="14" y="9" width="1" height="2" fill="#fff"/>
+          <!-- 大きな三角立ち耳 -->
+          <rect x="2" y="0" width="1" height="1" fill="#c25b3f"/>
+          <rect x="2" y="1" width="2" height="1" fill="#e6814a"/>
+          <rect x="2" y="2" width="3" height="1" fill="#e6814a"/>
+          <rect x="2" y="3" width="3" height="1" fill="#e6814a"/>
+          <rect x="13" y="0" width="1" height="1" fill="#c25b3f"/>
+          <rect x="12" y="1" width="2" height="1" fill="#e6814a"/>
+          <rect x="11" y="2" width="3" height="1" fill="#e6814a"/>
+          <rect x="11" y="3" width="3" height="1" fill="#e6814a"/>
+          <!-- 耳内（白） -->
+          <rect x="3" y="2" width="1" height="2" fill="#fff"/>
+          <rect x="12" y="2" width="1" height="2" fill="#fff"/>
+          <!-- 顔（細長く尖り） -->
+          <rect x="2" y="4" width="12" height="4" fill="#e6814a"/>
+          <rect x="3" y="8" width="10" height="2" fill="#e6814a"/>
+          <rect x="5" y="10" width="6" height="1" fill="#e6814a"/>
+          <!-- 顔の下半分 白（キツネ特徴） -->
+          <rect x="4" y="8" width="8" height="2" fill="#fff"/>
+          <rect x="5" y="10" width="6" height="1" fill="#fff"/>
+          <!-- 鋭い細目 -->
+          <rect x="4" y="6" width="2" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="2" height="1" fill="#0e0e1a"/>
+          <rect x="5" y="7" width="1" height="1" fill="#fff"/>
+          <rect x="10" y="7" width="1" height="1" fill="#fff"/>
+          <!-- 黒い鼻（尖り先） -->
+          <rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/>
+          <!-- 体 -->
+          <rect x="3" y="11" width="6" height="3" fill="#e6814a"/>
+          <rect x="3" y="13" width="6" height="1" fill="#fff"/>
+          <!-- 足 -->
+          <rect x="3" y="14" width="2" height="1" fill="#c25b3f"/>
+          <rect x="7" y="14" width="2" height="1" fill="#c25b3f"/>
+          <!-- 大きなふさふさしっぽ -->
+          <rect x="9" y="10" width="2" height="2" fill="#e6814a"/>
+          <rect x="11" y="9" width="3" height="3" fill="#e6814a"/>
+          <rect x="13" y="11" width="2" height="3" fill="#e6814a"/>
+          <rect x="12" y="14" width="3" height="1" fill="#e6814a"/>
+          <!-- しっぽの先 白 -->
+          <rect x="13" y="13" width="2" height="2" fill="#fff"/>
+          <rect x="12" y="14" width="3" height="1" fill="#fff"/>
         </svg>
         <div class="kit-name">キツネ</div>
         <div class="kit-role">— 軍師 / 占い師 —</div>
@@ -511,22 +563,56 @@ footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-al
         <div class="kit-trait">仲間を守る忠誠心。責任感と面倒見の良さで前線に立つ</div>
       </div>
 
-      <!-- 7. リス -->
+      <!-- 7. リス（特徴強調版・巨大しっぽ＆どんぐり） -->
       <div class="kit-card">
         <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
-          <rect x="3" y="2" width="2" height="2" fill="#a87132"/>
-          <rect x="11" y="2" width="2" height="2" fill="#a87132"/>
-          <rect x="2" y="4" width="10" height="7" fill="#a87132"/>
-          <rect x="3" y="8" width="8" height="3" fill="#fcd5a3"/>
-          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="9" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="6" y="8" width="2" height="1" fill="#e63d6a"/>
-          <rect x="3" y="11" width="2" height="2" fill="#a87132"/>
-          <rect x="9" y="11" width="2" height="2" fill="#a87132"/>
-          <rect x="12" y="2" width="3" height="3" fill="#a87132"/>
-          <rect x="13" y="5" width="3" height="5" fill="#a87132"/>
-          <rect x="12" y="9" width="3" height="2" fill="#a87132"/>
-          <rect x="13" y="11" width="2" height="2" fill="#a87132"/>
+          <!-- 三角耳＋房毛 -->
+          <rect x="2" y="0" width="1" height="1" fill="#6a4a1f"/>
+          <rect x="2" y="1" width="2" height="2" fill="#a87132"/>
+          <rect x="8" y="0" width="1" height="1" fill="#6a4a1f"/>
+          <rect x="8" y="1" width="2" height="2" fill="#a87132"/>
+          <!-- 耳内 -->
+          <rect x="3" y="2" width="1" height="1" fill="#fcd5a3"/>
+          <rect x="9" y="2" width="1" height="1" fill="#fcd5a3"/>
+          <!-- 顔（小さめ・左寄せ） -->
+          <rect x="2" y="3" width="8" height="5" fill="#a87132"/>
+          <!-- ぷっくり頬（はみ出すほど） -->
+          <rect x="1" y="6" width="2" height="2" fill="#c89455"/>
+          <rect x="9" y="6" width="2" height="2" fill="#c89455"/>
+          <!-- 大きな黒目 -->
+          <rect x="3" y="5" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="7" y="5" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="4" y="5" width="1" height="1" fill="#fff"/>
+          <rect x="8" y="5" width="1" height="1" fill="#fff"/>
+          <!-- 小さな鼻 -->
+          <rect x="5" y="7" width="2" height="1" fill="#e63d6a"/>
+          <!-- 口 -->
+          <rect x="5" y="8" width="1" height="1" fill="#5a1a1a"/>
+          <rect x="6" y="8" width="1" height="1" fill="#5a1a1a"/>
+          <!-- 体（小さい） -->
+          <rect x="3" y="9" width="6" height="4" fill="#a87132"/>
+          <rect x="4" y="10" width="4" height="3" fill="#fcd5a3"/>
+          <!-- 前足（どんぐり持ち） -->
+          <rect x="5" y="11" width="2" height="2" fill="#a87132"/>
+          <!-- どんぐり -->
+          <rect x="5" y="9" width="2" height="2" fill="#6a4a1f"/>
+          <rect x="5" y="9" width="2" height="1" fill="#3a2a14"/>
+          <!-- 足 -->
+          <rect x="3" y="13" width="2" height="2" fill="#a87132"/>
+          <rect x="7" y="13" width="2" height="2" fill="#a87132"/>
+          <!-- 巨大ふさふさしっぽ（最大の特徴） -->
+          <rect x="10" y="2" width="3" height="2" fill="#a87132"/>
+          <rect x="11" y="1" width="4" height="2" fill="#a87132"/>
+          <rect x="12" y="0" width="3" height="2" fill="#a87132"/>
+          <rect x="13" y="2" width="3" height="3" fill="#a87132"/>
+          <rect x="13" y="5" width="3" height="3" fill="#a87132"/>
+          <rect x="12" y="8" width="3" height="3" fill="#a87132"/>
+          <rect x="11" y="11" width="3" height="2" fill="#a87132"/>
+          <rect x="10" y="13" width="2" height="1" fill="#a87132"/>
+          <!-- しっぽの陰影（縞模様） -->
+          <rect x="14" y="3" width="1" height="2" fill="#6a4a1f"/>
+          <rect x="14" y="6" width="1" height="2" fill="#6a4a1f"/>
+          <rect x="13" y="9" width="1" height="2" fill="#6a4a1f"/>
         </svg>
         <div class="kit-name">リス</div>
         <div class="kit-role">— 武闘家 —</div>
@@ -534,19 +620,42 @@ footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-al
         <div class="kit-trait">几帳面に積み上げる継続力。約束を必ず守る守護者</div>
       </div>
 
-      <!-- 8. ハムスター -->
+      <!-- 8. ハムスター（特徴強調版・パンパン頬） -->
       <div class="kit-card">
         <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
-          <rect x="4" y="2" width="2" height="2" fill="#ffd644"/>
-          <rect x="10" y="2" width="2" height="2" fill="#ffd644"/>
-          <rect x="2" y="4" width="12" height="8" fill="#ffd644"/>
-          <rect x="3" y="8" width="3" height="2" fill="#fff"/>
-          <rect x="10" y="8" width="3" height="2" fill="#fff"/>
-          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="7" y="8" width="2" height="1" fill="#e63d6a"/>
-          <rect x="3" y="12" width="3" height="2" fill="#ffd644"/>
-          <rect x="10" y="12" width="3" height="2" fill="#ffd644"/>
+          <!-- 丸い小さな耳 -->
+          <rect x="3" y="1" width="2" height="2" fill="#c89a55"/>
+          <rect x="11" y="1" width="2" height="2" fill="#c89a55"/>
+          <rect x="3" y="2" width="2" height="1" fill="#f6a0c4"/>
+          <rect x="11" y="2" width="2" height="1" fill="#f6a0c4"/>
+          <!-- まんまる頭（黄色〜薄茶） -->
+          <rect x="3" y="3" width="10" height="6" fill="#ffd644"/>
+          <rect x="2" y="4" width="12" height="5" fill="#ffd644"/>
+          <!-- パンパンに膨らんだ頬（最大特徴・はみ出す） -->
+          <rect x="0" y="6" width="3" height="3" fill="#fff5b8"/>
+          <rect x="13" y="6" width="3" height="3" fill="#fff5b8"/>
+          <rect x="0" y="7" width="2" height="2" fill="#fce4a0"/>
+          <rect x="14" y="7" width="2" height="2" fill="#fce4a0"/>
+          <!-- 大きなつぶらな目 -->
+          <rect x="4" y="5" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="10" y="5" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="5" y="5" width="1" height="1" fill="#fff"/>
+          <rect x="11" y="5" width="1" height="1" fill="#fff"/>
+          <!-- ピンクの鼻 -->
+          <rect x="7" y="7" width="2" height="1" fill="#f6a0c4"/>
+          <!-- 小さな口 -->
+          <rect x="7" y="8" width="1" height="1" fill="#c45a8e"/>
+          <rect x="8" y="8" width="1" height="1" fill="#c45a8e"/>
+          <!-- まんまる体 -->
+          <rect x="2" y="9" width="12" height="5" fill="#ffd644"/>
+          <rect x="3" y="10" width="10" height="4" fill="#fff5b8"/>
+          <!-- 短い手足 -->
+          <rect x="2" y="13" width="2" height="1" fill="#c89a55"/>
+          <rect x="6" y="13" width="2" height="1" fill="#c89a55"/>
+          <rect x="8" y="13" width="2" height="1" fill="#c89a55"/>
+          <rect x="12" y="13" width="2" height="1" fill="#c89a55"/>
+          <!-- 種子（口の横に少し見える） -->
+          <rect x="13" y="9" width="2" height="1" fill="#fcd5a3"/>
         </svg>
         <div class="kit-name">ハムスター</div>
         <div class="kit-role">— 薬師 —</div>
@@ -574,27 +683,44 @@ footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-al
         <div class="kit-trait">静かに観察し、一気に動く。実行力と冷静さが武器</div>
       </div>
 
-      <!-- 10. クマ -->
-      <div class="kit-card">
+      <!-- 10. たまご（未診断） -->
+      <div class="kit-card" style="background:linear-gradient(180deg,#fffcf5 0%,#fdf2f4 100%);border-color:#e8d6a8">
         <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
-          <rect x="3" y="2" width="2" height="2" fill="#a07840"/>
-          <rect x="11" y="2" width="2" height="2" fill="#a07840"/>
-          <rect x="3" y="3" width="2" height="1" fill="#fcd5a3"/>
-          <rect x="11" y="3" width="2" height="1" fill="#fcd5a3"/>
-          <rect x="2" y="4" width="12" height="8" fill="#a07840"/>
-          <rect x="4" y="8" width="8" height="4" fill="#fcd5a3"/>
-          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="7" y="8" width="2" height="1" fill="#0e0e1a"/>
-          <rect x="6" y="9" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="9" y="9" width="1" height="1" fill="#0e0e1a"/>
-          <rect x="3" y="12" width="3" height="2" fill="#a07840"/>
-          <rect x="10" y="12" width="3" height="2" fill="#a07840"/>
+          <!-- 卵本体（縦長楕円） -->
+          <rect x="6" y="2" width="4" height="1" fill="#fff"/>
+          <rect x="5" y="3" width="6" height="1" fill="#fff"/>
+          <rect x="4" y="4" width="8" height="2" fill="#fff"/>
+          <rect x="3" y="6" width="10" height="5" fill="#fff"/>
+          <rect x="4" y="11" width="8" height="2" fill="#fff"/>
+          <rect x="5" y="13" width="6" height="1" fill="#fff"/>
+          <!-- 殻のドット模様（ピンク） -->
+          <rect x="6" y="5" width="1" height="1" fill="#f6a0c4"/>
+          <rect x="9" y="6" width="1" height="1" fill="#f6a0c4"/>
+          <rect x="5" y="8" width="1" height="1" fill="#f6a0c4"/>
+          <rect x="10" y="9" width="1" height="1" fill="#f6a0c4"/>
+          <rect x="7" y="10" width="1" height="1" fill="#f6a0c4"/>
+          <rect x="9" y="12" width="1" height="1" fill="#f6a0c4"/>
+          <!-- 殻のドット（金） -->
+          <rect x="8" y="4" width="1" height="1" fill="#ffd644"/>
+          <rect x="4" y="9" width="1" height="1" fill="#ffd644"/>
+          <rect x="11" y="7" width="1" height="1" fill="#ffd644"/>
+          <rect x="6" y="12" width="1" height="1" fill="#ffd644"/>
+          <!-- 殻の影 -->
+          <rect x="11" y="6" width="1" height="5" fill="#e8d6c8" opacity="0.5"/>
+          <rect x="12" y="7" width="1" height="3" fill="#e8d6c8" opacity="0.5"/>
+          <!-- ハイライト（光沢） -->
+          <rect x="5" y="4" width="2" height="1" fill="#fffce0"/>
+          <rect x="4" y="5" width="1" height="2" fill="#fffce0"/>
+          <!-- 「?」マーク -->
+          <rect x="7" y="7" width="2" height="1" fill="#c25b3f"/>
+          <rect x="8" y="8" width="1" height="1" fill="#c25b3f"/>
+          <rect x="7" y="9" width="1" height="1" fill="#c25b3f"/>
+          <rect x="7" y="11" width="1" height="1" fill="#c25b3f"/>
         </svg>
-        <div class="kit-name">クマ</div>
-        <div class="kit-role">— 旅人（未診断） —</div>
-        <div class="kit-mbti">DEFAULT</div>
-        <div class="kit-trait">MBTI診断前のデフォルト相棒。診断後に専属の動物へ進化</div>
+        <div class="kit-name">？？？</div>
+        <div class="kit-role">— ふしぎなたまご —</div>
+        <div class="kit-mbti">UNDIAGNOSED</div>
+        <div class="kit-trait">中身はまだわからない。MBTI診断を受けると、ここから固有の動物が生まれる</div>
       </div>
     </div>
   </section>
