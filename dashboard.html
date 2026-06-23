@@ -603,24 +603,27 @@ body{
     <div class="history-grid" id="historyGrid"></div>
   </section>
 
-  <!-- IJOUCHI GAME LINK -->
+  <!-- QUEST GAME LINK -->
   <section class="card" style="background:linear-gradient(135deg,#0e0e1a 0%,#2a1828 100%);border-color:#5a3a5a;color:#fff">
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-      <div style="width:64px;height:64px;flex-shrink:0;background:#5fbb5f;border:3px solid #fffbf3;border-radius:4px;display:flex;align-items:center;justify-content:center">
+      <div style="width:64px;height:64px;flex-shrink:0;background:#7a4a8a;border:3px solid #fffbf3;border-radius:4px;display:flex;align-items:center;justify-content:center">
         <svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:80%;height:80%;image-rendering:pixelated">
-          <rect x="3" y="1" width="10" height="2" fill="#1c4a1c"/>
-          <rect x="2" y="3" width="12" height="3" fill="#2e6e2e"/>
-          <rect x="3" y="6" width="10" height="2" fill="#1c4a1c"/>
-          <rect x="7" y="8" width="2" height="6" fill="#6a4a1f"/>
-          <rect x="6" y="14" width="4" height="1" fill="#a87132"/>
+          <rect x="5" y="1" width="6" height="1" fill="#f78ac0"/>
+          <rect x="4" y="2" width="8" height="2" fill="#f78ac0"/>
+          <rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/>
+          <rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="6" width="2" height="1" fill="#e63d6a"/>
+          <rect x="5" y="7" width="5" height="5" fill="#e63d6a"/>
+          <rect x="5" y="9" width="5" height="1" fill="#ffd644"/>
         </svg>
       </div>
       <div style="flex:1;min-width:200px">
-        <div style="font-family:'DotGothic16',sans-serif;font-size:11px;color:#ffd644;letter-spacing:0.3em;margin-bottom:4px">⚔ MINI GAME</div>
-        <h3 style="font-family:'DotGothic16',sans-serif;font-size:18px;font-weight:normal;letter-spacing:0.05em;margin-bottom:6px;color:#fcd5e6">異常値の森へ行く</h3>
-        <p style="font-size:12px;line-height:1.85;color:#c8c8d8;letter-spacing:0.04em">5つの宝箱を開けて、自分の<strong style="color:#ffd644">異常値（変態性＝強み）</strong>を見つけるRPG。ミニゲーム感覚で5〜7分で完了。</p>
+        <div style="font-family:'DotGothic16',sans-serif;font-size:11px;color:#ffd644;letter-spacing:0.3em;margin-bottom:4px">⚔ NEW RPG</div>
+        <h3 style="font-family:'DotGothic16',sans-serif;font-size:18px;font-weight:normal;letter-spacing:0.05em;margin-bottom:6px;color:#fcd5e6">異常値のカケラを求めて</h3>
+        <p style="font-size:12px;line-height:1.85;color:#c8c8d8;letter-spacing:0.04em">MBTI診断・5人からの強み発掘・問いかけの泉。<strong style="color:#ffd644">自分と他者の声を集めて</strong>本当の強みを見つけるドラクエ風RPG。BGM＆マインドゲージ付き。</p>
       </div>
-      <a href="ijouchi.html" id="ijouchiLink" style="font-family:'DotGothic16',sans-serif;background:#e63d6a;color:#fff;border:3px solid #fcd5e6;padding:14px 24px;text-decoration:none;letter-spacing:0.15em;font-size:13px;white-space:nowrap;transition:all 0.2s">▶ PLAY</a>
+      <a href="quest.html" id="ijouchiLink" style="font-family:'DotGothic16',sans-serif;background:#e63d6a;color:#fff;border:3px solid #fcd5e6;padding:14px 24px;text-decoration:none;letter-spacing:0.15em;font-size:13px;white-space:nowrap;transition:all 0.2s">▶ PLAY</a>
     </div>
   </section>
 
@@ -1657,7 +1660,7 @@ if(nameParam && !state.userName){
   if(name) q.set('name', name);
   if(params.get('demo')) q.set('demo', '1');
   const qs = q.toString();
-  link.href = 'ijouchi.html' + (qs ? '?' + qs : '');
+  link.href = 'quest.html' + (qs ? '?' + qs : '');
 })();
 
 function demoSimulate(weekCount, achieveRatio){
