@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re:alize Quest ｜ 異常値の冒険</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0e0e1a;--white:#fffbf3;
+  --grass:#5fbb5f;--grass-d:#3a8a3a;
+  --tree:#2e6e2e;--tree-d:#1c4a1c;
+  --water:#3a76d6;--path:#c8a060;
+  --hair:#f78ac0;--hair-d:#c45a8e;
+  --dress:#e63d6a;--dress-d:#a02448;
+  --gold:#ffd644;--pink:#f6a0c4;--sakura:#fcd5e6;
+  --msg-bg:#0e0e1a;--msg-border:#fffbf3;
+  --accent:#e63d6a;--mind:#7ac8ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:"DotGothic16","Yu Gothic",sans-serif;background:#000;color:var(--white);
+  display:flex;align-items:center;justify-content:center;padding:8px;letter-spacing:0.04em;user-select:none;
+}
+svg{image-rendering:pixelated}
+
+.frame{
+  width:100%;max-width:780px;background:#000;border:6px solid #1e1e2a;border-radius:8px;
+  padding:10px;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 40px rgba(0,0,0,0.5);
+}
+.status-bar{display:grid;grid-template-columns:1fr auto;gap:8px;background:var(--msg-bg);border:2px solid var(--msg-border);padding:6px 10px;font-size:10px}
+.status-left{display:flex;flex-direction:column;gap:3px}
+.status-row{display:flex;align-items:center;gap:6px}
+.status-row .name{color:var(--sakura);font-size:11px;letter-spacing:0.1em}
+.status-row .role{color:var(--gold);font-size:10px}
+.status-row .town-label{color:var(--gold);font-size:10px}
+.status-right{display:flex;flex-direction:column;gap:3px;text-align:right}
+.kakera{font-size:11px;color:var(--sakura)}
+.warp-btn{font-size:10px;color:var(--mind);cursor:pointer;text-decoration:underline}
+
+.stage-wrap{position:relative;width:100%;aspect-ratio:20/12;background:var(--grass);border:3px solid var(--msg-border);overflow:hidden}
+.stage{position:absolute;inset:0}
+.tile{position:absolute;width:5%;height:8.333%;display:flex;align-items:center;justify-content:center}
+.tile svg{width:100%;height:100%}
+
+#hero{position:absolute;width:5%;height:8.333%;transition:left 0.18s linear,top 0.18s linear;z-index:10}
+#hero.facing-left{transform:scaleX(-1)}
+#hero.facing-right{transform:scaleX(1)}
+#hero.walk .hero-body{animation:bob 0.36s steps(2) infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+
+.label-tile{position:absolute;font-size:8px;color:var(--white);background:var(--msg-bg);padding:1px 4px;border:1px solid var(--msg-border);white-space:nowrap;pointer-events:none;letter-spacing:0.08em}
+
+.msg-win{background:var(--msg-bg);border:3px solid var(--msg-border);padding:10px 14px;min-height:100px;position:relative}
+.msg-text{font-size:13px;line-height:1.85;letter-spacing:0.04em;white-space:pre-wrap;min-height:46px}
+.msg-text .em{color:var(--gold)}
+.msg-text .pink{color:var(--sakura)}
+.msg-text .red{color:var(--accent)}
+.msg-text .mind{color:var(--mind)}
+.cursor-tri{display:inline-block;color:var(--gold);animation:blink 0.7s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.msg-input,.msg-textarea{width:100%;background:transparent;border:2px solid var(--msg-border);color:var(--white);font-family:inherit;font-size:12px;padding:8px 10px;margin-top:8px;outline:none;letter-spacing:0.04em;line-height:1.6}
+.msg-textarea{min-height:60px;resize:vertical}
+.msg-input:focus,.msg-textarea:focus{border-color:var(--gold)}
+.msg-actions{display:flex;gap:6px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap}
+.btn{background:var(--msg-bg);color:var(--white);border:2px solid var(--msg-border);font-family:inherit;font-size:11px;padding:6px 16px;cursor:pointer;letter-spacing:0.12em;transition:all 0.15s}
+.btn:hover,.btn:focus{background:var(--gold);color:var(--msg-bg);border-color:var(--gold);outline:none}
+.btn.primary{background:var(--accent);border-color:var(--sakura)}
+.btn.primary:hover{background:var(--gold);color:var(--msg-bg)}
+.btn.danger{border-color:var(--accent);color:var(--accent)}
+.btn.danger:hover{background:var(--accent);color:#fff}
+
+.choice-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.choice{background:var(--msg-bg);color:var(--white);border:2px solid var(--msg-border);font-family:inherit;font-size:11.5px;padding:10px 14px;cursor:pointer;letter-spacing:0.04em;text-align:left;transition:all 0.15s}
+.choice:hover,.choice:focus{background:var(--gold);color:var(--msg-bg);outline:none}
+.choice .head{display:block;font-size:9px;color:var(--gold);letter-spacing:0.18em;margin-bottom:3px}
+.choice:hover .head{color:var(--msg-bg)}
+
+.controls{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px}
+.dpad{display:grid;grid-template-columns:repeat(3,36px);grid-template-rows:repeat(3,36px);gap:2px}
+.dpad-btn{background:#1e1e2a;border:2px solid #3a3a4a;color:var(--white);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all 0.1s}
+.dpad-btn:active{background:var(--accent);transform:scale(0.94)}
+.dpad-btn.up{grid-column:2;grid-row:1}
+.dpad-btn.left{grid-column:1;grid-row:2}
+.dpad-btn.center{grid-column:2;grid-row:2;background:#0a0a14;border-color:#1a1a2a;cursor:default}
+.dpad-btn.right{grid-column:3;grid-row:2}
+.dpad-btn.down{grid-column:2;grid-row:3}
+.ab-buttons{display:flex;flex-direction:column;gap:6px}
+.ab-btn{width:60px;height:60px;border-radius:50%;background:var(--accent);color:var(--white);border:2px solid var(--sakura);font-family:inherit;font-size:13px;letter-spacing:0.08em;cursor:pointer;font-weight:bold;box-shadow:0 3px 0 var(--dress-d);transition:all 0.1s}
+.ab-btn.b{background:#3a3a5a;border-color:#7a7aaa;box-shadow:0 3px 0 #1a1a3a}
+.ab-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--dress-d)}
+.ab-btn.b:active{box-shadow:0 1px 0 #1a1a3a}
+.hint{font-size:9px;color:var(--gold);text-align:center;letter-spacing:0.15em;margin-top:2px}
+
+.title-screen{position:fixed;inset:0;background:#000;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;color:var(--white)}
+.title-logo{font-size:34px;color:var(--sakura);letter-spacing:0.18em;text-shadow:4px 4px 0 var(--dress-d);margin-bottom:6px;line-height:1.3}
+.title-logo2{font-size:18px;color:var(--gold);letter-spacing:0.2em;margin-bottom:8px}
+.title-sub{font-size:11px;letter-spacing:0.3em;color:var(--mind);margin-bottom:32px}
+.title-art{margin-bottom:32px}
+.title-art svg{width:84px;height:84px}
+.title-press{font-size:13px;color:var(--white);letter-spacing:0.22em;animation:blink 0.9s steps(2) infinite;cursor:pointer;padding:12px 32px;border:2px solid var(--white);background:transparent;font-family:inherit}
+.title-press:hover{background:var(--accent);border-color:var(--sakura)}
+.title-note{position:absolute;bottom:16px;font-size:8px;letter-spacing:0.2em;color:#5a5a7a}
+
+.howto-screen{position:fixed;inset:0;background:#0e0e1a;z-index:900;display:none;flex-direction:column;align-items:center;padding:24px 20px;overflow-y:auto;color:var(--white)}
+.howto-screen.show{display:flex}
+.howto-screen h2{font-size:22px;color:var(--gold);letter-spacing:0.2em;text-shadow:3px 3px 0 var(--dress-d);margin-bottom:8px}
+.howto-sub{font-size:11px;color:var(--sakura);letter-spacing:0.2em;margin-bottom:24px}
+.howto-card{background:var(--msg-bg);border:3px solid var(--gold);padding:18px 18px;max-width:560px;width:100%;margin-bottom:14px;font-size:12px;line-height:1.85;letter-spacing:0.04em}
+.howto-card h3{color:var(--gold);font-size:13px;margin-bottom:8px;letter-spacing:0.15em}
+.howto-card .em{color:var(--gold)}
+.howto-card .pink{color:var(--sakura)}
+.howto-actions{margin-top:14px;display:flex;gap:10px}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:800;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+.modal-bg.show{display:flex;animation:fadeIn 0.3s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--msg-bg);border:4px solid var(--msg-border);padding:22px 22px;max-width:560px;width:100%;color:var(--white);max-height:90vh;overflow-y:auto}
+.modal h2{font-size:16px;color:var(--gold);margin-bottom:6px;letter-spacing:0.12em}
+.modal .sub{font-size:10px;color:var(--sakura);letter-spacing:0.2em;margin-bottom:18px}
+.modal p{font-size:12.5px;line-height:1.85;margin-bottom:10px;letter-spacing:0.04em}
+.modal .em{color:var(--gold)}
+.modal .pink{color:var(--sakura)}
+.modal .red{color:var(--accent)}
+.modal .mind{color:var(--mind)}
+.modal-input{width:100%;background:transparent;border:2px solid var(--msg-border);color:var(--white);font-family:inherit;font-size:12px;padding:8px 10px;margin-top:8px;outline:none;letter-spacing:0.04em}
+.modal-input:focus{border-color:var(--gold)}
+.modal-textarea{min-height:80px;resize:vertical}
+.modal-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap}
+
+.role-card{background:linear-gradient(135deg,#3a2a5a 0%,#1a1a3a 100%);border:3px solid var(--gold);padding:22px;text-align:center;margin:18px 0}
+.role-card .you-are{font-size:11px;color:var(--sakura);letter-spacing:0.3em;margin-bottom:6px}
+.role-card .mbti{font-size:18px;color:var(--gold);letter-spacing:0.2em;margin-bottom:4px}
+.role-card .role-name{font-size:28px;color:var(--white);letter-spacing:0.15em;text-shadow:2px 2px 0 var(--dress-d);margin-bottom:12px}
+.role-card .animal{width:96px;height:96px;margin:0 auto 12px;display:block}
+.role-card .desc{font-size:11.5px;color:var(--sakura);line-height:1.85;letter-spacing:0.04em}
+
+.warp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.warp-card{background:#1a1a2a;border:2px solid var(--msg-border);padding:14px;cursor:pointer;transition:all 0.15s;text-align:center}
+.warp-card:hover:not(.locked){background:var(--gold);color:var(--msg-bg);border-color:var(--gold)}
+.warp-card.locked{opacity:0.4;cursor:not-allowed}
+.warp-card.current{border-color:var(--accent);background:#2a1a3a}
+.warp-card .num{font-size:10px;color:var(--gold);letter-spacing:0.2em;margin-bottom:4px}
+.warp-card:hover:not(.locked) .num{color:var(--msg-bg)}
+.warp-card .nm{font-size:13px;letter-spacing:0.08em;font-weight:700}
+.warp-card .ds{font-size:9px;color:var(--sakura);margin-top:4px;letter-spacing:0.04em}
+.warp-card:hover:not(.locked) .ds{color:var(--msg-bg)}
+
+.battle-arena{background:radial-gradient(circle at 50% 30%, #4a2a5a 0%, #1a1a2a 100%);padding:24px 16px;border:3px solid var(--gold);text-align:center}
+.battle-leader{width:128px;height:128px;margin:0 auto 14px;display:block;border:2px solid var(--gold);background:#0e0e1a}
+.battle-timer{font-size:28px;color:var(--accent);letter-spacing:0.2em;text-shadow:2px 2px 0 var(--dress-d);margin-bottom:10px}
+.battle-timer.warning{animation:blink 0.5s steps(2) infinite}
+.battle-question{font-size:14px;color:var(--gold);margin-bottom:14px;line-height:1.6}
+.battle-hint{font-size:11px;color:var(--sakura);margin-top:10px;line-height:1.6;letter-spacing:0.06em}
+
+.synth-result{background:linear-gradient(135deg,rgba(255,214,68,0.18) 0%,rgba(122,200,255,0.15) 100%);border:2px solid var(--gold);padding:20px;margin:14px 0;text-align:center;border-radius:4px}
+.synth-result .label{font-size:11px;color:var(--gold);letter-spacing:0.3em;margin-bottom:8px}
+.synth-result .statement{font-size:16px;color:var(--white);line-height:1.95;letter-spacing:0.06em}
+</style>
+</head>
+<body>
+
+<div class="title-screen" id="titleScreen">
+  <div class="title-logo">Re:alize Quest</div>
+  <div class="title-logo2">— 異常値の冒険 —</div>
+  <div class="title-sub">A Self-Discovery RPG</div>
+  <div class="title-art">
+    <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+      <rect x="6" y="2" width="4" height="1" fill="#fff"/><rect x="5" y="3" width="6" height="1" fill="#fff"/><rect x="4" y="4" width="8" height="2" fill="#fff"/><rect x="3" y="6" width="10" height="5" fill="#fff"/><rect x="4" y="11" width="8" height="2" fill="#fff"/><rect x="5" y="13" width="6" height="1" fill="#fff"/>
+      <rect x="6" y="5" width="1" height="1" fill="#f6a0c4"/><rect x="9" y="6" width="1" height="1" fill="#ffd644"/><rect x="5" y="8" width="1" height="1" fill="#f6a0c4"/>
+      <rect x="7" y="7" width="2" height="1" fill="#c25b3f"/><rect x="8" y="8" width="1" height="1" fill="#c25b3f"/><rect x="7" y="9" width="1" height="1" fill="#c25b3f"/><rect x="7" y="11" width="1" height="1" fill="#c25b3f"/>
+    </svg>
+  </div>
+  <button class="title-press" onclick="showHowTo()">▶ PRESS TO START</button>
+  <div class="title-note">© RE:ALIZE / MERONE INC.</div>
+</div>
+
+<div class="howto-screen" id="howtoScreen">
+  <h2>あそびかた</h2>
+  <div class="howto-sub">— HOW TO PLAY —</div>
+  <div class="howto-card">
+    <h3>🗺 4つの街を旅する</h3>
+    <p><span class="em">街1：はじまりの町</span> — 博士から卵をもらい、MBTI診断＋他者からの強み収集</p>
+    <p><span class="em">街2：強み発掘の街</span> — 身近な3人から強みを聞き、ジムリーダーに挑戦</p>
+    <p><span class="em">街3：異常値の谷</span> — 自分自身の「誰にも負けない異常値」を発見</p>
+    <p><span class="em">街4：交流の都</span> — 他のRealize仲間と交流＆バトル</p>
+  </div>
+  <div class="howto-card">
+    <h3>🕹 操作方法</h3>
+    <p>移動：<span class="em">矢印キー or 画面下の十字ボタン</span></p>
+    <p>調べる・話す：<span class="em">スペース or A ボタン</span></p>
+    <p>メニュー＆<span class="pink">街ワープ</span>：<span class="em">M キー or B ボタン</span></p>
+  </div>
+  <div class="howto-card">
+    <h3>💎 進めかた</h3>
+    <p>1. <span class="em">博士に話す</span>→ 卵をもらう</p>
+    <p>2. <span class="em">MBTI館で診断</span>→ 卵が10種類の動物のどれかに進化</p>
+    <p>3. <span class="em">5軒の家</span>で他者からの強みを聞き出す</p>
+    <p>4. 街2→3→4 と進む（ワープも可）</p>
+  </div>
+  <div class="howto-actions">
+    <button class="btn primary" onclick="startGame()">▶ ぼうけんに出る</button>
+  </div>
+</div>
+
+<div class="frame" id="frame" style="display:none">
+  <div class="status-bar">
+    <div class="status-left">
+      <div class="status-row">
+        <span class="name" id="heroName">YOU</span>
+        <span class="role" id="heroRole">— 旅人 —</span>
+      </div>
+      <div class="status-row">
+        <span class="town-label" id="townLabel">🏘 はじまりの町</span>
+      </div>
+    </div>
+    <div class="status-right">
+      <div class="kakera">★ 進行度 <span id="progressNum">0</span> / 10</div>
+      <div class="warp-btn" onclick="openWarp()">🚀 ワープ</div>
+    </div>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="stage" id="stage"></div>
+    <div id="hero"></div>
+  </div>
+
+  <div class="msg-win">
+    <div class="msg-text" id="msgText">▼ <span class="pink">はじまりの町</span>へようこそ！<br>まずは <span class="em">博士の家（中央）</span> へ。 <span class="cursor-tri">▼</span></div>
+  </div>
+
+  <div class="controls">
+    <div class="dpad">
+      <button class="dpad-btn up" onclick="move(0,-1)">▲</button>
+      <button class="dpad-btn left" onclick="move(-1,0)">◀</button>
+      <button class="dpad-btn center"></button>
+      <button class="dpad-btn right" onclick="move(1,0)">▶</button>
+      <button class="dpad-btn down" onclick="move(0,1)">▼</button>
+    </div>
+    <div class="ab-buttons">
+      <button class="ab-btn" onclick="action()">A</button>
+      <button class="ab-btn b" onclick="openMenu()">B</button>
+    </div>
+  </div>
+  <div class="hint">矢印で移動 ／ A=しらべる ／ B=メニュー</div>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- Town2/3/4 のデータ -->
+<script src="town2_data.js"></script>
+<script src="town3_data.js"></script>
+<script src="town4_data.js"></script>
+
+<script>
+const params = new URLSearchParams(location.search);
+const userKey = params.get('u') || 'guest';
+const userName = (params.get('name') || '').trim();
+const storageKey = 're_alize_quest_v2_' + userKey;
+const COLS = 20, ROWS = 12;
+
+const MBTI_TO_ANIMAL = {'ENFP':'neko','ESFP':'neko','INFP':'usagi','ISFP':'usagi','INFJ':'panda','ENFJ':'panda','INTJ':'fukurou','INTP':'fukurou','ENTJ':'kitsune','ENTP':'kitsune','ESTJ':'shibainu','ESFJ':'shibainu','ISTJ':'risu','ISFJ':'hamster','ISTP':'penguin','ESTP':'penguin'};
+const ANIMAL_NAME = {neko:'ねこ',usagi:'うさぎ',panda:'パンダ',fukurou:'フクロウ',kitsune:'キツネ',shibainu:'シバイヌ',risu:'リス',hamster:'ハムスター',penguin:'ペンギン'};
+const ANIMAL_ROLE = {neko:'遊び人 / 商人',usagi:'吟遊詩人 / 踊り子',panda:'預言者 / 僧侶',fukurou:'大賢者 / 魔法使い',kitsune:'軍師 / 占い師',shibainu:'戦士 / 聖女',risu:'武闘家',hamster:'薬師',penguin:'忍者 / 勇者'};
+
+const ANIMAL_SVG = {
+  neko: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="1" height="1" fill="#c45a8e"/><rect x="2" y="2" width="2" height="1" fill="#c45a8e"/><rect x="2" y="3" width="3" height="1" fill="#f78ac0"/><rect x="13" y="1" width="1" height="1" fill="#c45a8e"/><rect x="12" y="2" width="2" height="1" fill="#c45a8e"/><rect x="11" y="3" width="3" height="1" fill="#f78ac0"/><rect x="3" y="2" width="1" height="1" fill="#e63d6a"/><rect x="12" y="2" width="1" height="1" fill="#e63d6a"/><rect x="2" y="4" width="12" height="6" fill="#f78ac0"/><rect x="3" y="3" width="10" height="1" fill="#f78ac0"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="6" width="1" height="1" fill="#fff"/><rect x="11" y="6" width="1" height="1" fill="#fff"/><rect x="7" y="8" width="2" height="1" fill="#e63d6a"/><rect x="6" y="9" width="1" height="1" fill="#c45a8e"/><rect x="9" y="9" width="1" height="1" fill="#c45a8e"/><rect x="7" y="9" width="2" height="1" fill="#c45a8e"/><rect x="3" y="10" width="10" height="3" fill="#f78ac0"/><rect x="3" y="13" width="2" height="2" fill="#f78ac0"/><rect x="6" y="13" width="2" height="2" fill="#f78ac0"/><rect x="11" y="13" width="2" height="2" fill="#f78ac0"/><rect x="13" y="9" width="1" height="2" fill="#f78ac0"/><rect x="14" y="7" width="1" height="3" fill="#f78ac0"/><rect x="15" y="6" width="1" height="2" fill="#f78ac0"/></svg>`,
+  usagi: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="4" y="0" width="2" height="5" fill="#fff"/><rect x="10" y="0" width="2" height="5" fill="#fff"/><rect x="5" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="10" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="2" y="5" width="12" height="7" fill="#fff"/><rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#f6a0c4"/><rect x="3" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg>`,
+  panda: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="8" fill="#fff"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="6" width="1" height="1" fill="#fff"/><rect x="11" y="6" width="1" height="1" fill="#fff"/><rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/><rect x="3" y="12" width="3" height="2" fill="#0e0e1a"/><rect x="10" y="12" width="3" height="2" fill="#0e0e1a"/></svg>`,
+  fukurou: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="2" y="3" width="12" height="9" fill="#a87132"/><rect x="4" y="5" width="3" height="3" fill="#fff"/><rect x="9" y="5" width="3" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#ffd644"/><rect x="5" y="12" width="2" height="2" fill="#ffd644"/><rect x="9" y="12" width="2" height="2" fill="#ffd644"/></svg>`,
+  kitsune: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="3" height="3" fill="#e6814a"/><rect x="11" y="1" width="3" height="3" fill="#e6814a"/><rect x="3" y="2" width="1" height="2" fill="#fff"/><rect x="12" y="2" width="1" height="2" fill="#fff"/><rect x="2" y="4" width="12" height="6" fill="#e6814a"/><rect x="4" y="8" width="8" height="2" fill="#fff"/><rect x="4" y="6" width="2" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/><rect x="3" y="10" width="6" height="4" fill="#e6814a"/><rect x="9" y="10" width="5" height="3" fill="#e6814a"/><rect x="13" y="13" width="2" height="2" fill="#fff"/></svg>`,
+  shibainu: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="2" width="2" height="3" fill="#c89455"/><rect x="11" y="2" width="2" height="3" fill="#c89455"/><rect x="2" y="4" width="12" height="7" fill="#c89455"/><rect x="4" y="8" width="8" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/><rect x="6" y="10" width="1" height="1" fill="#e63d6a"/><rect x="9" y="10" width="1" height="1" fill="#e63d6a"/><rect x="3" y="11" width="2" height="3" fill="#c89455"/><rect x="11" y="11" width="2" height="3" fill="#c89455"/></svg>`,
+  risu: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="2" height="2" fill="#a87132"/><rect x="8" y="1" width="2" height="2" fill="#a87132"/><rect x="2" y="3" width="8" height="5" fill="#a87132"/><rect x="1" y="6" width="2" height="2" fill="#c89455"/><rect x="9" y="6" width="2" height="2" fill="#c89455"/><rect x="3" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="4" y="5" width="1" height="1" fill="#fff"/><rect x="8" y="5" width="1" height="1" fill="#fff"/><rect x="5" y="7" width="2" height="1" fill="#e63d6a"/><rect x="3" y="9" width="6" height="4" fill="#a87132"/><rect x="4" y="10" width="4" height="3" fill="#fcd5a3"/><rect x="3" y="13" width="2" height="2" fill="#a87132"/><rect x="7" y="13" width="2" height="2" fill="#a87132"/><rect x="11" y="1" width="4" height="2" fill="#a87132"/><rect x="13" y="2" width="3" height="6" fill="#a87132"/><rect x="12" y="8" width="3" height="3" fill="#a87132"/><rect x="11" y="11" width="3" height="2" fill="#a87132"/></svg>`,
+  hamster: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="1" width="2" height="2" fill="#c89a55"/><rect x="11" y="1" width="2" height="2" fill="#c89a55"/><rect x="3" y="3" width="10" height="6" fill="#ffd644"/><rect x="2" y="4" width="12" height="5" fill="#ffd644"/><rect x="0" y="6" width="3" height="3" fill="#fff5b8"/><rect x="13" y="6" width="3" height="3" fill="#fff5b8"/><rect x="4" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="5" width="1" height="1" fill="#fff"/><rect x="11" y="5" width="1" height="1" fill="#fff"/><rect x="7" y="7" width="2" height="1" fill="#f6a0c4"/><rect x="2" y="9" width="12" height="5" fill="#ffd644"/><rect x="3" y="10" width="10" height="4" fill="#fff5b8"/></svg>`,
+  penguin: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="2" width="10" height="11" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="9" fill="#0e0e1a"/><rect x="4" y="6" width="8" height="6" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#e6814a"/><rect x="4" y="13" width="3" height="2" fill="#e6814a"/><rect x="9" y="13" width="3" height="2" fill="#e6814a"/></svg>`,
+  tamago: `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="6" y="2" width="4" height="1" fill="#fff"/><rect x="5" y="3" width="6" height="1" fill="#fff"/><rect x="4" y="4" width="8" height="2" fill="#fff"/><rect x="3" y="6" width="10" height="5" fill="#fff"/><rect x="4" y="11" width="8" height="2" fill="#fff"/><rect x="5" y="13" width="6" height="1" fill="#fff"/><rect x="6" y="5" width="1" height="1" fill="#f6a0c4"/><rect x="9" y="6" width="1" height="1" fill="#ffd644"/><rect x="7" y="7" width="2" height="1" fill="#c25b3f"/><rect x="8" y="8" width="1" height="1" fill="#c25b3f"/><rect x="7" y="11" width="1" height="1" fill="#c25b3f"/></svg>`
+};
+
+const MBTI_QS = [
+  { q:'休日、本当はどっちが回復する？', a:'みんなで集まってワイワイ', b:'ひとりで静かに過ごす', axis:'EI'},
+  { q:'初対面の場で、ふつう…', a:'自分から話しかける', b:'誰かから話されるまで待つ', axis:'EI'},
+  { q:'新しいレストラン、どっちで選ぶ？', a:'いつもの好きな料理がある店', b:'まだ食べたことがない料理の店', axis:'SN'},
+  { q:'説明を聞くとき、しっくり来るのは…', a:'具体的な事実とデータ', b:'全体像と将来のイメージ', axis:'SN'},
+  { q:'友達が悩んでいる時、つい…', a:'解決策を一緒に考えてあげる', b:'まず気持ちに寄り添う', axis:'TF'},
+  { q:'判断するとき、優先するのは…', a:'論理的に正しいか', b:'みんなが心地よいか', axis:'TF'},
+  { q:'旅行のとき、好きなのは…', a:'計画をきっちり立てて回る', b:'その時の気分で行き先を決める', axis:'JP'},
+  { q:'締め切りまでの仕事、つい…', a:'前倒しで終わらせたい', b:'ギリギリで集中して終わらせる', axis:'JP'}
+];
+const ROLE_DESCS = {
+  'INTJ':'静かに世界を見つめ、深い洞察で道を示す。','INTP':'好奇心の塊。新しい知の魔法を発見し続ける。',
+  'ENTJ':'未来を読み、仲間を勝利に導く戦略の天才。','ENTP':'閃きと議論で、誰も思いつかない可能性を見せる。',
+  'INFJ':'人の心の奥を見抜き、静かに導く理想の伴走者。','INFP':'内なる詩を抱き、人の心を物語で動かす。',
+  'ENFJ':'仲間を信じ、励まし、誰も置いていかない導き手。','ENFP':'自由と情熱の塊。出会った人の人生に光を灯す。',
+  'ISTJ':'地道に積み上げた力で、必ず約束を果たす守り手。','ISFJ':'人の痛みに気づき、そっと癒す優しさの達人。',
+  'ESTJ':'責任を背負って前線に立つ、頼れるリーダー。','ESFJ':'仲間の幸せが自分の喜び。場を温める太陽。',
+  'ISTP':'静かに観察し、誰も気づかない解を一閃で出す。','ISFP':'感性と美の使い手。世界を美しく舞いで彩る。',
+  'ESTP':'飛び込んで道を切り開く、行動の戦士。','ESFP':'場の空気を読み、人と人をつなぐ才能の人。'
+};
+
+// Town1 マップ
+const TOWN1 = {
+  name: "はじまりの町",
+  description: "卵を孵し、自分のキャラクターを見つける旅の出発点",
+  map: [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,6,0,0,0,0,0,3,0,0,0,0,0,1],
+    [1,0,1,0,0,0,0,0,0,7,7,0,0,0,0,0,1,0,6,1],
+    [1,0,0,0,0,7,7,7,7,7,7,7,7,7,0,0,0,0,0,1],
+    [1,6,0,2,0,0,0,2,0,0,0,2,0,0,2,0,0,1,0,1],
+    [1,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,1,0,0,7,0,8,0,0,0,0,2,0,0,6,1],
+    [1,0,0,0,0,0,0,0,7,0,0,0,0,1,0,0,0,0,0,1],
+    [1,0,6,0,0,0,0,0,7,0,0,0,6,0,0,0,1,0,0,1],
+    [1,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,0,0,0,0,1,1,0,0,1,1,0,0,0,9,9,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,1,1,1]
+  ],
+  spawnPos: { x: 11, y: 7 },
+  facilities: {
+    '10,6':  { type: 'professor' },
+    '13,1':  { type: 'mbti_hall' },
+    '3,4':   { type: 'strength', id: 0 },
+    '7,4':   { type: 'strength', id: 1 },
+    '11,4':  { type: 'strength', id: 2 },
+    '14,4':  { type: 'strength', id: 3 },
+    '15,6':  { type: 'strength', id: 4 },
+    '15,10': { type: 'exit', to: 'town2' },
+    '16,10': { type: 'exit', to: 'town2' }
+  },
+  labels: [
+    { x: 13, y: 0, text: 'MBTIの館' },
+    { x: 10, y: 5, text: '博士の家' },
+    { x: 14, y: 9, text: '街2へ→' }
+  ]
+};
+
+const STRENGTH_PROMPTS = [
+  '町人A：「あなたから見た私の強みって、なんだと思う？」',
+  '町人B：「あなたが私について感じる、わたしらしさを 教えてほしいの」',
+  '町人C：「私のことを 一言で表すと、どんな人？」',
+  '町人D：「他人にはマネできない 私の良さって なんだと思う？」',
+  '町人E：「私が自分でも気づいてない、いいところって なに？」'
+];
+
+// 街レジストリ：外部から TOWN2/3/4 が定義される
+function getTowns(){
+  return {
+    town1: TOWN1,
+    town2: (typeof TOWN2 !== 'undefined') ? TOWN2 : null,
+    town3: (typeof TOWN3 !== 'undefined') ? TOWN3 : null,
+    town4: (typeof TOWN4 !== 'undefined') ? TOWN4 : null
+  };
+}
+function currentTownData(){ return getTowns()[state.currentTown] || TOWN1; }
+
+function defaultState(){
+  return {
+    name: userName || 'あなた',
+    currentTown: 'town1',
+    pos: { x: 11, y: 7 },
+    dir: 'down',
+    mbtiAnswers: [],
+    mbti: '',
+    role: '旅人',
+    animal: '',
+    progress: {
+      professorMet: false,
+      eggReceived: false,
+      mbtiCompleted: false,
+      hatched: false,
+      strengthsFromOthers: ['','','','',''],
+      town1Cleared: false,
+      town2NpcStrengths: [[],[],[]],
+      town2GymOpen: false,
+      town2GymLeaderOpen: false,
+      town2GymCleared: false,
+      town3Answers: {},
+      town3IjouchiStatement: '',
+      town3Cleared: false,
+      rivalsBattled: {}
+    },
+    visitedTowns: { town1: true, town2: false, town3: false, town4: false },
+    lastVisit: null
+  };
+}
+let state = loadState();
+if(!state.lastVisit){ state.lastVisit = new Date().toISOString(); }
+saveState();
+
+function loadState(){
+  const raw = localStorage.getItem(storageKey);
+  if(raw){ try{
+    const d = JSON.parse(raw);
+    return Object.assign(defaultState(), d, { progress: Object.assign(defaultState().progress, d.progress || {}) });
+  }catch(e){} }
+  return defaultState();
+}
+function saveState(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
+
+// SVG
+function heroSVG(){return `<svg class="hero-body" viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="5" y="1" width="6" height="1" fill="#f78ac0"/><rect x="4" y="2" width="8" height="2" fill="#f78ac0"/><rect x="4" y="4" width="2" height="1" fill="#c45a8e"/><rect x="10" y="4" width="2" height="1" fill="#c45a8e"/><rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/><rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="6" width="2" height="1" fill="#e63d6a"/><rect x="4" y="5" width="1" height="3" fill="#f78ac0"/><rect x="10" y="5" width="1" height="3" fill="#f78ac0"/><rect x="5" y="7" width="5" height="5" fill="#e63d6a"/><rect x="4" y="8" width="1" height="3" fill="#e63d6a"/><rect x="10" y="8" width="1" height="3" fill="#e63d6a"/><rect x="5" y="9" width="5" height="1" fill="#ffd644"/><rect x="5" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="8" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="5" y="14" width="2" height="1" fill="#0e0e1a"/><rect x="8" y="14" width="2" height="1" fill="#0e0e1a"/></svg>`;}
+function houseSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="6" width="12" height="8" fill="#fcd5a3"/><rect x="1" y="5" width="14" height="2" fill="#a02448"/><rect x="0" y="4" width="16" height="1" fill="#7a1a3a"/><rect x="3" y="3" width="10" height="2" fill="#a02448"/><rect x="7" y="9" width="2" height="5" fill="#6a3010"/><rect x="4" y="8" width="2" height="2" fill="#7ac8ff"/><rect x="10" y="8" width="2" height="2" fill="#7ac8ff"/></svg>`;}
+function professorHouseSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="6" width="12" height="8" fill="#d8c8ee"/><rect x="1" y="5" width="14" height="2" fill="#4a2a5a"/><rect x="0" y="4" width="16" height="1" fill="#2a1a3a"/><rect x="3" y="3" width="10" height="2" fill="#4a2a5a"/><rect x="7" y="8" width="2" height="6" fill="#2a1a3a"/><rect x="4" y="8" width="2" height="2" fill="#ffd644"/><rect x="10" y="8" width="2" height="2" fill="#ffd644"/><rect x="6" y="9" width="4" height="1" fill="#fff"/></svg>`;}
+function towerSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="6" y="1" width="4" height="1" fill="#a02448"/><rect x="5" y="2" width="6" height="2" fill="#a02448"/><rect x="4" y="4" width="8" height="2" fill="#7a4a8a"/><rect x="3" y="6" width="10" height="8" fill="#7a4a8a"/><rect x="7" y="8" width="2" height="3" fill="#0e0e1a"/><rect x="6" y="10" width="1" height="1" fill="#ffd644"/><rect x="9" y="10" width="1" height="1" fill="#ffd644"/></svg>`;}
+function gymSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="1" y="5" width="14" height="9" fill="#d68040"/><rect x="0" y="4" width="16" height="1" fill="#8a4020"/><rect x="2" y="2" width="12" height="3" fill="#8a4020"/><rect x="4" y="1" width="8" height="2" fill="#8a4020"/><rect x="6" y="9" width="4" height="5" fill="#3a1a0a"/><rect x="3" y="7" width="2" height="2" fill="#ffd644"/><rect x="11" y="7" width="2" height="2" fill="#ffd644"/><rect x="2" y="3" width="12" height="1" fill="#ffd644"/></svg>`;}
+function exitSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#c8a060"/><rect x="2" y="2" width="12" height="12" fill="#a07a3a"/><rect x="4" y="4" width="8" height="8" fill="#ffd644"/><rect x="6" y="6" width="4" height="4" fill="#0e0e1a"/></svg>`;}
+function treeSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="1" width="10" height="2" fill="#1c4a1c"/><rect x="2" y="3" width="12" height="3" fill="#2e6e2e"/><rect x="3" y="6" width="10" height="2" fill="#1c4a1c"/><rect x="7" y="8" width="2" height="6" fill="#6a4a1f"/></svg>`;}
+function flowerSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="7" y="8" width="2" height="6" fill="#3a8a3a"/><rect x="6" y="5" width="4" height="3" fill="#fcd5e6"/><rect x="7" y="6" width="2" height="1" fill="#ffd644"/></svg>`;}
+function pathSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#c8a060"/></svg>`;}
+
+function renderStage(){
+  const town = currentTownData();
+  const map = town.map;
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  for(let y = 0; y < ROWS; y++){
+    for(let x = 0; x < COLS; x++){
+      const v = map[y][x];
+      if(v === 0) continue;
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.style.left = (x * 5) + '%';
+      tile.style.top = (y * (100/ROWS)) + '%';
+      let svg = '';
+      if(v === 1) svg = treeSVG();
+      else if(v === 2) svg = houseSVG();
+      else if(v === 3) svg = towerSVG();
+      else if(v === 6) svg = flowerSVG();
+      else if(v === 7) svg = pathSVG();
+      else if(v === 8) svg = professorHouseSVG();
+      else if(v === 9) svg = exitSVG();
+      else if(v === 5) svg = gymSVG();
+      else if(v === 4) svg = `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="10" width="12" height="3" fill="#7ac8ff"/><rect x="2" y="13" width="12" height="1" fill="#3a76d6"/></svg>`;
+      tile.innerHTML = svg;
+      stage.appendChild(tile);
+    }
+  }
+  (town.labels || []).forEach(l => {
+    const lb = document.createElement('div');
+    lb.className = 'label-tile';
+    lb.style.left = (l.x * 5 + 1) + '%';
+    lb.style.top = (l.y * (100/ROWS) + 0.5) + '%';
+    lb.textContent = l.text;
+    stage.appendChild(lb);
+  });
+}
+function renderHero(){
+  const h = document.getElementById('hero');
+  h.style.left = (state.pos.x * 5) + '%';
+  h.style.top = (state.pos.y * (100/ROWS)) + '%';
+  h.innerHTML = heroSVG();
+  h.className = 'walk facing-' + (state.dir === 'left' ? 'left' : 'right');
+}
+function renderStatus(){
+  document.getElementById('heroName').textContent = state.name + 'さん';
+  document.getElementById('heroRole').textContent = state.mbti ? '— ' + state.role + ' —' : '— 旅人 —';
+  const town = currentTownData();
+  const townNum = { town1:'1', town2:'2', town3:'3', town4:'4' }[state.currentTown] || '1';
+  document.getElementById('townLabel').textContent = `🏘 街${townNum}：${town.name}`;
+  document.getElementById('progressNum').textContent = computeProgressNum();
+}
+function computeProgressNum(){
+  let n = 0;
+  if(state.progress.professorMet) n++;
+  if(state.progress.eggReceived) n++;
+  if(state.progress.mbtiCompleted) n++;
+  if(state.progress.hatched) n++;
+  n += state.progress.strengthsFromOthers.filter(s=>s).length;
+  if(state.progress.town2GymCleared) n++;
+  if(state.progress.town3Cleared) n++;
+  return n;
+}
+function setMsg(t){
+  document.getElementById('msgText').innerHTML = t.replace(/\n/g, '<br>') + ' <span class="cursor-tri">▼</span>';
+}
+
+function canMoveTo(x, y){
+  if(x < 0 || x >= COLS || y < 0 || y >= ROWS) return false;
+  const map = currentTownData().map;
+  const v = map[y][x];
+  return v === 0 || v === 6 || v === 7;
+}
+function move(dx, dy){
+  if(currentModal) return;
+  if(dx === -1) state.dir = 'left';
+  else if(dx === 1) state.dir = 'right';
+  const nx = state.pos.x + dx, ny = state.pos.y + dy;
+  if(canMoveTo(nx, ny)){
+    state.pos.x = nx; state.pos.y = ny;
+    saveState();
+  }
+  renderHero();
+  showNearbyHint();
+}
+function showNearbyHint(){
+  const adj = nearbyFacility();
+  if(!adj){ setMsg('▼ 探索中…'); return; }
+  const labels = {
+    professor:'🧑‍🔬 博士の家', mbti_hall:'🏰 MBTIの館', strength:'👥 町人の家',
+    exit:'🚪 出口', npc:'💬 ' + (adj.f.name || '町人'),
+    gym_door:'⚔ ジム入口', gym_leader:'👑 ジムリーダーの間',
+    sage:'🧙 ' + (adj.f.name || '賢者'), synthesizer:'✨ 集約者',
+    rival:'🥊 ' + (adj.f.name || 'メンバー'), exchange:'📜 メッセージ掲示板'
+  };
+  setMsg(`▼ ${labels[adj.f.type] || '何かありそう'}\n  Aボタンで しらべる。`);
+}
+function nearbyFacility(){
+  const town = currentTownData();
+  const dirs = [[0,-1],[0,1],[-1,0],[1,0],[0,0]];
+  for(const [dx, dy] of dirs){
+    const x = state.pos.x + dx, y = state.pos.y + dy;
+    const key = `${x},${y}`;
+    if(town.facilities && town.facilities[key]) return { x, y, f:town.facilities[key] };
+    if(town.npcs){
+      const npc = town.npcs.find(n => n.x === x && n.y === y);
+      if(npc) return { x, y, f: Object.assign({type:'npc'}, npc) };
+    }
+    if(town.gym){
+      if(town.gym.door && town.gym.door.x === x && town.gym.door.y === y) return { x, y, f:{type:'gym_door', gym:town.gym} };
+      if(town.gym.leaderPos && town.gym.leaderPos.x === x && town.gym.leaderPos.y === y) return { x, y, f:{type:'gym_leader', gym:town.gym} };
+    }
+    if(town.synthesizer && town.synthesizer.x === x && town.synthesizer.y === y){
+      return { x, y, f:Object.assign({type:'synthesizer'}, town.synthesizer) };
+    }
+    if(town.rivals){
+      const r = town.rivals.find(n => n.x === x && n.y === y);
+      if(r) return { x, y, f:Object.assign({type:'rival'}, r) };
+    }
+  }
+  return null;
+}
+
+function action(){
+  if(currentModal) return;
+  const adj = nearbyFacility();
+  if(!adj){ setMsg('▼ ここには何もない…'); return; }
+  const f = adj.f;
+  const handlers = {
+    professor: openProfessor, mbti_hall: openMbtiHall,
+    strength: () => openStrengthHouse(f.id),
+    exit: () => openExit(f.to),
+    npc: () => openTownNpc(f),
+    gym_door: () => openGymDoor(f.gym),
+    gym_leader: () => openGymLeader(f.gym),
+    sage: () => openSage(f),
+    synthesizer: () => openSynthesizer(f),
+    rival: () => openRival(f),
+    exchange: () => openExchange(f)
+  };
+  if(handlers[f.type]) handlers[f.type]();
+}
+
+let currentModal = null;
+function showModal(html){
+  document.getElementById('modal').innerHTML = html;
+  document.getElementById('modalBg').classList.add('show');
+  currentModal = true;
+}
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('show');
+  currentModal = null;
+}
+
+// ===== 街1 =====
+function openProfessor(){
+  state.progress.professorMet = true; saveState(); renderStatus();
+  if(!state.progress.eggReceived){
+    showModal(`
+      <h2>🧑‍🔬 オーキド博士の家</h2>
+      <div class="sub">— PROFESSOR —</div>
+      <p>博士：「おお、${escapeHtml(state.name)}さん！ 待っていたぞ。」</p>
+      <p>「キミにはこれから 自分自身の <span class="em">異常値</span> ―― 誰にも負けない強みを 見つける旅に出てもらう。」</p>
+      <p>「まずはこの <span class="pink">不思議なたまご</span> を 受け取ってほしい。」</p>
+      <div style="text-align:center;margin:14px 0">
+        <div style="display:inline-block;width:80px;height:80px;background:#1a1a2a;border:2px solid var(--gold);padding:6px">${ANIMAL_SVG.tamago}</div>
+      </div>
+      <p>「中身が何になるかは、キミ自身の <span class="em">性格次第</span>。<br>北の <span class="em">MBTIの館</span> で診断を受けると、たまごが孵る。」</p>
+      <div class="modal-actions"><button class="btn primary" onclick="receiveEgg()">たまごを受け取る</button></div>
+    `); return;
+  }
+  if(!state.progress.hatched){
+    showModal(`
+      <h2>🧑‍🔬 博士</h2>
+      <p>博士：「たまごは持ったか。北の <span class="em">MBTIの館</span> で診断を受けてくるんじゃ。」</p>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>
+    `); return;
+  }
+  const others = state.progress.strengthsFromOthers.filter(s=>s).length;
+  if(others < 5){
+    showModal(`
+      <h2>🧑‍🔬 博士</h2>
+      <p>博士：「たまごが ${escapeHtml(ANIMAL_NAME[state.animal])} に孵ったか！素晴らしい。」</p>
+      <p>「あとは <span class="em">5人の町人</span> から強みを聞き出すこと。現在 ${others}/5。」</p>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>
+    `);
+  } else {
+    showModal(`
+      <h2>🧑‍🔬 博士</h2>
+      <p>博士：「素晴らしい！ 5人の声を集めたな。<br>南の <span class="em">街2への出口</span> から、次の街へ向かいなさい。」</p>
+      <div class="modal-actions"><button class="btn primary" onclick="closeModal()">出発する</button></div>
+    `);
+  }
+}
+function receiveEgg(){
+  state.progress.eggReceived = true; saveState(); renderStatus(); closeModal();
+  setTimeout(()=>{
+    showModal(`
+      <h2>✨ たまごを手にいれた！</h2>
+      <p>北の <span class="em">MBTIの館</span> で診断を受けよう。</p>
+      <div class="modal-actions"><button class="btn primary" onclick="closeModal()">わかった</button></div>
+    `);
+  }, 300);
+}
+
+function openMbtiHall(){
+  if(!state.progress.eggReceived){
+    showModal(`<h2>🏰 MBTIの館</h2><p>受付：「診断には まず <span class="em">博士からたまご</span> を受け取ってきて。」</p><div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>`);
+    return;
+  }
+  if(state.mbti){
+    showModal(`
+      <h2>🏰 MBTIの館</h2>
+      <div class="role-card">
+        <div class="you-are">YOU ARE</div>
+        <div class="mbti">${state.mbti}</div>
+        <div class="role-name">${state.role}</div>
+        <div class="animal">${ANIMAL_SVG[state.animal] || ANIMAL_SVG.tamago}</div>
+        <div class="desc">${ROLE_DESCS[state.mbti] || ''}</div>
+      </div>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">館を出る</button><button class="btn danger" onclick="resetMBTI()">もう一度診断</button></div>
+    `); return;
+  }
+  state.mbtiAnswers = []; askMBTI(0);
+}
+function resetMBTI(){
+  if(!confirm('もう一度診断する？')) return;
+  state.mbti=''; state.role='旅人'; state.animal=''; state.mbtiAnswers=[];
+  state.progress.mbtiCompleted=false; state.progress.hatched=false;
+  saveState(); closeModal(); setTimeout(openMbtiHall, 100);
+}
+function askMBTI(i){
+  if(i >= MBTI_QS.length){ finishMBTI(); return; }
+  const q = MBTI_QS[i];
+  showModal(`
+    <h2>🏰 占い師の問い (${i+1}/${MBTI_QS.length})</h2>
+    <p class="em">${q.q}</p>
+    <div class="choice-list">
+      <button class="choice" onclick="answerMBTI(${i},'a')">${q.a}</button>
+      <button class="choice" onclick="answerMBTI(${i},'b')">${q.b}</button>
+    </div>
+  `);
+}
+function answerMBTI(i, choice){
+  state.mbtiAnswers[i] = choice; saveState(); askMBTI(i+1);
+}
+function finishMBTI(){
+  const t = { E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0 };
+  MBTI_QS.forEach((q, i) => {
+    const a = state.mbtiAnswers[i];
+    if(q.axis === 'EI') t[a==='a'?'E':'I']++;
+    else if(q.axis === 'SN') t[a==='a'?'S':'N']++;
+    else if(q.axis === 'TF') t[a==='a'?'T':'F']++;
+    else if(q.axis === 'JP') t[a==='a'?'J':'P']++;
+  });
+  const code = (t.E>=t.I?'E':'I') + (t.S>=t.N?'S':'N') + (t.T>=t.F?'T':'F') + (t.J>=t.P?'J':'P');
+  state.mbti = code;
+  state.animal = MBTI_TO_ANIMAL[code];
+  state.role = ANIMAL_ROLE[state.animal] || '冒険者';
+  state.progress.mbtiCompleted = true; state.progress.hatched = true;
+  saveState(); renderStatus();
+  showModal(`
+    <h2>🌟 たまごが孵った！</h2>
+    <div class="role-card">
+      <div class="you-are">YOU ARE</div>
+      <div class="mbti">${code}</div>
+      <div class="role-name">${state.role}</div>
+      <div class="animal">${ANIMAL_SVG[state.animal]}</div>
+      <div class="desc">${ROLE_DESCS[code]}</div>
+    </div>
+    <p>あなたの相棒：<span class="em">${ANIMAL_NAME[state.animal]}</span>！</p>
+    <p>次は <span class="pink">5人の町人</span> に話しかけて、強みを聞こう。</p>
+    <div class="modal-actions"><button class="btn primary" onclick="closeModal()">館を出る</button></div>
+  `);
+}
+
+function openStrengthHouse(id){
+  if(!state.progress.hatched){
+    showModal(`<h2>👥 町人の家</h2><p>「先に <span class="em">MBTIの館</span> で診断を受けてきて。」</p><div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>`);
+    return;
+  }
+  const current = state.progress.strengthsFromOthers[id] || '';
+  showModal(`
+    <h2>👥 町人の家 (${id+1}/5)</h2>
+    <p>${STRENGTH_PROMPTS[id]}</p>
+    <p class="pink">↓ 聞いた強みを書こう ↓</p>
+    <textarea class="modal-input modal-textarea" id="strInput" placeholder="例：聞き上手、人の気持ちを汲み取れる…">${current}</textarea>
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">あとで</button><button class="btn primary" onclick="saveStrength(${id})">のこす</button></div>
+  `);
+  setTimeout(()=>{const el=document.getElementById('strInput');if(el)el.focus();}, 100);
+}
+function saveStrength(id){
+  const v = document.getElementById('strInput').value.trim();
+  if(!v){ alert('書いてね'); return; }
+  state.progress.strengthsFromOthers[id] = v; saveState(); renderStatus(); closeModal();
+  const done = state.progress.strengthsFromOthers.filter(s=>s).length;
+  setTimeout(()=>{
+    if(done >= 5){
+      state.progress.town1Cleared = true; saveState();
+      showModal(`
+        <h2>✨ 5人の声がそろった！</h2>
+        <p>南の <span class="em">出口</span> から街2へ進もう。</p>
+        <div class="modal-actions"><button class="btn primary" onclick="closeModal()">わかった</button></div>
+      `);
+    } else setMsg(`▼ 強みを ひとつ手にいれた！\n  集めた強み：${done} / 5`);
+  }, 100);
+}
+
+function openExit(targetTown){
+  if(targetTown === 'town2' && !state.progress.town1Cleared){
+    showModal(`
+      <h2>🚪 街の出口</h2>
+      <p>警備員：「街2へ行くには <span class="em">MBTI診断</span> ＋ <span class="em">5人の強み</span> が必要。」</p>
+      <p>現在：MBTI ${state.progress.mbtiCompleted ? '◯' : '×'} ／ 強み ${state.progress.strengthsFromOthers.filter(s=>s).length}/5</p>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>
+    `); return;
+  }
+  if(!getTowns()[targetTown]){
+    showModal(`<h2>🚪 出口</h2><p>次の街は準備中…</p><div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>`);
+    return;
+  }
+  showModal(`
+    <h2>🚪 街の出口</h2>
+    <p class="pink">${getTowns()[targetTown].description}</p>
+    <div class="modal-actions"><button class="btn primary" onclick="warpTo('${targetTown}')">${getTowns()[targetTown].name}へ</button></div>
+  `);
+}
+
+// ===== ワープ =====
+function openWarp(){
+  if(currentModal) return;
+  const towns = getTowns();
+  const unlocked = {
+    town1: true,
+    town2: state.progress.town1Cleared,
+    town3: state.progress.town2GymCleared,
+    town4: state.progress.town3Cleared
+  };
+  let cards = '';
+  ['town1','town2','town3','town4'].forEach((tk, i) => {
+    const t = towns[tk]; const u = unlocked[tk]; const cur = state.currentTown === tk; const has = !!t;
+    cards += `
+      <div class="warp-card ${!u || !has ? 'locked' : ''} ${cur ? 'current' : ''}" ${u && has && !cur ? `onclick="warpTo('${tk}')"` : ''}>
+        <div class="num">街 0${i+1}</div>
+        <div class="nm">${has ? t.name : '準備中'}</div>
+        <div class="ds">${has ? (cur ? '— 現在地 —' : (u ? t.description.slice(0,24) : '🔒 ロック中')) : '未実装'}</div>
+      </div>`;
+  });
+  showModal(`<h2>🚀 ワープステーション</h2><div class="sub">— TOWN WARP —</div><p>移動先を選ぼう。</p><div class="warp-grid">${cards}</div><div class="modal-actions"><button class="btn" onclick="closeModal()">とじる</button></div>`);
+}
+function warpTo(tk){
+  const t = getTowns()[tk]; if(!t){ alert('準備中…'); return; }
+  state.currentTown = tk;
+  state.pos = Object.assign({}, t.spawnPos);
+  state.visitedTowns[tk] = true;
+  saveState(); closeModal(); renderStage(); renderHero(); renderStatus();
+  setMsg(`▼ <span class="em">${t.name}</span> に到着！\n  ${t.description}`);
+}
+
+// ===== 街2 機能 =====
+function openTownNpc(npc){
+  if(state.currentTown !== 'town2' || typeof TOWN2 === 'undefined') return;
+  const idx = TOWN2.npcs.findIndex(n => n.id === npc.id);
+  const collected = state.progress.town2NpcStrengths[idx];
+  if(collected && collected.length >= 2){
+    showModal(`
+      <h2>💬 ${escapeHtml(npc.name)}</h2>
+      <p>${escapeHtml(npc.followUp || 'またね！')}</p>
+      <p class="em">あなたから聞いた強み：</p>
+      <p class="pink">・${collected.map(escapeHtml).join('<br>・')}</p>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">わかれる</button></div>
+    `); return;
+  }
+  showModal(`
+    <h2>💬 ${escapeHtml(npc.name)}</h2>
+    <p>${escapeHtml(npc.greeting || 'こんにちは。')}</p>
+    ${(npc.dialog || []).map(d => `<p>${escapeHtml(d)}</p>`).join('')}
+    <div class="modal-actions"><button class="btn primary" onclick='receiveTown2Strengths(${JSON.stringify(npc.id)})'>強みを 聞く</button></div>
+  `);
+}
+function receiveTown2Strengths(npcId){
+  const idx = TOWN2.npcs.findIndex(n => n.id === npcId);
+  const npc = TOWN2.npcs[idx];
+  state.progress.town2NpcStrengths[idx] = npc.strengths.slice();
+  saveState(); renderStatus();
+  showModal(`
+    <h2>✨ 強みを受け取った！</h2>
+    <p>${escapeHtml(npc.name)}が見たあなたの強み：</p>
+    <p class="em">・${npc.strengths.map(escapeHtml).join('<br>・')}</p>
+    <p class="pink">${escapeHtml(npc.followUp || '')}</p>
+    <div class="modal-actions"><button class="btn primary" onclick="closeModal()">ありがとう</button></div>
+  `);
+  if(state.progress.town2NpcStrengths.every(s => s && s.length >= 2)){
+    state.progress.town2GymOpen = true; saveState();
+  }
+}
+
+function openGymDoor(gym){
+  if(!state.progress.town2GymOpen){
+    showModal(`<h2>⚔ ジム入口</h2><p>受付：「まず <span class="em">街の3人</span> から強みを聞いて。」</p><p>${state.progress.town2NpcStrengths.filter(s=>s.length>=2).length}/3 人</p><div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>`);
+    return;
+  }
+  if(state.progress.town2GymLeaderOpen){
+    showModal(`<h2>⚔ ジム入口</h2><p>トレーナー：「奥のジムリーダーに挑戦しよう！」</p><div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>`);
+    return;
+  }
+  showModal(`
+    <h2>⚔ ジム入口トレーナー</h2>
+    <p>${escapeHtml(gym.trainer.greeting || '挑戦者よ！あなたの強みは？')}</p>
+    <p class="em">${escapeHtml(gym.trainer.challengePrompt || '3人分・各3つずつ・計9個の強みを答えなさい！')}</p>
+    <textarea class="modal-input modal-textarea" id="strChallenge" placeholder="9個の強みを改行で区切って書く"></textarea>
+    <p style="font-size:10px;color:var(--mind);margin-top:6px">ヒント：聞いた6つ＋自分で考えた3つでもOK</p>
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">あとで</button><button class="btn primary" onclick="submitGymTrainer()">挑む</button></div>
+  `);
+}
+function submitGymTrainer(){
+  const v = document.getElementById('strChallenge').value.trim();
+  const lines = v.split(/[\n、,]/).map(s=>s.trim()).filter(s=>s.length>0);
+  if(lines.length < 9){ alert(`9個以上必要（現在${lines.length}個）`); return; }
+  state.progress.town2GymLeaderOpen = true; saveState();
+  showModal(`
+    <h2>✨ 合格！</h2>
+    <p>トレーナー：「${escapeHtml(TOWN2.gym.trainer.successMessage || '素晴らしい！')}」</p>
+    <p>ジムリーダーへの扉が開かれた。奥へどうぞ。</p>
+    <div class="modal-actions"><button class="btn primary" onclick="closeModal()">奥へ進む</button></div>
+  `);
+}
+
+function openGymLeader(gym){
+  if(!state.progress.town2GymOpen || !state.progress.town2GymLeaderOpen){
+    showModal(`<h2>👑 ジムリーダーの間</h2><p>「まず入口のトレーナーをクリアして。」</p><div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>`); return;
+  }
+  if(state.progress.town2GymCleared){
+    showModal(`
+      <h2>👑 ${escapeHtml(gym.leader.name)}</h2>
+      <div style="text-align:center">${gym.leader.portrait}</div>
+      <p>「${escapeHtml(gym.leader.battle.winMessage || '勝利者よ、また来たのね')}」</p>
+      <p>次は <span class="em">街3</span> へ。</p>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>
+    `); return;
+  }
+  startGymBattle(gym);
+}
+let gymBattleTimer = null;
+function startGymBattle(gym){
+  const leader = gym.leader;
+  const battle = leader.battle;
+  showModal(`
+    <h2>⚔ ジム戦：${escapeHtml(leader.name)}</h2>
+    <div class="battle-arena">
+      <div class="battle-leader">${leader.portrait}</div>
+      <p style="color:var(--gold);font-size:13px">${escapeHtml(leader.name)}（${escapeHtml(leader.title || '')}）</p>
+      <p class="pink" style="font-size:11px">${escapeHtml(leader.catchphrase || '')}</p>
+      <div class="battle-timer" id="battleTimer">${battle.timeLimitSec || 30}</div>
+      <div class="battle-question">${escapeHtml(battle.question)}</div>
+      <textarea class="modal-input modal-textarea" id="battleAnswer" placeholder="あなたの強みを端的に書いて！" style="background:rgba(0,0,0,0.5)"></textarea>
+      <div class="battle-hint" id="battleHint"></div>
+    </div>
+    <div class="modal-actions"><button class="btn danger" onclick="abandonBattle()">逃げる</button><button class="btn primary" onclick="submitBattleAnswer()">こたえる</button></div>
+  `);
+  setTimeout(()=>document.getElementById('battleAnswer').focus(), 100);
+  let remain = battle.timeLimitSec || 30;
+  gymBattleTimer = setInterval(()=>{
+    remain--;
+    const tEl = document.getElementById('battleTimer');
+    if(!tEl){ clearInterval(gymBattleTimer); return; }
+    tEl.textContent = remain;
+    if(remain <= 10) tEl.classList.add('warning');
+    if(remain === 20 && battle.hints && battle.hints[0]) document.getElementById('battleHint').innerHTML = '💡 ' + escapeHtml(battle.hints[0]);
+    else if(remain === 12 && battle.hints && battle.hints[1]) document.getElementById('battleHint').innerHTML = '💡 ' + escapeHtml(battle.hints[1]);
+    else if(remain === 5 && battle.hints && battle.hints[2]) document.getElementById('battleHint').innerHTML = '💡 ' + escapeHtml(battle.hints[2]);
+    if(remain <= 0){ clearInterval(gymBattleTimer); gymBattleTimer = null; onBattleTimeUp(); }
+  }, 1000);
+}
+function onBattleTimeUp(){
+  const battle = TOWN2.gym.leader.battle;
+  showModal(`<h2>⏰ 時間切れ！</h2><p class="red">「${escapeHtml(battle.retryMessage || 'もう一度落ち着いて')}」</p><div class="modal-actions"><button class="btn primary" onclick="closeModal()">わかった</button></div>`);
+}
+function submitBattleAnswer(){
+  const v = document.getElementById('battleAnswer').value.trim();
+  if(!v || v.length < 3){ alert('もう少し長く！'); return; }
+  if(gymBattleTimer){ clearInterval(gymBattleTimer); gymBattleTimer = null; }
+  const battle = TOWN2.gym.leader.battle;
+  state.progress.town2GymCleared = true;
+  state.progress.myStrengthAnswer = v;
+  saveState(); renderStatus();
+  showModal(`
+    <h2>🏆 勝利！</h2>
+    <p class="pink">あなたの答え：「${escapeHtml(v)}」</p>
+    <p>${escapeHtml(TOWN2.gym.leader.name)}：「${escapeHtml(battle.winMessage || '見事だ！')}」</p>
+    <p class="em">★ ${escapeHtml(battle.rewardItem || '強みのバッジ')} 獲得！</p>
+    <p>次は <span class="em">街3</span> へ。</p>
+    <div class="modal-actions"><button class="btn primary" onclick="closeModal();setTimeout(openWarp, 300)">街3へワープ</button><button class="btn" onclick="closeModal()">あとで</button></div>
+  `);
+}
+function abandonBattle(){
+  if(gymBattleTimer){ clearInterval(gymBattleTimer); gymBattleTimer = null; }
+  closeModal(); setMsg('▼ 逃げ出した… また挑戦しよう。');
+}
+
+// ===== 街3 機能 =====
+function openSage(sage){
+  if(state.currentTown !== 'town3' || typeof TOWN3 === 'undefined') return;
+  const answered = state.progress.town3Answers[sage.id];
+  showModal(`
+    <h2>🧙 ${escapeHtml(sage.name)}</h2>
+    <div class="sub">— ${escapeHtml(sage.intro || '')} —</div>
+    <p>${escapeHtml(sage.greeting || '')}</p>
+    <p class="em">${escapeHtml(sage.question || '')}</p>
+    <textarea class="modal-input modal-textarea" id="sageAnswer" placeholder="${escapeHtml(sage.placeholder || '思いつくままに書こう')}">${escapeHtml(answered || '')}</textarea>
+    <p style="font-size:10px;color:var(--mind);margin-top:6px">${escapeHtml(sage.depthFollowUp || '')}</p>
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">あとで</button><button class="btn primary" onclick='saveSageAnswer(${JSON.stringify(sage.id)},${JSON.stringify(sage.acknowledgment || "")})'>こたえる</button></div>
+  `);
+  setTimeout(()=>document.getElementById('sageAnswer').focus(), 100);
+}
+function saveSageAnswer(sageId, ack){
+  const v = document.getElementById('sageAnswer').value.trim();
+  if(!v){ alert('書いてね'); return; }
+  state.progress.town3Answers[sageId] = v; saveState(); renderStatus(); closeModal();
+  setTimeout(()=>{
+    showModal(`<h2>✨ 賢者の言葉</h2><p>「${escapeHtml(ack || 'なるほど…受け取った。')}」</p><p class="pink">「${escapeHtml(v)}」</p><p>すべて答えたら <span class="em">集約者</span> のところへ。</p><div class="modal-actions"><button class="btn primary" onclick="closeModal()">わかった</button></div>`);
+  }, 100);
+}
+function openSynthesizer(syn){
+  if(typeof TOWN3 === 'undefined') return;
+  const ans = state.progress.town3Answers;
+  const sageIds = TOWN3.npcs.map(n => n.id);
+  const answered = sageIds.filter(id => ans[id]).length;
+  if(answered < sageIds.length){
+    showModal(`<h2>✨ ${escapeHtml(syn.name)}</h2><p>「まだ ${sageIds.length - answered} 人の賢者の問いに答えていないようだ…」</p><p>進捗：${answered} / ${sageIds.length}</p><div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>`); return;
+  }
+  if(state.progress.town3IjouchiStatement){
+    showModal(`<h2>✨ ${escapeHtml(syn.name)}</h2><p>「キミの異常値はもう見つけた」</p><div class="synth-result"><div class="label">— あなたの異常値 —</div><div class="statement">${escapeHtml(state.progress.town3IjouchiStatement)}</div></div><p>次は <span class="em">街4</span> へ。</p><div class="modal-actions"><button class="btn primary" onclick="closeModal()">わかった</button><button class="btn danger" onclick="resetIjouchi()">もう一度集約</button></div>`); return;
+  }
+  showModal(`<h2>✨ ${escapeHtml(syn.name)}</h2><p>「${escapeHtml(syn.intro || '答えを読み取らせてくれ')}」</p><div style="text-align:center;padding:20px;font-size:30px;color:var(--gold);animation:blink 1s steps(2) infinite">⚙️ ⚙️ ⚙️</div><p style="text-align:center;color:var(--mind)">心を読み取り中…</p><div class="modal-actions"><button class="btn primary" onclick="performSynthesis()">結果を見る</button></div>`);
+}
+function performSynthesis(){
+  if(typeof TOWN3 === 'undefined') return;
+  const ans = state.progress.town3Answers;
+  let statement = '';
+  try {
+    const f = new Function('answers', `${TOWN3.synthesizer.synthesisLogic || ''} return typeof synthesize === 'function' ? synthesize(answers) : null;`);
+    const result = f(ans);
+    if(result && result.statement) statement = result.statement;
+    else { const samples = Object.values(ans).filter(s=>s); statement = `${state.name}さんの異常値：${samples.slice(0,3).map(s=>s.slice(0,15)).join(' × ')} に、誰にも追いつけない深さを持つ。`; }
+  } catch(e){
+    const samples = Object.values(ans).filter(s=>s);
+    statement = `${state.name}さんの異常値：${samples.slice(0,3).map(s=>s.slice(0,15)).join(' × ')}`;
+  }
+  state.progress.town3IjouchiStatement = statement;
+  state.progress.town3Cleared = true;
+  saveState(); renderStatus();
+  showModal(`<h2>🌟 異常値を発見！</h2><p>「${escapeHtml(TOWN3.synthesizer.revealMessage || 'これがキミの異常値だ')}」</p><div class="synth-result"><div class="label">— あなたの異常値 —</div><div class="statement">${escapeHtml(statement)}</div></div><p>${escapeHtml(TOWN3.synthesizer.blessingMessage || '誇りなさい、これがキミの旗じゃ。')}</p><div class="modal-actions"><button class="btn primary" onclick="closeModal()">受け取る</button><button class="btn" onclick="editIjouchi()">少し直す</button></div>`);
+}
+function editIjouchi(){
+  showModal(`<h2>✏ 異常値を微調整</h2><p>提示された異常値を自分の言葉で書き直してOK。</p><textarea class="modal-input modal-textarea" id="ijouchiEdit" style="min-height:100px">${escapeHtml(state.progress.town3IjouchiStatement)}</textarea><div class="modal-actions"><button class="btn" onclick="closeModal()">キャンセル</button><button class="btn primary" onclick="saveIjouchiEdit()">確定</button></div>`);
+}
+function saveIjouchiEdit(){
+  const v = document.getElementById('ijouchiEdit').value.trim();
+  if(!v){ alert('書いてね'); return; }
+  state.progress.town3IjouchiStatement = v; saveState(); closeModal();
+  setMsg('▼ 異常値を自分の言葉にした。');
+}
+function resetIjouchi(){
+  if(!confirm('もう一度集約する？')) return;
+  state.progress.town3IjouchiStatement = ''; state.progress.town3Cleared = false;
+  saveState(); closeModal();
+}
+
+// ===== 街4 機能 =====
+function openRival(rival){
+  if(state.currentTown !== 'town4' || typeof TOWN4 === 'undefined') return;
+  const battled = state.progress.rivalsBattled[rival.id];
+  showModal(`
+    <h2>🥊 ${escapeHtml(rival.name)}</h2>
+    <div class="sub">— ${escapeHtml(rival.mbti)} ・ ${escapeHtml(ANIMAL_NAME[rival.animalKey] || '')} —</div>
+    <div style="text-align:center;width:80px;height:80px;margin:0 auto 12px;background:#1a1a2a;border:2px solid var(--gold)">${ANIMAL_SVG[rival.animalKey] || ANIMAL_SVG.tamago}</div>
+    <p class="pink">「${escapeHtml(rival.backstory || '')}」</p>
+    <p class="em">異常値：${escapeHtml(rival.ijouchi || '')}</p>
+    <p>強み：${(rival.strengths || []).map(escapeHtml).join('・')}</p>
+    ${battled ? `<p class="mind">★ 対戦済み（称号「${escapeHtml(rival.reward || '')}」獲得）</p>` : ''}
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">話を聞くだけ</button><button class="btn primary" onclick='startRivalBattle(${JSON.stringify(rival.id)})'>${battled ? 'もう一度対戦' : '対戦する'}</button></div>
+  `);
+}
+function startRivalBattle(rivalId){
+  if(typeof TOWN4 === 'undefined') return;
+  const rival = TOWN4.rivals.find(r => r.id === rivalId);
+  const bank = (TOWN4.battleSystem && TOWN4.battleSystem.questionsBank) || [];
+  if(bank.length === 0){ alert('問題データなし'); return; }
+  const shuffled = bank.slice().sort(()=>Math.random()-0.5);
+  state._currentRivalBattle = { rivalId, questions: shuffled.slice(0,3), idx:0, answers:[] };
+  showRivalQuestion();
+}
+function showRivalQuestion(){
+  const b = state._currentRivalBattle; if(!b) return;
+  if(b.idx >= b.questions.length){ finishRivalBattle(); return; }
+  const q = b.questions[b.idx];
+  const rival = TOWN4.rivals.find(r => r.id === b.rivalId);
+  showModal(`
+    <h2>🥊 ${escapeHtml(rival.name)} 戦 (${b.idx+1}/${b.questions.length})</h2>
+    <p class="pink">${escapeHtml(rival.preBattle || '挑戦するか…')}</p>
+    <div class="battle-arena" style="text-align:left">
+      <p class="em" style="font-size:12px">シーン：</p>
+      <p>${escapeHtml(q.scenario || '')}</p>
+      <p class="em" style="margin-top:10px">問い：</p>
+      <p>${escapeHtml(q.challenge || '')}</p>
+    </div>
+    <textarea class="modal-input modal-textarea" id="rivalAnswer" placeholder="あなたの強みでどう動く？" style="margin-top:10px"></textarea>
+    <div class="modal-actions"><button class="btn danger" onclick="closeModal()">逃げる</button><button class="btn primary" onclick="submitRivalAnswer()">こたえる</button></div>
+  `);
+  setTimeout(()=>document.getElementById('rivalAnswer').focus(), 100);
+}
+function submitRivalAnswer(){
+  const b = state._currentRivalBattle;
+  const v = document.getElementById('rivalAnswer').value.trim();
+  if(!v || v.length < 5){ alert('もう少し詳しく！'); return; }
+  b.answers.push(v); b.idx++; saveState(); showRivalQuestion();
+}
+function finishRivalBattle(){
+  const b = state._currentRivalBattle;
+  const rival = TOWN4.rivals.find(r => r.id === b.rivalId);
+  state.progress.rivalsBattled[b.rivalId] = true;
+  saveState(); renderStatus();
+  showModal(`
+    <h2>🏆 対戦終了！</h2>
+    <p>${escapeHtml(rival.name)}：「${escapeHtml(rival.defeatSpeech || 'やるじゃない…')}」</p>
+    <p class="em">★ 称号「${escapeHtml(rival.reward || '冒険者')}」獲得！</p>
+    ${b.answers.map((a,i)=>`<p class="pink">${i+1}. ${escapeHtml(a)}</p>`).join('')}
+    <p class="mind">★ 相手のストーリーから 学ぼう。</p>
+    <div class="modal-actions"><button class="btn primary" onclick="closeModal()">街に戻る</button></div>
+  `);
+  state._currentRivalBattle = null;
+}
+function openExchange(ex){
+  if(typeof TOWN4 === 'undefined' || !TOWN4.exchangeBoard){ setMsg('▼ 掲示板はまだ準備中…'); return; }
+  const board = TOWN4.exchangeBoard;
+  showModal(`<h2>📜 ${escapeHtml(board.description || 'メッセージ掲示板')}</h2>${(board.messages||[]).map(m=>`<div style="background:rgba(255,255,255,0.05);padding:10px;margin:8px 0;border-left:3px solid var(--gold)"><p class="em" style="font-size:11px">${escapeHtml(m.from)}</p><p style="font-size:12px">${escapeHtml(m.text)}</p></div>`).join('')}<div class="modal-actions"><button class="btn" onclick="closeModal()">読んだ</button></div>`);
+}
+
+function openMenu(){
+  if(currentModal) return;
+  const t = currentTownData();
+  showModal(`
+    <h2>📜 メニュー</h2>
+    <div class="role-card">
+      <div class="you-are">YOU ARE</div>
+      ${state.mbti ? `<div class="mbti">${state.mbti}</div><div class="role-name">${state.role}</div>` : '<div class="role-name">未診断（旅人）</div>'}
+      ${state.animal ? `<div class="animal">${ANIMAL_SVG[state.animal]}</div>` : ''}
+    </div>
+    <p>★ 現在地：${t.name}</p>
+    <p>★ 進行度：${computeProgressNum()} / 10</p>
+    <p>★ 街1 ${state.progress.town1Cleared ? '◯' : '進行中'} ／ 街2 ${state.progress.town2GymCleared ? '◯' : '×'} ／ 街3 ${state.progress.town3Cleared ? '◯' : '×'}</p>
+    ${state.progress.town3IjouchiStatement ? `<div class="synth-result"><div class="label">— あなたの異常値 —</div><div class="statement" style="font-size:13px">${escapeHtml(state.progress.town3IjouchiStatement)}</div></div>` : ''}
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">とじる</button><button class="btn" onclick="closeModal();openWarp()">🚀 ワープ</button><button class="btn danger" onclick="resetAll()">全リセット</button></div>
+  `);
+}
+function resetAll(){
+  if(!confirm('全リセットする？')) return;
+  localStorage.removeItem(storageKey);
+  state = defaultState();
+  state.lastVisit = new Date().toISOString();
+  saveState(); closeModal();
+  renderStage(); renderHero(); renderStatus();
+  setMsg('▼ あたらしい旅が はじまる！');
+}
+
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+document.addEventListener('keydown', e => {
+  if(document.getElementById('frame').style.display === 'none'){
+    if(e.code === 'Space' || e.code === 'Enter'){
+      if(document.getElementById('titleScreen').style.display !== 'none') showHowTo();
+      else if(document.getElementById('howtoScreen').classList.contains('show')) startGame();
+      e.preventDefault();
+    } return;
+  }
+  if(currentModal){ if(e.code === 'Escape'){ closeModal(); e.preventDefault(); } return; }
+  if(e.code === 'ArrowUp' || e.code === 'KeyW'){ move(0,-1); e.preventDefault(); }
+  else if(e.code === 'ArrowDown' || e.code === 'KeyS'){ move(0,1); e.preventDefault(); }
+  else if(e.code === 'ArrowLeft' || e.code === 'KeyA'){ move(-1,0); e.preventDefault(); }
+  else if(e.code === 'ArrowRight' || e.code === 'KeyD'){ move(1,0); e.preventDefault(); }
+  else if(e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ'){ action(); e.preventDefault(); }
+  else if(e.code === 'KeyM' || e.code === 'KeyB' || e.code === 'KeyX'){ openMenu(); e.preventDefault(); }
+});
+
+function showHowTo(){
+  document.getElementById('titleScreen').style.display = 'none';
+  document.getElementById('howtoScreen').classList.add('show');
+}
+function startGame(){
+  document.getElementById('titleScreen').style.display = 'none';
+  document.getElementById('howtoScreen').classList.remove('show');
+  document.getElementById('frame').style.display = 'flex';
+  renderStage(); renderHero(); renderStatus();
+}
+</script>
+
+</body>
+</html>
