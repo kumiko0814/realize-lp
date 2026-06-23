@@ -447,6 +447,7 @@ body{
     <div class="user-info">
       <input id="userNameInput" placeholder="お名前" value=""/>
       <span id="weekLabel">— Week 1 / 26 —</span>
+      <a href="welcome.html" class="help-link" style="display:block;margin-top:4px">📖 使い方を見る</a>
     </div>
   </header>
 
@@ -531,7 +532,7 @@ body{
     <div class="stat-card" id="paceCard">
       <div class="stat-label">ペース</div>
       <div><span class="stat-num" id="paceLabel">—</span></div>
-      <div class="stat-desc" id="paceDesc">直近4週で判定</div>
+      <div class="stat-desc" id="paceDesc">直近4週の提出率＋達成率</div>
     </div>
   </section>
 
@@ -930,11 +931,40 @@ function getComRatesByWeek(week){
   return count > 0 ? (totalRatio / count) : 0;
 }
 
-function judgeRoute(){
-  // 直近4週で、進捗ライン（経過分に対する目安）の60%以上ならsuccess
+function getSubmissionRate(){
+  // 直近4週の週報提出率（いずれかのKRに値が入っていれば「提出済み」）
   const recentN = 4;
   const week = state.currentWeek;
-  if(week <= 1) return 'success'; // 開始直後はsuccess扱い
+  if(week <= 1) return 1;
+  const startIdx = Math.max(0, week - 1 - recentN);
+  const endIdx = week - 1;
+  const totalCount = endIdx - startIdx;
+  if(totalCount <= 0) return 1;
+  let submitted = 0;
+  for(let w = startIdx; w < endIdx; w++){
+    let anyDefined = false;
+    state.krs.forEach(kr => kr.subs.forEach(sub => {
+      if(sub.history && sub.history[w] !== undefined && sub.history[w] !== null){
+        anyDefined = true;
+      }
+    }));
+    if(anyDefined) submitted++;
+  }
+  return submitted / totalCount;
+}
+
+function judgeRoute(){
+  // 直近4週で「週報提出率」と「達成率」の両方で判定。
+  // どちらかが基準を下回ったら fail。達成し始めれば戻る。
+  const recentN = 4;
+  const week = state.currentWeek;
+  if(week <= 1) return 'success';
+
+  // 1) 週報提出率
+  const submissionRate = getSubmissionRate();
+  if(submissionRate < 0.5) return 'fail';
+
+  // 2) 達成率
   let achieved = 0, expected = 0;
   state.krs.forEach(kr => kr.subs.forEach(sub => {
     if(!sub.cha) return;
@@ -949,8 +979,8 @@ function judgeRoute(){
     expected += expectedSum;
   }));
   if(expected === 0) return 'success';
-  const ratio = achieved / expected;
-  return ratio >= 0.6 ? 'success' : 'fail';
+  const achievementRatio = achieved / expected;
+  return achievementRatio >= 0.6 ? 'success' : 'fail';
 }
 
 function judgeStage(){
