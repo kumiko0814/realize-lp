@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ミー10種類プレビュー ｜ Re:alize</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;--sub:#5a5a5a;--mute:#8b8278;
+  --bg:#fffaf6;--card:#fff;--line:#ece5d8;--line-soft:#f5eee2;
+  --accent:#c25b3f;--accent-deep:#a64626;
+  --leaf:#7a9070;--leaf-deep:#5a7050;
+  --pink:#e8b6bc;--pink-soft:#fce4e6;
+  --gold:#c9a574;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Yu Gothic","YuGothic","Hiragino Kaku Gothic ProN",sans-serif;
+  color:var(--ink);background:var(--bg);
+  font-size:14px;line-height:1.85;letter-spacing:0.05em;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"palt";
+}
+svg{image-rendering:pixelated;image-rendering:crisp-edges}
+
+.wrap{max-width:1080px;margin:0 auto;padding:48px 24px 96px}
+.head{text-align:center;margin-bottom:48px}
+.head .meta{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:12px;letter-spacing:0.3em;color:var(--mute);margin-bottom:10px}
+.head h1{font-family:"Yu Mincho",serif;font-size:28px;font-weight:500;letter-spacing:0.08em;line-height:1.5;margin-bottom:10px}
+.head .sub{font-size:13px;color:var(--sub);letter-spacing:0.06em}
+
+section{margin-bottom:64px}
+section h2{
+  font-family:"Yu Mincho",serif;font-size:20px;font-weight:600;letter-spacing:0.06em;
+  padding-bottom:12px;margin-bottom:24px;border-bottom:2px solid var(--leaf-deep);
+  display:flex;align-items:baseline;gap:14px;
+}
+section h2 .num{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:14px;color:var(--leaf);letter-spacing:0.2em;font-weight:500}
+.lead{font-size:13px;color:var(--sub);margin-bottom:24px}
+
+/* 10種類 成体一覧 */
+.kit-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+@media(max-width:720px){.kit-grid{grid-template-columns:repeat(2,1fr)}}
+.kit-card{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:18px 12px;text-align:center;transition:transform 0.2s;
+}
+.kit-card:hover{transform:translateY(-3px);border-color:var(--leaf)}
+.kit-svg{width:88px;height:88px;margin:0 auto 10px;display:block}
+.kit-name{font-size:13px;font-weight:700;letter-spacing:0.06em;margin-bottom:4px}
+.kit-role{font-size:10px;color:var(--leaf-deep);font-weight:600;letter-spacing:0.1em;margin-bottom:6px}
+.kit-mbti{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:10px;color:var(--mute);letter-spacing:0.18em}
+.kit-trait{font-size:10.5px;color:var(--sub);line-height:1.7;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+
+/* 5段階展開 */
+.stage-row{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:20px 18px;margin-bottom:20px;
+}
+.stage-row-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line-soft)}
+.stage-row-head .name{font-size:15px;font-weight:700;letter-spacing:0.06em}
+.stage-row-head .role{font-size:11px;color:var(--leaf-deep);font-weight:600;letter-spacing:0.1em}
+.stage-row-head .mbti{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:11px;color:var(--mute);letter-spacing:0.2em}
+.stages{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:720px){.stages{grid-template-columns:repeat(3,1fr)}}
+.stage-cell{text-align:center;padding:8px 4px;background:var(--line-soft);border-radius:8px}
+.stage-cell svg{width:64px;height:64px;margin:0 auto 4px;display:block}
+.stage-cell .lv{font-size:10px;color:var(--leaf-deep);font-weight:600;letter-spacing:0.08em}
+.stage-cell .stg-name{font-size:10px;color:var(--sub);margin-top:2px}
+
+/* MBTI割当表 */
+.mbti-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:12px}
+.mbti-table th,.mbti-table td{padding:10px 12px;border:1px solid var(--line);text-align:left}
+.mbti-table th{background:var(--line-soft);font-weight:700}
+.mbti-table .a{display:flex;align-items:center;gap:8px}
+.mbti-table .a svg{width:24px;height:24px;flex-shrink:0}
+.mbti-table .em{color:var(--accent-deep);font-weight:600}
+
+/* 失敗ver注釈 */
+.fail-note{
+  background:#fdf6f3;border-left:3px solid var(--accent);
+  padding:14px 16px;margin:18px 0;font-size:12.5px;line-height:1.85;border-radius:0 6px 6px 0;
+}
+.fail-note strong{color:var(--accent-deep)}
+
+.cta{
+  background:linear-gradient(135deg,var(--leaf-deep) 0%,var(--leaf) 100%);
+  color:#fff;padding:24px 24px;border-radius:14px;text-align:center;margin-top:32px;
+}
+.cta h3{font-size:16px;letter-spacing:0.1em;margin-bottom:8px;font-weight:700}
+.cta p{font-size:12.5px;line-height:1.85;color:#fffdf7}
+
+footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-align:center;font-size:11px;color:var(--mute);letter-spacing:0.1em}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="head">
+    <div class="meta">— CHARACTER PROPOSAL —</div>
+    <h1>ミー 10種類プレビュー</h1>
+    <p class="sub">MBTI診断結果に応じて、参加者ごとに育つ動物が変わる設計案</p>
+  </div>
+
+  <!-- ============ 10種類 一覧 ============ -->
+  <section>
+    <h2><span class="num">01</span>10種類の相棒（成体）</h2>
+    <p class="lead">それぞれが「強みの軸」に対応。あなたのMBTI結果で、どの相棒と旅するかが決まる。</p>
+
+    <div class="kit-grid">
+      <!-- 1. ねこ -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="3" y="2" width="2" height="2" fill="#c45a8e"/>
+          <rect x="11" y="2" width="2" height="2" fill="#c45a8e"/>
+          <rect x="3" y="3" width="1" height="1" fill="#f78ac0"/>
+          <rect x="12" y="3" width="1" height="1" fill="#f78ac0"/>
+          <rect x="2" y="4" width="12" height="7" fill="#f78ac0"/>
+          <rect x="3" y="3" width="10" height="1" fill="#f78ac0"/>
+          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="8" width="1" height="1" fill="#e63d6a"/>
+          <rect x="8" y="8" width="1" height="1" fill="#e63d6a"/>
+          <rect x="3" y="11" width="2" height="2" fill="#f78ac0"/>
+          <rect x="7" y="11" width="2" height="2" fill="#f78ac0"/>
+          <rect x="11" y="11" width="2" height="2" fill="#f78ac0"/>
+          <rect x="13" y="6" width="1" height="3" fill="#f78ac0"/>
+        </svg>
+        <div class="kit-name">ねこ</div>
+        <div class="kit-role">— 遊び人 / 商人 —</div>
+        <div class="kit-mbti">ENFP / ESFP</div>
+        <div class="kit-trait">人を惹きつける明るさ。場の空気を読み、人と人をつなぐ</div>
+      </div>
+
+      <!-- 2. うさぎ -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="4" y="0" width="2" height="5" fill="#fff"/>
+          <rect x="10" y="0" width="2" height="5" fill="#fff"/>
+          <rect x="5" y="1" width="1" height="3" fill="#f6a0c4"/>
+          <rect x="10" y="1" width="1" height="3" fill="#f6a0c4"/>
+          <rect x="2" y="5" width="12" height="7" fill="#fff"/>
+          <rect x="3" y="4" width="10" height="1" fill="#fff"/>
+          <rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="9" width="2" height="1" fill="#f6a0c4"/>
+          <rect x="3" y="12" width="3" height="2" fill="#fff"/>
+          <rect x="10" y="12" width="3" height="2" fill="#fff"/>
+        </svg>
+        <div class="kit-name">うさぎ</div>
+        <div class="kit-role">— 吟遊詩人 / 踊り子 —</div>
+        <div class="kit-mbti">INFP / ISFP</div>
+        <div class="kit-trait">繊細な感性で世界を見る。言葉や芸術で人を癒す</div>
+      </div>
+
+      <!-- 3. パンダ -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/>
+          <rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/>
+          <rect x="2" y="4" width="12" height="8" fill="#fff"/>
+          <rect x="3" y="3" width="10" height="1" fill="#fff"/>
+          <rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="5" y="6" width="1" height="1" fill="#fff"/>
+          <rect x="11" y="6" width="1" height="1" fill="#fff"/>
+          <rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/>
+          <rect x="3" y="12" width="3" height="2" fill="#0e0e1a"/>
+          <rect x="10" y="12" width="3" height="2" fill="#0e0e1a"/>
+        </svg>
+        <div class="kit-name">パンダ</div>
+        <div class="kit-role">— 預言者 / 僧侶 —</div>
+        <div class="kit-mbti">INFJ / ENFJ</div>
+        <div class="kit-trait">人の心を見抜く優しさ。仲間を信じて静かに導く</div>
+      </div>
+
+      <!-- 4. フクロウ -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/>
+          <rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/>
+          <rect x="2" y="3" width="12" height="9" fill="#a87132"/>
+          <rect x="4" y="5" width="3" height="3" fill="#fff"/>
+          <rect x="9" y="5" width="3" height="3" fill="#fff"/>
+          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="8" width="2" height="2" fill="#ffd644"/>
+          <rect x="7" y="9" width="2" height="1" fill="#c89a1a"/>
+          <rect x="3" y="10" width="2" height="2" fill="#6a4a1f" opacity="0.5"/>
+          <rect x="11" y="10" width="2" height="2" fill="#6a4a1f" opacity="0.5"/>
+          <rect x="5" y="12" width="2" height="2" fill="#ffd644"/>
+          <rect x="9" y="12" width="2" height="2" fill="#ffd644"/>
+        </svg>
+        <div class="kit-name">フクロウ</div>
+        <div class="kit-role">— 大賢者 / 魔法使い —</div>
+        <div class="kit-mbti">INTJ / INTP</div>
+        <div class="kit-trait">深い洞察と知性。本質を見抜き、未来を読む</div>
+      </div>
+
+      <!-- 5. キツネ -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="2" y="2" width="2" height="3" fill="#e6814a"/>
+          <rect x="12" y="2" width="2" height="3" fill="#e6814a"/>
+          <rect x="3" y="3" width="1" height="1" fill="#fff"/>
+          <rect x="12" y="3" width="1" height="1" fill="#fff"/>
+          <rect x="2" y="4" width="12" height="7" fill="#e6814a"/>
+          <rect x="4" y="9" width="8" height="2" fill="#fff"/>
+          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="8" width="2" height="1" fill="#0e0e1a"/>
+          <rect x="3" y="11" width="2" height="2" fill="#e6814a"/>
+          <rect x="11" y="11" width="2" height="2" fill="#e6814a"/>
+          <rect x="13" y="4" width="2" height="6" fill="#e6814a"/>
+          <rect x="14" y="9" width="1" height="2" fill="#fff"/>
+        </svg>
+        <div class="kit-name">キツネ</div>
+        <div class="kit-role">— 軍師 / 占い師 —</div>
+        <div class="kit-mbti">ENTJ / ENTP</div>
+        <div class="kit-trait">戦略と閃きの天才。可能性を見つけ、勝利を読む</div>
+      </div>
+
+      <!-- 6. シバイヌ -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="3" y="2" width="2" height="3" fill="#c89455"/>
+          <rect x="11" y="2" width="2" height="3" fill="#c89455"/>
+          <rect x="2" y="4" width="12" height="7" fill="#c89455"/>
+          <rect x="4" y="8" width="8" height="3" fill="#fff"/>
+          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/>
+          <rect x="6" y="10" width="1" height="1" fill="#e63d6a"/>
+          <rect x="9" y="10" width="1" height="1" fill="#e63d6a"/>
+          <rect x="3" y="11" width="2" height="3" fill="#c89455"/>
+          <rect x="11" y="11" width="2" height="3" fill="#c89455"/>
+          <rect x="12" y="3" width="2" height="3" fill="#a07840"/>
+        </svg>
+        <div class="kit-name">シバイヌ</div>
+        <div class="kit-role">— 戦士 / 聖女 —</div>
+        <div class="kit-mbti">ESTJ / ESFJ</div>
+        <div class="kit-trait">仲間を守る忠誠心。責任感と面倒見の良さで前線に立つ</div>
+      </div>
+
+      <!-- 7. リス -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="3" y="2" width="2" height="2" fill="#a87132"/>
+          <rect x="11" y="2" width="2" height="2" fill="#a87132"/>
+          <rect x="2" y="4" width="10" height="7" fill="#a87132"/>
+          <rect x="3" y="8" width="8" height="3" fill="#fcd5a3"/>
+          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="9" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="6" y="8" width="2" height="1" fill="#e63d6a"/>
+          <rect x="3" y="11" width="2" height="2" fill="#a87132"/>
+          <rect x="9" y="11" width="2" height="2" fill="#a87132"/>
+          <rect x="12" y="2" width="3" height="3" fill="#a87132"/>
+          <rect x="13" y="5" width="3" height="5" fill="#a87132"/>
+          <rect x="12" y="9" width="3" height="2" fill="#a87132"/>
+          <rect x="13" y="11" width="2" height="2" fill="#a87132"/>
+        </svg>
+        <div class="kit-name">リス</div>
+        <div class="kit-role">— 武闘家 —</div>
+        <div class="kit-mbti">ISTJ</div>
+        <div class="kit-trait">几帳面に積み上げる継続力。約束を必ず守る守護者</div>
+      </div>
+
+      <!-- 8. ハムスター -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="4" y="2" width="2" height="2" fill="#ffd644"/>
+          <rect x="10" y="2" width="2" height="2" fill="#ffd644"/>
+          <rect x="2" y="4" width="12" height="8" fill="#ffd644"/>
+          <rect x="3" y="8" width="3" height="2" fill="#fff"/>
+          <rect x="10" y="8" width="3" height="2" fill="#fff"/>
+          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="8" width="2" height="1" fill="#e63d6a"/>
+          <rect x="3" y="12" width="3" height="2" fill="#ffd644"/>
+          <rect x="10" y="12" width="3" height="2" fill="#ffd644"/>
+        </svg>
+        <div class="kit-name">ハムスター</div>
+        <div class="kit-role">— 薬師 —</div>
+        <div class="kit-mbti">ISFJ</div>
+        <div class="kit-trait">人の痛みに気づく優しさ。そっと寄り添い、癒す</div>
+      </div>
+
+      <!-- 9. ペンギン -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="3" y="2" width="10" height="11" fill="#0e0e1a"/>
+          <rect x="2" y="4" width="12" height="9" fill="#0e0e1a"/>
+          <rect x="4" y="6" width="8" height="6" fill="#fff"/>
+          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="8" width="2" height="2" fill="#e6814a"/>
+          <rect x="1" y="6" width="2" height="3" fill="#0e0e1a"/>
+          <rect x="13" y="6" width="2" height="3" fill="#0e0e1a"/>
+          <rect x="4" y="13" width="3" height="2" fill="#e6814a"/>
+          <rect x="9" y="13" width="3" height="2" fill="#e6814a"/>
+        </svg>
+        <div class="kit-name">ペンギン</div>
+        <div class="kit-role">— 忍者 / 勇者 —</div>
+        <div class="kit-mbti">ISTP / ESTP</div>
+        <div class="kit-trait">静かに観察し、一気に動く。実行力と冷静さが武器</div>
+      </div>
+
+      <!-- 10. クマ -->
+      <div class="kit-card">
+        <svg class="kit-svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+          <rect x="3" y="2" width="2" height="2" fill="#a07840"/>
+          <rect x="11" y="2" width="2" height="2" fill="#a07840"/>
+          <rect x="3" y="3" width="2" height="1" fill="#fcd5a3"/>
+          <rect x="11" y="3" width="2" height="1" fill="#fcd5a3"/>
+          <rect x="2" y="4" width="12" height="8" fill="#a07840"/>
+          <rect x="4" y="8" width="8" height="4" fill="#fcd5a3"/>
+          <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="7" y="8" width="2" height="1" fill="#0e0e1a"/>
+          <rect x="6" y="9" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="9" y="9" width="1" height="1" fill="#0e0e1a"/>
+          <rect x="3" y="12" width="3" height="2" fill="#a07840"/>
+          <rect x="10" y="12" width="3" height="2" fill="#a07840"/>
+        </svg>
+        <div class="kit-name">クマ</div>
+        <div class="kit-role">— 旅人（未診断） —</div>
+        <div class="kit-mbti">DEFAULT</div>
+        <div class="kit-trait">MBTI診断前のデフォルト相棒。診断後に専属の動物へ進化</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MBTI割当表 ============ -->
+  <section>
+    <h2><span class="num">02</span>MBTI × 動物 × 役職 対応表</h2>
+    <p class="lead">quest.htmlのMBTI診断結果に応じて、dashboardのミーが自動的にこの動物に切り替わる仕様。</p>
+
+    <table class="mbti-table">
+      <tr><th>MBTI</th><th>動物</th><th>役職（ドラクエ風）</th><th>強みの軸</th></tr>
+      <tr><td class="em">ENFP</td><td class="a">ねこ</td><td>遊び人</td><td>人を惹きつける明るさ</td></tr>
+      <tr><td class="em">ESFP</td><td class="a">ねこ</td><td>商人</td><td>場の空気を読む天才</td></tr>
+      <tr><td class="em">INFP</td><td class="a">うさぎ</td><td>吟遊詩人</td><td>繊細な感性で物語を紡ぐ</td></tr>
+      <tr><td class="em">ISFP</td><td class="a">うさぎ</td><td>踊り子</td><td>美意識と表現力</td></tr>
+      <tr><td class="em">INFJ</td><td class="a">パンダ</td><td>預言者</td><td>人の心を見抜く洞察</td></tr>
+      <tr><td class="em">ENFJ</td><td class="a">パンダ</td><td>僧侶</td><td>仲間を信じる導き手</td></tr>
+      <tr><td class="em">INTJ</td><td class="a">フクロウ</td><td>大賢者</td><td>戦略的な深い思考</td></tr>
+      <tr><td class="em">INTP</td><td class="a">フクロウ</td><td>魔法使い</td><td>知の探求と発見</td></tr>
+      <tr><td class="em">ENTJ</td><td class="a">キツネ</td><td>軍師</td><td>未来を読む戦略性</td></tr>
+      <tr><td class="em">ENTP</td><td class="a">キツネ</td><td>占い師</td><td>閃きと議論の天才</td></tr>
+      <tr><td class="em">ESTJ</td><td class="a">シバイヌ</td><td>戦士</td><td>責任と前線リーダーシップ</td></tr>
+      <tr><td class="em">ESFJ</td><td class="a">シバイヌ</td><td>聖女</td><td>場を温める世話役</td></tr>
+      <tr><td class="em">ISTJ</td><td class="a">リス</td><td>武闘家</td><td>地道に積み上げる継続</td></tr>
+      <tr><td class="em">ISFJ</td><td class="a">ハムスター</td><td>薬師</td><td>人の痛みに気づく優しさ</td></tr>
+      <tr><td class="em">ISTP</td><td class="a">ペンギン</td><td>忍者</td><td>観察と一閃の判断</td></tr>
+      <tr><td class="em">ESTP</td><td class="a">ペンギン</td><td>勇者</td><td>飛び込む行動力</td></tr>
+    </table>
+  </section>
+
+  <!-- ============ 5段階展開 ============ -->
+  <section>
+    <h2><span class="num">03</span>育成5段階（代表3匹の例）</h2>
+    <p class="lead">どの動物も同じ「卵 → 赤ちゃん → 子ども → 大人 → 完成形」の5段階で進化。目標達成度に応じてレベルアップする仕組みは既存のミーと同じ。</p>
+
+    <!-- ねこ 5段階 -->
+    <div class="stage-row">
+      <div class="stage-row-head">
+        <div class="name">ねこ</div>
+        <div class="role">— 遊び人 / 商人 —</div>
+        <div class="mbti">ENFP / ESFP</div>
+      </div>
+      <div class="stages">
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="5" y="3" width="6" height="10" fill="#fff"/>
+            <rect x="4" y="4" width="8" height="8" fill="#fff"/>
+            <rect x="6" y="5" width="1" height="1" fill="#f78ac0"/>
+            <rect x="9" y="5" width="1" height="1" fill="#f78ac0"/>
+            <rect x="7" y="7" width="2" height="1" fill="#f6a0c4"/>
+          </svg>
+          <div class="lv">Lv.1</div>
+          <div class="stg-name">たまご</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="4" y="3" width="1" height="2" fill="#c45a8e"/>
+            <rect x="11" y="3" width="1" height="2" fill="#c45a8e"/>
+            <rect x="3" y="5" width="10" height="7" fill="#f78ac0"/>
+            <rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="7" y="9" width="2" height="1" fill="#e63d6a"/>
+          </svg>
+          <div class="lv">Lv.2</div>
+          <div class="stg-name">赤ちゃん</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="3" y="2" width="2" height="3" fill="#c45a8e"/>
+            <rect x="11" y="2" width="2" height="3" fill="#c45a8e"/>
+            <rect x="4" y="3" width="1" height="2" fill="#f78ac0"/>
+            <rect x="11" y="3" width="1" height="2" fill="#f78ac0"/>
+            <rect x="2" y="5" width="12" height="7" fill="#f78ac0"/>
+            <rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="7" y="9" width="2" height="1" fill="#e63d6a"/>
+            <rect x="3" y="12" width="3" height="2" fill="#f78ac0"/>
+            <rect x="10" y="12" width="3" height="2" fill="#f78ac0"/>
+          </svg>
+          <div class="lv">Lv.3</div>
+          <div class="stg-name">こども</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="3" y="2" width="2" height="2" fill="#c45a8e"/>
+            <rect x="11" y="2" width="2" height="2" fill="#c45a8e"/>
+            <rect x="3" y="3" width="1" height="1" fill="#f78ac0"/>
+            <rect x="12" y="3" width="1" height="1" fill="#f78ac0"/>
+            <rect x="2" y="4" width="12" height="7" fill="#f78ac0"/>
+            <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="7" y="8" width="2" height="1" fill="#e63d6a"/>
+            <rect x="3" y="11" width="2" height="2" fill="#f78ac0"/>
+            <rect x="7" y="11" width="2" height="2" fill="#f78ac0"/>
+            <rect x="11" y="11" width="2" height="2" fill="#f78ac0"/>
+            <rect x="13" y="6" width="1" height="3" fill="#f78ac0"/>
+          </svg>
+          <div class="lv">Lv.4</div>
+          <div class="stg-name">おとな</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="2" y="0" width="3" height="1" fill="#ffd644"/>
+            <rect x="6" y="0" width="4" height="1" fill="#ffd644"/>
+            <rect x="11" y="0" width="3" height="1" fill="#ffd644"/>
+            <rect x="3" y="2" width="2" height="2" fill="#c45a8e"/>
+            <rect x="11" y="2" width="2" height="2" fill="#c45a8e"/>
+            <rect x="2" y="4" width="12" height="7" fill="#f78ac0"/>
+            <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="7" y="8" width="2" height="1" fill="#e63d6a"/>
+            <rect x="3" y="11" width="2" height="2" fill="#f78ac0"/>
+            <rect x="7" y="11" width="2" height="2" fill="#f78ac0"/>
+            <rect x="11" y="11" width="2" height="2" fill="#f78ac0"/>
+            <rect x="13" y="5" width="1" height="3" fill="#f78ac0"/>
+            <rect x="5" y="14" width="6" height="1" fill="#ffd644"/>
+          </svg>
+          <div class="lv">Lv.5</div>
+          <div class="stg-name">かんせい</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- パンダ 5段階 -->
+    <div class="stage-row">
+      <div class="stage-row-head">
+        <div class="name">パンダ</div>
+        <div class="role">— 預言者 / 僧侶 —</div>
+        <div class="mbti">INFJ / ENFJ</div>
+      </div>
+      <div class="stages">
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="4" y="3" width="8" height="10" fill="#fff"/>
+            <rect x="5" y="2" width="6" height="11" fill="#fff"/>
+            <rect x="5" y="5" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="9" y="5" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="7" y="8" width="2" height="1" fill="#0e0e1a"/>
+          </svg>
+          <div class="lv">Lv.1</div>
+          <div class="stg-name">たまご</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="3" y="3" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="11" y="3" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="3" y="5" width="10" height="7" fill="#fff"/>
+            <rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/>
+          </svg>
+          <div class="lv">Lv.2</div>
+          <div class="stg-name">赤ちゃん</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/>
+            <rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/>
+            <rect x="2" y="5" width="12" height="7" fill="#fff"/>
+            <rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="7" y="9" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="3" y="12" width="3" height="2" fill="#0e0e1a"/>
+            <rect x="10" y="12" width="3" height="2" fill="#0e0e1a"/>
+          </svg>
+          <div class="lv">Lv.3</div>
+          <div class="stg-name">こども</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/>
+            <rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/>
+            <rect x="2" y="4" width="12" height="8" fill="#fff"/>
+            <rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="5" y="6" width="1" height="1" fill="#fff"/>
+            <rect x="11" y="6" width="1" height="1" fill="#fff"/>
+            <rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="3" y="12" width="3" height="2" fill="#0e0e1a"/>
+            <rect x="10" y="12" width="3" height="2" fill="#0e0e1a"/>
+          </svg>
+          <div class="lv">Lv.4</div>
+          <div class="stg-name">おとな</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="2" y="0" width="3" height="1" fill="#ffd644"/>
+            <rect x="6" y="0" width="4" height="1" fill="#ffd644"/>
+            <rect x="11" y="0" width="3" height="1" fill="#ffd644"/>
+            <rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/>
+            <rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/>
+            <rect x="2" y="4" width="12" height="8" fill="#fff"/>
+            <rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="5" y="6" width="1" height="1" fill="#fff"/>
+            <rect x="11" y="6" width="1" height="1" fill="#fff"/>
+            <rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/>
+            <rect x="3" y="12" width="3" height="2" fill="#0e0e1a"/>
+            <rect x="10" y="12" width="3" height="2" fill="#0e0e1a"/>
+            <rect x="5" y="14" width="6" height="1" fill="#ffd644"/>
+          </svg>
+          <div class="lv">Lv.5</div>
+          <div class="stg-name">かんせい</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- フクロウ 5段階 -->
+    <div class="stage-row">
+      <div class="stage-row-head">
+        <div class="name">フクロウ</div>
+        <div class="role">— 大賢者 / 魔法使い —</div>
+        <div class="mbti">INTJ / INTP</div>
+      </div>
+      <div class="stages">
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="4" y="3" width="8" height="10" fill="#a87132"/>
+            <rect x="5" y="2" width="6" height="11" fill="#a87132"/>
+            <rect x="6" y="5" width="1" height="1" fill="#fff"/>
+            <rect x="9" y="5" width="1" height="1" fill="#fff"/>
+            <rect x="7" y="8" width="2" height="1" fill="#ffd644"/>
+          </svg>
+          <div class="lv">Lv.1</div>
+          <div class="stg-name">たまご</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="3" y="3" width="10" height="9" fill="#a87132"/>
+            <rect x="5" y="5" width="2" height="2" fill="#fff"/>
+            <rect x="9" y="5" width="2" height="2" fill="#fff"/>
+            <rect x="6" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="9" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="7" y="8" width="2" height="1" fill="#ffd644"/>
+          </svg>
+          <div class="lv">Lv.2</div>
+          <div class="stg-name">赤ちゃん</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="3" y="2" width="2" height="2" fill="#6a4a1f"/>
+            <rect x="11" y="2" width="2" height="2" fill="#6a4a1f"/>
+            <rect x="2" y="4" width="12" height="9" fill="#a87132"/>
+            <rect x="4" y="6" width="3" height="3" fill="#fff"/>
+            <rect x="9" y="6" width="3" height="3" fill="#fff"/>
+            <rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="7" y="9" width="2" height="2" fill="#ffd644"/>
+            <rect x="5" y="13" width="2" height="1" fill="#ffd644"/>
+            <rect x="9" y="13" width="2" height="1" fill="#ffd644"/>
+          </svg>
+          <div class="lv">Lv.3</div>
+          <div class="stg-name">こども</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/>
+            <rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/>
+            <rect x="2" y="3" width="12" height="9" fill="#a87132"/>
+            <rect x="4" y="5" width="3" height="3" fill="#fff"/>
+            <rect x="9" y="5" width="3" height="3" fill="#fff"/>
+            <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="7" y="8" width="2" height="2" fill="#ffd644"/>
+            <rect x="7" y="9" width="2" height="1" fill="#c89a1a"/>
+            <rect x="3" y="10" width="2" height="2" fill="#6a4a1f" opacity="0.5"/>
+            <rect x="11" y="10" width="2" height="2" fill="#6a4a1f" opacity="0.5"/>
+            <rect x="5" y="12" width="2" height="2" fill="#ffd644"/>
+            <rect x="9" y="12" width="2" height="2" fill="#ffd644"/>
+          </svg>
+          <div class="lv">Lv.4</div>
+          <div class="stg-name">おとな</div>
+        </div>
+        <div class="stage-cell">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+            <rect x="2" y="0" width="3" height="1" fill="#ffd644"/>
+            <rect x="6" y="0" width="4" height="1" fill="#ffd644"/>
+            <rect x="11" y="0" width="3" height="1" fill="#ffd644"/>
+            <rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/>
+            <rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/>
+            <rect x="2" y="3" width="12" height="9" fill="#a87132"/>
+            <rect x="4" y="5" width="3" height="3" fill="#fff"/>
+            <rect x="9" y="5" width="3" height="3" fill="#fff"/>
+            <rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/>
+            <rect x="7" y="8" width="2" height="2" fill="#ffd644"/>
+            <rect x="3" y="10" width="2" height="2" fill="#6a4a1f" opacity="0.5"/>
+            <rect x="11" y="10" width="2" height="2" fill="#6a4a1f" opacity="0.5"/>
+            <rect x="5" y="12" width="2" height="2" fill="#ffd644"/>
+            <rect x="9" y="12" width="2" height="2" fill="#ffd644"/>
+            <rect x="5" y="14" width="6" height="1" fill="#ffd644"/>
+          </svg>
+          <div class="lv">Lv.5</div>
+          <div class="stg-name">かんせい</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 失敗ver注釈 ============ -->
+  <section>
+    <h2><span class="num">04</span>失敗ver（おやじ化）はどうする？</h2>
+    <div class="fail-note">
+      <strong>提案：失敗時の「おやじ化」は10種類すべて共通の「おやじ」のままにする。</strong><br>
+      ① 各動物に専用のおやじ版を作ると工数が10倍。<br>
+      ② Claudeの回答にもあった「サボり＝劣化のネガティブ演出は刺さる人と折れる人が分かれる」リスクを考えると、共通のおやじキャラの方が「ユーモア＝救い」として機能しやすい。<br>
+      ③ 「自分の相棒（推し動物）が おやじ化する」より「動物が一時的に おやじに化けてる」設定の方が、復帰のハードルが低い。
+    </div>
+    <p style="font-size:12.5px;color:var(--sub)">代案：完璧主義設計なら、各動物に「やつれ版」を1段階だけ用意するのもアリ（おやじ化までいかない、目元の隈／だらしない毛並み等）。ただし工数大。</p>
+  </section>
+
+  <!-- ============ Phase設計 ============ -->
+  <section>
+    <h2><span class="num">05</span>実装フェーズ（Claudeの回答に沿って）</h2>
+    <p class="lead">いきなり10匹×5段階×50個を実装すると重い。Claude（別チャット）の助言に沿ってPhase分けする。</p>
+
+    <table class="mbti-table">
+      <tr><th>Phase</th><th>内容</th><th>工数目安</th></tr>
+      <tr><td class="em">0</td><td>10匹の成体（Lv5）だけ実装＋MBTI分岐ロジック<br>→ MBTI診断するとdashboardに専属動物が現れる</td><td>2時間</td></tr>
+      <tr><td class="em">1</td><td>3匹分の5段階を実装（ねこ・パンダ・フクロウ）<br>→ 進捗達成度で段階進化</td><td>3時間</td></tr>
+      <tr><td class="em">2</td><td>残り7匹の5段階を実装（フル展開）</td><td>5時間</td></tr>
+      <tr><td class="em">3</td><td>10匹の図鑑ページ（他者の動物が見られる）<br>→ Supabase導入の足がかり</td><td>3時間</td></tr>
+    </table>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h3>🌸 この方向性で進めていい？</h3>
+    <p>これで OK なら Phase 0（10匹の成体実装＋dashboard連動）から着手する。<br>気になる動物や、追加したい役職／変更したい動物があれば教えて。</p>
+  </div>
+
+  <footer>
+    — Re:alize Character Proposal ／ Merone Inc. ／ 2026 —
+  </footer>
+
+</div>
+
+</body>
+</html>
