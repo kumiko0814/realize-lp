@@ -325,20 +325,31 @@ svg{image-rendering:pixelated}
     <h3><span class="ico">🗺</span>このゲームの目的</h3>
     <p>あなたは <span class="em">はじまりの町</span> に住む冒険者。<br>
     旅に出て <span class="pink">自分の異常値（＝強み）のカケラ</span> を集める。<br>
-    異常値とは「自分が思う強み」と「他者が感じる強み」のかけ合わせ。<br>
+    異常値とは「<span class="em">自分が思う強み</span>」と「<span class="em">他者が感じる強み</span>」のかけ合わせ。<br>
     全部見つけた時、はじめて「自分の本当の強み」が見えてくる。</p>
   </div>
 
   <div class="howto-card">
-    <h3><span class="ico">🎯</span>3つのカケラを集めよう</h3>
-    <p><span class="em">① MBTIの塔</span><br>
-    塔に登って自分の <span class="pink">性格タイプ</span> を診断。ドラクエ風の役職名がもらえる。</p>
-    <p><span class="em">② 強み集めの家（5軒）</span><br>
-    町の人 5 人に <span class="pink">「あなたから見た私の強みは？」</span> を聞いて回る。<br>
-    自分が思う強みも別途記録できる。</p>
-    <p><span class="em">③ 問いかけの泉</span><br>
+    <h3><span class="ico">⭐</span>異常値カケラ（6個）← これがメイン！</h3>
+    <p><span class="em">👥 強み集めの家（5軒）</span><br>
+    町の人 5 人にひとりずつ会いに行き、<br>
+    <span class="pink">「あなたから見た私の強みは？」</span> を聞いて回る。<br>
+    → <span class="em">他者からの強み 5カケラ ゲット</span></p>
+    <p><span class="em">✨ 5人の声がそろった時</span><br>
+    最後に「自分が思う自分の強み」を記録するイベントが発動。<br>
+    → <span class="em">自分の強み 1カケラ ゲット</span></p>
+    <p class="pink">この <span class="em">5＋1＝6カケラ</span> こそが あなたの異常値の正体。</p>
+  </div>
+
+  <div class="howto-card">
+    <h3><span class="ico">☆</span>ボーナスカケラ（2個）</h3>
+    <p><span class="em">🏰 MBTIの塔</span><br>
+    塔に登って自分の <span class="pink">性格タイプ</span> を診断。<br>
+    ドラクエ風の役職名（勇者・遊び人・大賢者…）がもらえる。</p>
+    <p><span class="em">💧 問いかけの泉</span><br>
     悩みを泉に投げかけると、それが <span class="pink">良い思考</span> から来ているか、<br>
     <span class="danger">恐れや嫉妬</span> から来ているか映し出される。</p>
+    <p class="pink">この2つは <span class="em">自己理解のおまけ</span>。旅の途中いつでも寄れる。</p>
   </div>
 
   <div class="howto-card">
@@ -384,7 +395,8 @@ svg{image-rendering:pixelated}
       </div>
     </div>
     <div class="status-right">
-      <div class="kakera">★ カケラ <span id="kakeraNum">0</span> / 7</div>
+      <div class="kakera" title="他者からの強み5＋自分の強み1">★ 異常値 <span id="ijouchiNum">0</span> / 6</div>
+      <div class="kakera" style="font-size:9px;color:#7ac8ff" title="MBTI診断＋泉のおまけ">☆ ボーナス <span id="bonusNum">0</span> / 2</div>
       <div class="coin">♪ <span id="bgmBtn" onclick="toggleBGM()" style="cursor:pointer">OFF</span></div>
     </div>
   </div>
@@ -397,7 +409,7 @@ svg{image-rendering:pixelated}
 
   <!-- MESSAGE -->
   <div class="msg-win">
-    <div class="msg-text" id="msgText">▼ <span class="pink">はじまりの町</span>へようこそ！<br>町の人や施設に近づいて、<span class="em">A ボタン</span> を押そう。<br>異常値のカケラを集める旅、はじまり <span class="cursor-tri">▼</span></div>
+    <div class="msg-text" id="msgText">▼ <span class="pink">はじまりの町</span>へようこそ！<br>まずは <span class="em">5軒の町人の家</span> をたずねよう。<br>5人から「あなたの強み」を聞き出すと <span class="em">異常値カケラ</span> がGETできる！ <span class="cursor-tri">▼</span></div>
   </div>
 
   <!-- CONTROLS -->
@@ -742,7 +754,12 @@ function renderHero(){
 function renderStatus(){
   document.getElementById('heroName').textContent = state.name + 'さん';
   document.getElementById('heroRole').textContent = '— ' + state.role + ' —';
-  document.getElementById('kakeraNum').textContent = state.kakera;
+  const others = state.strengthsOthers.filter(s=>s).length;
+  const self = state.strengthSelf ? 1 : 0;
+  const ijouchi = others + self;
+  const bonus = (state.mbti ? 1 : 0) + (state.visited.fountain ? 1 : 0);
+  document.getElementById('ijouchiNum').textContent = ijouchi;
+  document.getElementById('bonusNum').textContent = bonus;
   const m = Math.max(0, Math.min(100, state.mind));
   document.getElementById('mindNum').textContent = m;
   document.getElementById('mindFill').style.width = m + '%';
@@ -776,8 +793,17 @@ function move(dx, dy){
   // 隣接施設のヒント
   const adj = nearbyFacility();
   if(adj){
-    const labels = { tower:'MBTIの塔', strength:'町人の家', fountain:'問いかけの泉', bar:'酒場' };
-    setMsg(`▼ ${labels[adj.f.type]} だ。\n  Aボタンで しらべる。`);
+    const others = state.strengthsOthers.filter(s=>s).length;
+    if(adj.f.type === 'tower'){
+      setMsg(`▼ <span class="em">🏰 MBTIの塔</span>${state.mbti?' (診断ずみ)':' [ボーナス ★]'} \n  Aボタンで しらべる。`);
+    } else if(adj.f.type === 'strength'){
+      const got = state.strengthsOthers[adj.f.id] ? ' (聞きとり済)' : '';
+      setMsg(`▼ <span class="em">👥 町人の家 ${adj.f.id+1}/5</span>${got} [異常値カケラ ★]\n  あつめた強み：${others}/5　Aボタンで しらべる。`);
+    } else if(adj.f.type === 'fountain'){
+      setMsg(`▼ <span class="em">💧 問いかけの泉</span>${state.visited.fountain?' (おとずれ済)':' [ボーナス ★]'} \n  悩んだら ここに来よう。`);
+    } else if(adj.f.type === 'bar'){
+      setMsg(`▼ <span class="em">🍺 酒場</span>\n  バリュー確認＆休憩スポット。`);
+    }
   }
 }
 function nearbyFacility(){
@@ -1153,10 +1179,11 @@ function openMenu(){
       <div class="you-are">YOU ARE</div>
       ${state.mbti ? `<div class="mbti">${state.mbti}</div><div class="role-name">${state.role}</div>` : '<div class="role-name">旅人（未診断）</div>'}
     </div>
-    <p>★ <span class="em">カケラ ${state.kakera} / 7</span></p>
+    <p>★ <span class="em">異常値カケラ ${state.strengthsOthers.filter(s=>s).length + (state.strengthSelf?1:0)} / 6</span><br>
+    　　　他者の声 ${state.strengthsOthers.filter(s=>s).length} / 5 ＋ 自分の声 ${state.strengthSelf ? '◯' : '×'}</p>
+    <p>☆ <span style="color:#7ac8ff">ボーナス ${(state.mbti?1:0) + (state.visited.fountain?1:0)} / 2</span><br>
+    　　　MBTI塔 ${state.mbti ? '◯' : '×'} ／ 問いかけの泉 ${state.visited.fountain ? '◯' : '×'}</p>
     <p>★ <span class="pink">マインド ${state.mind} / 100</span></p>
-    <p>★ <span class="em">強み（他者）</span> ${state.strengthsOthers.filter(s=>s).length} / 5</p>
-    <p>★ <span class="em">強み（自分）</span> ${state.strengthSelf ? '記録済み' : '未記録'}</p>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal()">とじる</button>
       <button class="btn" onclick="closeModal();showHowTo()">あそびかた</button>
