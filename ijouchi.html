@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>異常値の森 ｜ Re:alize RPG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0e0e1a;--white:#fffbf3;
+  --grass:#5fbb5f;--grass-d:#3a8a3a;--grass-l:#a8d96e;
+  --tree:#2e6e2e;--tree-d:#1c4a1c;
+  --water:#3a76d6;
+  --path:#c8a060;--path-d:#a07a3a;
+  --hair:#f78ac0;--hair-d:#c45a8e;
+  --skin:#fcd1a3;--skin-d:#d49a6a;
+  --dress:#e63d6a;--dress-d:#a02448;
+  --chest:#a87132;--chest-d:#6a4a1f;
+  --gold:#ffd644;--gold-d:#c89a1a;
+  --pink:#f6a0c4;--sakura:#fcd5e6;
+  --msg-bg:#0e0e1a;--msg-border:#fffbf3;
+  --accent:#e63d6a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:"DotGothic16","Yu Gothic",sans-serif;
+  background:#000;color:var(--white);
+  display:flex;align-items:center;justify-content:center;
+  padding:12px;letter-spacing:0.05em;
+  user-select:none;
+}
+img{image-rendering:pixelated;image-rendering:crisp-edges}
+
+/* ============= GAME FRAME ============= */
+.frame{
+  width:100%;max-width:720px;
+  background:#000;border:6px solid #1e1e2a;border-radius:8px;
+  padding:14px;display:flex;flex-direction:column;gap:12px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);
+}
+.top-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;letter-spacing:0.2em;color:var(--gold);
+}
+.top-bar .title{font-family:"DotGothic16",sans-serif;font-size:16px;color:var(--sakura)}
+.top-bar .lv{display:flex;align-items:center;gap:6px}
+.top-bar .lv .num{color:#fff;font-size:14px}
+
+/* ============= STAGE ============= */
+.stage-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/10;
+  background:var(--grass);
+  border:4px solid var(--msg-border);
+  border-radius:2px;
+  overflow:hidden;
+  image-rendering:pixelated;
+}
+.stage{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,0,0,0.05) 1px,transparent 1px);
+  background-size:6.25% 10%; /* 16x10 grid */
+}
+
+/* タイル要素 */
+.tile{position:absolute;width:6.25%;height:10%;display:flex;align-items:center;justify-content:center}
+.tile svg{width:100%;height:100%;image-rendering:pixelated}
+
+/* main character */
+#hero{
+  position:absolute;width:6.25%;height:10%;
+  transition:left 0.18s linear, top 0.18s linear;
+  z-index:10;
+}
+#hero.facing-down{transform:scaleX(1)}
+#hero.facing-up{transform:scaleX(1)}
+#hero.facing-left{transform:scaleX(-1)}
+#hero.facing-right{transform:scaleX(1)}
+#hero.walk{animation:bob 0.36s steps(2) infinite}
+@keyframes bob{0%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+
+/* effects */
+.shimmer{position:absolute;width:6.25%;height:10%;pointer-events:none;animation:shimmer 0.8s ease-out forwards;z-index:20}
+@keyframes shimmer{
+  0%{transform:scale(0.6);opacity:0}
+  40%{transform:scale(1.4);opacity:1}
+  100%{transform:scale(2);opacity:0}
+}
+
+/* ============= MESSAGE WINDOW ============= */
+.msg-win{
+  background:var(--msg-bg);
+  border:3px solid var(--msg-border);
+  border-radius:2px;
+  padding:14px 16px;
+  min-height:120px;
+  position:relative;
+}
+.msg-win::before,.msg-win::after{
+  content:"";position:absolute;width:6px;height:6px;background:var(--msg-border);
+}
+.msg-win::before{top:-3px;left:-3px;box-shadow:calc(100% + 6px - 6px) 0 0 var(--msg-border)}
+.msg-text{
+  font-size:14px;line-height:1.85;color:var(--white);letter-spacing:0.06em;
+  min-height:50px;white-space:pre-wrap;
+}
+.msg-text .em{color:var(--gold)}
+.msg-text .pink{color:var(--sakura)}
+.msg-input{
+  width:100%;background:transparent;border:2px solid var(--msg-border);
+  color:var(--white);font-family:inherit;font-size:13px;padding:10px 12px;
+  margin-top:10px;outline:none;letter-spacing:0.04em;line-height:1.7;
+  resize:vertical;min-height:60px;
+}
+.msg-input:focus{border-color:var(--gold)}
+.msg-actions{display:flex;gap:8px;margin-top:10px;justify-content:flex-end;flex-wrap:wrap}
+.btn{
+  background:var(--msg-bg);color:var(--white);
+  border:2px solid var(--msg-border);font-family:inherit;font-size:12px;
+  padding:8px 18px;cursor:pointer;letter-spacing:0.15em;
+  transition:all 0.15s;
+}
+.btn:hover,.btn:focus{background:var(--gold);color:var(--msg-bg);border-color:var(--gold);outline:none}
+.btn.primary{background:var(--accent);border-color:var(--sakura)}
+.btn.primary:hover{background:var(--gold);color:var(--msg-bg)}
+.cursor-tri{display:inline-block;color:var(--gold);animation:blink 0.7s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ============= D-PAD ============= */
+.controls{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 4px}
+.dpad{
+  display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);gap:2px;
+}
+.dpad-btn{
+  background:#1e1e2a;border:2px solid #3a3a4a;color:var(--white);
+  font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:inherit;
+  transition:all 0.1s;
+}
+.dpad-btn:active{background:var(--accent);transform:scale(0.94)}
+.dpad-btn.up{grid-column:2;grid-row:1}
+.dpad-btn.left{grid-column:1;grid-row:2}
+.dpad-btn.center{grid-column:2;grid-row:2;background:#0a0a14;border-color:#1a1a2a;cursor:default}
+.dpad-btn.right{grid-column:3;grid-row:2}
+.dpad-btn.down{grid-column:2;grid-row:3}
+.action-btn{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--accent);color:var(--white);border:3px solid var(--sakura);
+  font-family:inherit;font-size:14px;letter-spacing:0.1em;
+  cursor:pointer;font-weight:bold;
+  box-shadow:0 4px 0 var(--dress-d);
+  transition:all 0.1s;
+}
+.action-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--dress-d)}
+
+.hint{
+  font-size:10px;color:var(--gold);text-align:center;
+  letter-spacing:0.2em;margin-top:4px;
+}
+
+/* ============= TITLE SCREEN ============= */
+.title-screen{
+  position:fixed;inset:0;background:#000;z-index:1000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 20px;text-align:center;color:var(--white);
+}
+.title-logo{
+  font-size:42px;color:var(--sakura);letter-spacing:0.2em;
+  text-shadow:4px 4px 0 var(--dress-d);
+  margin-bottom:16px;line-height:1.4;
+}
+.title-sub{font-size:13px;letter-spacing:0.32em;color:var(--gold);margin-bottom:48px}
+.title-art{margin-bottom:48px}
+.title-art svg{width:100px;height:100px;image-rendering:pixelated}
+.title-press{
+  font-size:14px;color:var(--white);letter-spacing:0.25em;
+  animation:blink 0.9s steps(2) infinite;cursor:pointer;
+  padding:14px 36px;border:2px solid var(--white);
+  background:transparent;font-family:inherit;
+}
+.title-press:hover{background:var(--accent);border-color:var(--sakura)}
+.title-note{position:absolute;bottom:20px;font-size:9px;letter-spacing:0.2em;color:#5a5a7a}
+
+/* ============= RESULT SCREEN ============= */
+.result-screen{
+  position:fixed;inset:0;background:linear-gradient(180deg,#0e0e1a 0%,#2a1828 100%);
+  z-index:1000;display:none;flex-direction:column;align-items:center;
+  padding:24px 16px;overflow-y:auto;color:var(--white);
+}
+.result-screen.show{display:flex}
+.result-screen .levelup{
+  font-size:32px;color:var(--gold);letter-spacing:0.3em;margin-bottom:8px;
+  text-shadow:3px 3px 0 var(--dress-d);
+  animation:scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes scaleIn{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
+.result-screen .got-it{font-size:13px;letter-spacing:0.2em;color:var(--sakura);margin-bottom:32px}
+.tree-art{margin-bottom:32px;text-align:center}
+.tree-art svg{width:180px;height:180px;image-rendering:pixelated;animation:grow 1.6s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes grow{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.report-card{
+  background:rgba(0,0,0,0.55);border:3px solid var(--gold);
+  padding:24px 22px;max-width:560px;width:100%;border-radius:4px;
+  margin-bottom:20px;
+}
+.report-title{font-size:14px;color:var(--gold);letter-spacing:0.32em;text-align:center;margin-bottom:18px}
+.report-row{
+  border-top:1px dashed rgba(255,255,255,0.2);
+  padding:12px 0;font-size:12px;line-height:1.85;letter-spacing:0.04em;
+}
+.report-row:first-of-type{border-top:none}
+.report-row .q{color:var(--sakura);font-size:11px;letter-spacing:0.1em;margin-bottom:6px}
+.report-row .a{color:var(--white);white-space:pre-wrap}
+.report-summary{
+  background:linear-gradient(135deg,rgba(230,61,106,0.18) 0%,rgba(255,214,68,0.15) 100%);
+  border:2px solid var(--gold);padding:18px 18px;margin-top:18px;border-radius:4px;
+}
+.report-summary .label{font-size:11px;color:var(--gold);letter-spacing:0.25em;margin-bottom:8px}
+.report-summary .axis-row{font-size:13px;line-height:1.95;margin-bottom:6px}
+.report-summary .axis-row strong{color:var(--sakura)}
+.result-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;margin-bottom:32px}
+.print-only{display:none}
+@media print{
+  .title-screen,.frame,.result-actions,.print-hide{display:none!important}
+  body{background:#fff;color:#000;display:block;padding:20px}
+  .result-screen{position:static;background:#fff;color:#000;padding:0}
+  .result-screen.show{display:block}
+  .tree-art svg{animation:none}
+  .report-card{border-color:#c89a1a;background:#fafafa;color:#000}
+  .report-row{border-color:#ccc}
+  .report-row .q{color:#a64626}
+  .report-row .a{color:#000}
+  .result-screen .levelup,.result-screen .got-it{color:#000;text-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ====================== TITLE SCREEN ====================== -->
+<div class="title-screen" id="titleScreen">
+  <div class="title-logo">異常値の森</div>
+  <div class="title-sub">— IJOUCHI NO MORI —</div>
+  <div class="title-art">
+    <!-- Hero pixel preview -->
+    <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+      <!-- Hair top -->
+      <rect x="5" y="1" width="6" height="1" fill="#f78ac0"/>
+      <rect x="4" y="2" width="8" height="2" fill="#f78ac0"/>
+      <!-- Bangs -->
+      <rect x="4" y="4" width="2" height="1" fill="#c45a8e"/>
+      <rect x="10" y="4" width="2" height="1" fill="#c45a8e"/>
+      <!-- Face -->
+      <rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/>
+      <rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/>
+      <rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/>
+      <rect x="7" y="6" width="2" height="1" fill="#e63d6a"/>
+      <!-- Side hair -->
+      <rect x="4" y="5" width="1" height="3" fill="#f78ac0"/>
+      <rect x="10" y="5" width="1" height="3" fill="#f78ac0"/>
+      <!-- Dress -->
+      <rect x="5" y="7" width="5" height="5" fill="#e63d6a"/>
+      <rect x="4" y="8" width="1" height="3" fill="#e63d6a"/>
+      <rect x="10" y="8" width="1" height="3" fill="#e63d6a"/>
+      <!-- Belt -->
+      <rect x="5" y="9" width="5" height="1" fill="#ffd644"/>
+      <!-- Legs -->
+      <rect x="5" y="12" width="2" height="2" fill="#fcd1a3"/>
+      <rect x="8" y="12" width="2" height="2" fill="#fcd1a3"/>
+      <!-- Shoes -->
+      <rect x="5" y="14" width="2" height="1" fill="#0e0e1a"/>
+      <rect x="8" y="14" width="2" height="1" fill="#0e0e1a"/>
+    </svg>
+  </div>
+  <button class="title-press" onclick="startGame()">▶ PRESS TO START</button>
+  <div class="title-note">© RE:ALIZE / MERONE INC.</div>
+</div>
+
+<!-- ====================== GAME FRAME ====================== -->
+<div class="frame" id="frame" style="display:none">
+
+  <div class="top-bar">
+    <span class="title">▶ <span id="playerName">YOU</span></span>
+    <span class="lv">CHEST: <span class="num" id="chestCount">0</span> / 5</span>
+  </div>
+
+  <!-- STAGE -->
+  <div class="stage-wrap">
+    <div class="stage" id="stage"></div>
+    <!-- 主人公 (hero) は JSで配置 -->
+    <div id="hero"></div>
+    <!-- 効果エフェクト -->
+    <div id="effects"></div>
+  </div>
+
+  <!-- MESSAGE WINDOW -->
+  <div class="msg-win">
+    <div class="msg-text" id="msgText">▼ ようかいの森にようこそ。<br>たからばこを ぜんぶ あけて、<br>キミの「いじょうち」を みつけよう <span class="cursor-tri">▼</span></div>
+    <textarea class="msg-input" id="msgInput" style="display:none" placeholder="ここに思ったことを書いてね"></textarea>
+    <div class="msg-actions" id="msgActions"></div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="dpad">
+      <button class="dpad-btn up" onclick="move(0,-1)">▲</button>
+      <button class="dpad-btn left" onclick="move(-1,0)">◀</button>
+      <button class="dpad-btn center"></button>
+      <button class="dpad-btn right" onclick="move(1,0)">▶</button>
+      <button class="dpad-btn down" onclick="move(0,1)">▼</button>
+    </div>
+    <button class="action-btn" onclick="action()">A</button>
+  </div>
+  <div class="hint">矢印キー or ▲▼◀▶ で移動 ／ スペース or A ボタンで「あける」</div>
+</div>
+
+<!-- ====================== RESULT SCREEN ====================== -->
+<div class="result-screen" id="resultScreen">
+  <div class="levelup">★ LEVEL UP ! ★</div>
+  <div class="got-it">— IJOUCHI DISCOVERED —</div>
+  <div class="tree-art">
+    <svg viewBox="0 0 32 32" shape-rendering="crispEdges">
+      <!-- 木の冠 -->
+      <rect x="10" y="2" width="12" height="2" fill="#3a8a3a"/>
+      <rect x="8" y="4" width="16" height="2" fill="#3a8a3a"/>
+      <rect x="6" y="6" width="20" height="4" fill="#5fbb5f"/>
+      <rect x="8" y="10" width="16" height="3" fill="#5fbb5f"/>
+      <rect x="10" y="13" width="12" height="2" fill="#3a8a3a"/>
+      <!-- 花 -->
+      <rect x="8" y="5" width="2" height="2" fill="#fcd5e6"/>
+      <rect x="22" y="5" width="2" height="2" fill="#fcd5e6"/>
+      <rect x="14" y="3" width="2" height="2" fill="#f6a0c4"/>
+      <rect x="18" y="7" width="2" height="2" fill="#f6a0c4"/>
+      <rect x="11" y="9" width="2" height="2" fill="#ffd644"/>
+      <rect x="20" y="11" width="2" height="2" fill="#fcd5e6"/>
+      <!-- 幹 -->
+      <rect x="14" y="15" width="4" height="10" fill="#a87132"/>
+      <rect x="13" y="17" width="1" height="2" fill="#6a4a1f"/>
+      <rect x="18" y="20" width="1" height="2" fill="#6a4a1f"/>
+      <!-- 根本 -->
+      <rect x="12" y="25" width="8" height="2" fill="#6a4a1f"/>
+      <rect x="10" y="27" width="12" height="1" fill="#3a8a3a"/>
+      <rect x="8" y="28" width="16" height="1" fill="#3a8a3a"/>
+    </svg>
+  </div>
+  <div class="report-card" id="reportCard"></div>
+  <div class="result-actions print-hide">
+    <button class="btn primary" onclick="window.print()">🖨 印刷／PDF保存</button>
+    <button class="btn" onclick="backToDashboard()">マイページへ戻る</button>
+    <button class="btn" onclick="resetGame()">もう一度プレイ</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   IJOUCHI NO MORI — Famicom-style RPG
+   ============================================================ */
+
+const params = new URLSearchParams(location.search);
+const userKey = params.get('u') || 'guest';
+const userName = params.get('name') || '';
+const storageKey = 're_alize_ijouchi_' + userKey;
+
+const COLS = 16, ROWS = 10;
+
+// マップ：5 = 宝箱, 1 = 木（通れない）, 2 = 草装飾, 3 = 花, 0 = 通れる草
+const MAP = [
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,3,0,0,5,0,0,1,1,0,0,5,0,0,3,1],
+  [1,0,0,1,0,0,2,0,0,2,0,0,1,0,0,1],
+  [1,0,2,0,0,0,0,0,0,0,0,0,0,2,0,1],
+  [1,5,0,0,2,0,1,1,0,0,3,0,0,0,0,1],
+  [1,0,0,3,0,0,0,0,0,0,0,0,0,2,5,1],
+  [1,0,2,0,0,1,0,0,2,0,0,0,1,0,0,1],
+  [1,3,0,0,0,0,0,0,0,0,3,0,0,0,2,1],
+  [1,0,0,2,0,0,5,1,1,0,0,0,2,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+// 5つの質問
+const QUESTIONS = [
+  {
+    intro: "▼ 1ばんめの たからばこ。\nキミは何をしている時、\n疲れる？それとも回復する？",
+    label: "Q1：それをやっている時、疲れる？回復する？"
+  },
+  {
+    intro: "▼ 2ばんめの たからばこ。\n周りの人は、\nどこで時間や気力を消耗してる？",
+    label: "Q2：周囲の人は、どこで時間／気力を消耗してる？"
+  },
+  {
+    intro: "▼ 3ばんめの たからばこ。\nそれをやる時、\n最初に頭に浮かぶことは？",
+    label: "Q3：それをやる時、最初に頭に浮かぶことは？"
+  },
+  {
+    intro: "▼ 4ばんめの たからばこ。\nそれを人に任せると、\nどこで一番モヤっとする？",
+    label: "Q4：それを人に任せると、どこで一番モヤっとする？"
+  },
+  {
+    intro: "▼ さいごの たからばこ。\nそれを使うと、\n何が異常に早く／深く／多くなる？",
+    label: "Q5：それを使うと、何が異常に早く／深く／多くなる？"
+  }
+];
+
+// ========== STATE ==========
+let hero = { x:7, y:5, dir:'down' };
+let chestOpened = new Set();
+let mode = 'walk'; // walk / question / wait
+let questionIdx = 0;
+let answers = JSON.parse(localStorage.getItem(storageKey) || '{}').answers || [];
+
+if(userName) document.getElementById('playerName').textContent = userName.toUpperCase();
+
+// ========== SVG SPRITES ==========
+function heroSVG(){
+  return `
+    <svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%">
+      <rect x="5" y="1" width="6" height="1" fill="#f78ac0"/>
+      <rect x="4" y="2" width="8" height="2" fill="#f78ac0"/>
+      <rect x="4" y="4" width="2" height="1" fill="#c45a8e"/>
+      <rect x="10" y="4" width="2" height="1" fill="#c45a8e"/>
+      <rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/>
+      <rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/>
+      <rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/>
+      <rect x="7" y="6" width="2" height="1" fill="#e63d6a"/>
+      <rect x="4" y="5" width="1" height="3" fill="#f78ac0"/>
+      <rect x="10" y="5" width="1" height="3" fill="#f78ac0"/>
+      <rect x="5" y="7" width="5" height="5" fill="#e63d6a"/>
+      <rect x="4" y="8" width="1" height="3" fill="#e63d6a"/>
+      <rect x="10" y="8" width="1" height="3" fill="#e63d6a"/>
+      <rect x="5" y="9" width="5" height="1" fill="#ffd644"/>
+      <rect x="5" y="12" width="2" height="2" fill="#fcd1a3"/>
+      <rect x="8" y="12" width="2" height="2" fill="#fcd1a3"/>
+      <rect x="5" y="14" width="2" height="1" fill="#0e0e1a"/>
+      <rect x="8" y="14" width="2" height="1" fill="#0e0e1a"/>
+    </svg>
+  `;
+}
+function chestSVG(opened){
+  if(opened){
+    return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%">
+      <rect x="2" y="6" width="12" height="2" fill="#6a4a1f"/>
+      <rect x="2" y="8" width="12" height="6" fill="#a87132"/>
+      <rect x="3" y="9" width="10" height="1" fill="#c89455"/>
+      <rect x="2" y="14" width="12" height="1" fill="#6a4a1f"/>
+      <rect x="7" y="10" width="2" height="3" fill="#ffd644"/>
+    </svg>`;
+  }
+  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%">
+    <rect x="2" y="5" width="12" height="3" fill="#a87132"/>
+    <rect x="2" y="8" width="12" height="6" fill="#a87132"/>
+    <rect x="3" y="6" width="10" height="1" fill="#c89455"/>
+    <rect x="3" y="9" width="10" height="1" fill="#c89455"/>
+    <rect x="2" y="5" width="1" height="9" fill="#6a4a1f"/>
+    <rect x="13" y="5" width="1" height="9" fill="#6a4a1f"/>
+    <rect x="2" y="13" width="12" height="1" fill="#6a4a1f"/>
+    <rect x="2" y="8" width="12" height="1" fill="#ffd644"/>
+    <rect x="7" y="9" width="2" height="3" fill="#ffd644"/>
+    <rect x="7" y="10" width="2" height="1" fill="#0e0e1a"/>
+  </svg>`;
+}
+function treeSVG(){
+  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%">
+    <rect x="3" y="1" width="10" height="2" fill="#1c4a1c"/>
+    <rect x="2" y="3" width="12" height="3" fill="#2e6e2e"/>
+    <rect x="3" y="6" width="10" height="2" fill="#1c4a1c"/>
+    <rect x="4" y="2" width="2" height="1" fill="#5fbb5f"/>
+    <rect x="10" y="2" width="2" height="1" fill="#5fbb5f"/>
+    <rect x="7" y="8" width="2" height="6" fill="#6a4a1f"/>
+    <rect x="6" y="14" width="4" height="1" fill="#a87132"/>
+  </svg>`;
+}
+function grassSVG(){
+  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%">
+    <rect x="3" y="11" width="1" height="2" fill="#3a8a3a"/>
+    <rect x="4" y="10" width="1" height="3" fill="#3a8a3a"/>
+    <rect x="5" y="11" width="1" height="2" fill="#3a8a3a"/>
+    <rect x="10" y="11" width="1" height="2" fill="#3a8a3a"/>
+    <rect x="11" y="10" width="1" height="3" fill="#3a8a3a"/>
+    <rect x="12" y="11" width="1" height="2" fill="#3a8a3a"/>
+  </svg>`;
+}
+function flowerSVG(){
+  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%">
+    <rect x="7" y="8" width="2" height="6" fill="#3a8a3a"/>
+    <rect x="6" y="5" width="4" height="3" fill="#fcd5e6"/>
+    <rect x="5" y="6" width="6" height="1" fill="#fcd5e6"/>
+    <rect x="7" y="6" width="2" height="1" fill="#ffd644"/>
+  </svg>`;
+}
+
+// ========== RENDER MAP ==========
+function renderStage(){
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  for(let y = 0; y < ROWS; y++){
+    for(let x = 0; x < COLS; x++){
+      const v = MAP[y][x];
+      if(v === 0) continue;
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.style.left = (x * 6.25) + '%';
+      tile.style.top = (y * 10) + '%';
+      let svg = '';
+      if(v === 1) svg = treeSVG();
+      else if(v === 2) svg = grassSVG();
+      else if(v === 3) svg = flowerSVG();
+      else if(v === 5){
+        const id = `${x},${y}`;
+        svg = chestSVG(chestOpened.has(id));
+        tile.dataset.chest = id;
+      }
+      tile.innerHTML = svg;
+      stage.appendChild(tile);
+    }
+  }
+}
+
+function renderHero(){
+  const h = document.getElementById('hero');
+  h.style.left = (hero.x * 6.25) + '%';
+  h.style.top = (hero.y * 10) + '%';
+  h.innerHTML = heroSVG();
+  h.className = 'walk facing-' + hero.dir;
+}
+
+function updateChestCount(){
+  document.getElementById('chestCount').textContent = chestOpened.size;
+}
+
+// ========== MOVEMENT ==========
+function canMoveTo(x, y){
+  if(x < 0 || x >= COLS || y < 0 || y >= ROWS) return false;
+  const v = MAP[y][x];
+  return v === 0 || v === 2 || v === 3; // 草装飾／花は通れる
+}
+
+function move(dx, dy){
+  if(mode !== 'walk') return;
+  if(dx === -1) hero.dir = 'left';
+  else if(dx === 1) hero.dir = 'right';
+  else if(dy === -1) hero.dir = 'up';
+  else if(dy === 1) hero.dir = 'down';
+  const nx = hero.x + dx, ny = hero.y + dy;
+  if(canMoveTo(nx, ny)){
+    hero.x = nx; hero.y = ny;
+  }
+  renderHero();
+}
+
+// 隣接の宝箱を検出
+function nearbyChest(){
+  const dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+  for(const [dx, dy] of dirs){
+    const x = hero.x + dx, y = hero.y + dy;
+    if(y < 0 || y >= ROWS || x < 0 || x >= COLS) continue;
+    if(MAP[y][x] === 5){
+      const id = `${x},${y}`;
+      if(!chestOpened.has(id)) return { x, y, id };
+    }
+  }
+  return null;
+}
+
+// ========== ACTION (A button) ==========
+function action(){
+  if(mode !== 'walk') return;
+  const chest = nearbyChest();
+  if(!chest){
+    setMsg('▼ ここには何もない…\n  たからばこに ちかづいて Aボタン！');
+    return;
+  }
+  // 開ける
+  openChest(chest);
+}
+
+function openChest(chest){
+  mode = 'wait';
+  // shimmer effect
+  const eff = document.createElement('div');
+  eff.className = 'shimmer';
+  eff.style.left = (chest.x * 6.25) + '%';
+  eff.style.top = (chest.y * 10) + '%';
+  eff.innerHTML = '<svg viewBox="0 0 16 16"><rect x="6" y="6" width="4" height="4" fill="#ffd644"/></svg>';
+  document.getElementById('effects').appendChild(eff);
+  setTimeout(()=>eff.remove(), 800);
+
+  setTimeout(()=>{
+    chestOpened.add(chest.id);
+    questionIdx = chestOpened.size - 1;
+    if(questionIdx >= QUESTIONS.length) questionIdx = QUESTIONS.length - 1;
+    renderStage();
+    updateChestCount();
+    askQuestion(questionIdx);
+  }, 500);
+}
+
+// ========== QUESTION FLOW ==========
+function askQuestion(idx){
+  mode = 'question';
+  const q = QUESTIONS[idx];
+  setMsg(q.intro);
+  const input = document.getElementById('msgInput');
+  input.style.display = 'block';
+  input.value = answers[idx] || '';
+  input.focus();
+  document.getElementById('msgActions').innerHTML = `
+    <button class="btn" onclick="skipQuestion()">あとで</button>
+    <button class="btn primary" onclick="saveAnswer()">けってい</button>
+  `;
+}
+
+function saveAnswer(){
+  const input = document.getElementById('msgInput');
+  const val = input.value.trim();
+  answers[questionIdx] = val;
+  saveState();
+  closeQuestion();
+  setMsg('▼ こたえを 手にいれた！\n  たから ' + chestOpened.size + ' / 5\n' +
+    (chestOpened.size < 5 ? 'のこり ' + (5 - chestOpened.size) + ' この たからばこ。' : '★ ぜんぶ あけた！ ★'));
+  if(chestOpened.size >= 5){
+    setTimeout(()=>showResult(), 1500);
+  }
+}
+
+function skipQuestion(){
+  // 宝箱を開けたことにはするが、未回答
+  closeQuestion();
+  setMsg('▼ あとで こたえても OK。\n  ほかの たからばこも さがそう。');
+}
+
+function closeQuestion(){
+  mode = 'walk';
+  document.getElementById('msgInput').style.display = 'none';
+  document.getElementById('msgActions').innerHTML = '';
+}
+
+function setMsg(t){
+  document.getElementById('msgText').innerHTML = t.replace(/\n/g, '<br>') + ' <span class="cursor-tri">▼</span>';
+}
+
+// ========== STATE ==========
+function saveState(){
+  localStorage.setItem(storageKey, JSON.stringify({
+    answers,
+    chests: Array.from(chestOpened),
+    savedAt: new Date().toISOString().slice(0,10)
+  }));
+}
+
+function loadState(){
+  const raw = localStorage.getItem(storageKey);
+  if(!raw) return;
+  try{
+    const d = JSON.parse(raw);
+    answers = d.answers || [];
+    if(d.chests) chestOpened = new Set(d.chests);
+  }catch(e){}
+}
+
+// ========== RESULT ==========
+function showResult(){
+  document.getElementById('resultScreen').classList.add('show');
+  const card = document.getElementById('reportCard');
+  const name = (userName || 'あなた').trim();
+
+  // 各回答を表示
+  let rowsHtml = '';
+  QUESTIONS.forEach((q, i) => {
+    rowsHtml += `
+      <div class="report-row">
+        <div class="q">${escapeHtml(q.label)}</div>
+        <div class="a">${escapeHtml(answers[i] || '（未回答）')}</div>
+      </div>
+    `;
+  });
+
+  // 異常値の要約（キーワード抽出風）
+  const allText = answers.join(' ');
+  const summary = generateSummary(name, answers);
+
+  card.innerHTML = `
+    <div class="report-title">— ${escapeHtml(name)}さんの 異常値 —</div>
+    ${rowsHtml}
+    <div class="report-summary">
+      <div class="label">★ 3つの軸で見る ★</div>
+      <div class="axis-row"><strong>質：</strong>${escapeHtml(summary.quality)}</div>
+      <div class="axis-row"><strong>時間：</strong>${escapeHtml(summary.time)}</div>
+      <div class="axis-row"><strong>熱量：</strong>${escapeHtml(summary.passion)}</div>
+    </div>
+  `;
+}
+
+// 5問の回答から「質・時間・熱量」軸で要約を生成（テンプレ＋差し込み）
+function generateSummary(name, ans){
+  const a1 = (ans[0] || '').trim();
+  const a2 = (ans[1] || '').trim();
+  const a3 = (ans[2] || '').trim();
+  const a4 = (ans[3] || '').trim();
+  const a5 = (ans[4] || '').trim();
+
+  return {
+    quality: a1
+      ? `「${truncate(a1, 30)}」— やっていて疲れない＝あなたが質を出せる領域。`
+      : '（Q1未回答：やっていて回復することを書いてみよう）',
+    time: a3
+      ? `${truncate(a3, 30)} に頭が向く＝そこにあなたの時間が自然と注がれている。`
+      : '（Q3未回答：やる時、頭に最初に浮かぶことを書いてみよう）',
+    passion: a5
+      ? `${truncate(a5, 30)} が異常に伸びる＝ここがあなたの熱量の証。`
+      : '（Q5未回答：使うと異常に伸びるものを書いてみよう）'
+  };
+}
+function truncate(s, n){return s.length > n ? s.slice(0, n) + '…' : s}
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+// ========== NAVIGATION ==========
+function backToDashboard(){
+  const q = new URLSearchParams();
+  if(userKey !== 'guest') q.set('u', userKey);
+  if(userName) q.set('name', userName);
+  if(params.get('demo')) q.set('demo', '1');
+  location.href = 'dashboard.html?' + q.toString();
+}
+
+function resetGame(){
+  if(!confirm('もう一度プレイする？ 答えはリセットされます。')) return;
+  localStorage.removeItem(storageKey);
+  location.reload();
+}
+
+// ========== INIT ==========
+function startGame(){
+  document.getElementById('titleScreen').style.display = 'none';
+  document.getElementById('frame').style.display = 'flex';
+  loadState();
+  renderStage();
+  renderHero();
+  updateChestCount();
+  // 全部開け済みなら結果へ
+  if(chestOpened.size >= 5){
+    setTimeout(()=>showResult(), 300);
+  }
+}
+
+// keyboard
+document.addEventListener('keydown', e => {
+  if(document.getElementById('frame').style.display === 'none') {
+    if(e.code === 'Space' || e.code === 'Enter'){ startGame(); e.preventDefault(); }
+    return;
+  }
+  if(mode === 'question'){
+    // 入力中はキー無効
+    if(e.code === 'Enter' && (e.ctrlKey || e.metaKey)){ saveAnswer(); e.preventDefault(); }
+    return;
+  }
+  if(e.code === 'ArrowUp' || e.code === 'KeyW'){ move(0,-1); e.preventDefault(); }
+  else if(e.code === 'ArrowDown' || e.code === 'KeyS'){ move(0,1); e.preventDefault(); }
+  else if(e.code === 'ArrowLeft' || e.code === 'KeyA'){ move(-1,0); e.preventDefault(); }
+  else if(e.code === 'ArrowRight' || e.code === 'KeyD'){ move(1,0); e.preventDefault(); }
+  else if(e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ'){ action(); e.preventDefault(); }
+});
+</script>
+
+</body>
+</html>
