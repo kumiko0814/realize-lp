@@ -272,7 +272,8 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
 <div class="toast" id="toast">コピーしました ✓</div>
 
 <script>
-const BASE = location.origin + location.pathname.replace('distribute.html','');
+// 現在のページのファイル名を除いたディレクトリパス
+const BASE = location.origin + location.pathname.replace(/[^/]+$/, '');
 
 const MEMBERS = [
   {name:'水谷萌', id:'mizutani'},
@@ -588,8 +589,8 @@ function showMemberDetail(id){
       <div id="cmtList" style="margin-top:14px"></div>
     </div>
     <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
-      <button onclick="window.open('dashboard.html?u=${encodeURIComponent(m.id)}&name=${encodeURIComponent(m.name||'')}','_blank')" style="flex:1;background:#5a7050;color:#fff;border:none;padding:10px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">📊 ダッシュボードを開く</button>
-      <button onclick="window.open('quest_v2.html?u=${encodeURIComponent(m.id)}&name=${encodeURIComponent(m.name||'')}','_blank')" style="flex:1;background:#c25b3f;color:#fff;border:none;padding:10px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">🎮 ゲームを開く</button>
+      <button onclick="window.open(BASE + 'dashboard.html?u=${encodeURIComponent(m.id)}&name=${encodeURIComponent(m.name||'')}','_blank')" style="flex:1;background:#5a7050;color:#fff;border:none;padding:10px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">📊 ダッシュボードを開く</button>
+      <button onclick="window.open(BASE + 'quest_v2.html?u=${encodeURIComponent(m.id)}&name=${encodeURIComponent(m.name||'')}','_blank')" style="flex:1;background:#c25b3f;color:#fff;border:none;padding:10px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">🎮 ゲームを開く</button>
       <button onclick="closeMemberModal()" style="background:#1a1a1a;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">閉じる</button>
     </div>
   `;
