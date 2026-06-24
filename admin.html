@@ -106,8 +106,69 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
 
   <header class="head">
     <div class="logo">Re:alize</div>
-    <div class="tag">ADMIN BOARD</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="showHelp()" style="background:#5a7050;color:#fff;border:none;padding:8px 18px;border-radius:24px;font-family:inherit;font-weight:700;cursor:pointer;font-size:12px;letter-spacing:0.1em;box-shadow:0 2px 6px rgba(0,0,0,0.1)">📖 使い方マニュアル</button>
+      <div class="tag">ADMIN BOARD</div>
+    </div>
   </header>
+
+  <!-- ヘルプモーダル -->
+  <div id="helpModalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:700;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeHelp()">
+    <div style="background:#fff;border-radius:16px;padding:32px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.2)">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:6px;color:#1a1a1a">📖 管理者ボードの使い方</h2>
+      <p style="font-size:11px;color:#8b8278;letter-spacing:0.2em;margin-bottom:24px">— ADMIN MANUAL —</p>
+
+      <div style="background:#fef9f0;border:1px solid #ece5d8;border-radius:10px;padding:16px 18px;margin-bottom:16px">
+        <h3 style="font-size:13px;color:#c25b3f;margin-bottom:8px">🎯 このボードでできること</h3>
+        <ul style="padding-left:18px;font-size:12px;line-height:2;color:#5a5a5a">
+          <li>参加者ごとの専用URL発行（LINEで送る）</li>
+          <li>20名以上の参加者の進捗をリアルタイム監視</li>
+          <li>個別の参加者にメッセージ送信</li>
+          <li>確認用と本番用のURL分離（テストデータを本番に混ぜない）</li>
+        </ul>
+      </div>
+
+      <h3 style="font-size:14px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">STEP 1：参加者にURLを送る（新規配布）</h3>
+      <ol style="padding-left:20px;font-size:12px;line-height:1.95;color:#5a5a5a">
+        <li>「① 個別URLジェネレーター」セクションへ</li>
+        <li><strong>URLモード</strong>を選択（生徒に送るなら「<span style="color:#c25b3f;font-weight:700">本番配布用</span>」を必ず選ぶ）</li>
+        <li><strong>参加者の英字ID</strong>（例：<code style="background:#f5eee2;padding:1px 6px;border-radius:4px">shimizu</code>）と<strong>表示名</strong>（例：<code style="background:#f5eee2;padding:1px 6px;border-radius:4px">清水</code>）を入力</li>
+        <li><strong>「URL生成」</strong>ボタンを押す（必須！押さないとコピーできません）</li>
+        <li><strong>「② LINE送付テンプレ」</strong>セクションの「テンプレをコピー」を押す</li>
+        <li>LINE/メールで参加者に送る</li>
+      </ol>
+
+      <h3 style="font-size:14px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">STEP 2：参加者の進捗を見る</h3>
+      <ol style="padding-left:20px;font-size:12px;line-height:1.95;color:#5a5a5a">
+        <li>「📊 全メンバーの進捗」セクションに自動表示</li>
+        <li>各カードに動物・達成率・週数が見える</li>
+        <li>カードをクリック → 詳細モーダル（OKR目標・強み一覧・異常値も見える）</li>
+      </ol>
+
+      <h3 style="font-size:14px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">STEP 3：メッセージを送る</h3>
+      <ol style="padding-left:20px;font-size:12px;line-height:1.95;color:#5a5a5a">
+        <li>上部の「あなたの管理者ID」で自分を選ぶ（くみこ／清水CTO／講師A/B）</li>
+        <li>参加者カードをクリック → 詳細モーダル</li>
+        <li>下までスクロール → 「💌 ◯◯さんへメッセージ」欄</li>
+        <li>応援メッセージを書いて「📨 メッセージを送る」</li>
+        <li>その参加者のダッシュボードに、あなたのアイコン付きで表示されます</li>
+      </ol>
+
+      <h3 style="font-size:14px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">⚠ よくあるトラブル</h3>
+      <div style="background:#fdf6f3;border:1px solid #f0d6cc;border-radius:8px;padding:12px 14px;font-size:11.5px;line-height:1.85">
+        <p style="margin-bottom:6px"><strong style="color:#c25b3f">Q. URLをコピーしてもダメ／送ったら開けない</strong></p>
+        <p style="color:#5a5a5a;margin-bottom:10px">→ 「URL生成」ボタンを押し忘れていませんか？コピー前に必ず生成を押してください。<br>　 また、ID＋表示名の入力後に「URL生成」を再度押すと最新URLが反映されます。</p>
+        <p style="margin-bottom:6px"><strong style="color:#c25b3f">Q. テスト中のデータと本番データを分けたい</strong></p>
+        <p style="color:#5a5a5a;margin-bottom:10px">→ URLモードで「確認用」を選択。自動で <code>test_</code> prefix が付き、絞り込みで分離できます。</p>
+        <p style="margin-bottom:6px"><strong style="color:#c25b3f">Q. メッセージを送ったのに参加者に届かない</strong></p>
+        <p style="color:#5a5a5a">→ 参加者のダッシュボード画面を再読み込み（Cmd+Shift+R）してもらってください。1分以内に自動更新されます。</p>
+      </div>
+
+      <div style="text-align:center;margin-top:24px">
+        <button onclick="closeHelp()" style="background:#1a1a1a;color:#fff;border:none;padding:10px 32px;border-radius:24px;font-family:inherit;cursor:pointer;letter-spacing:0.1em;font-size:13px">閉じる</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ===== 新セクション：全員の進捗（Supabase連動） ===== -->
   <section class="card" id="memberDashSection">
@@ -190,10 +251,12 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
       <div class="url-display" id="dashboardUrl">—</div>
     </div>
 
-    <div style="display:flex;gap:10px;margin-top:8px">
-      <button class="btn copy" onclick="copyUrl('welcome')">使い方URLをコピー</button>
-      <button class="btn copy" onclick="copyUrl('dashboard')">マイページURLをコピー</button>
+    <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn copy" onclick="copyUrl('welcome')">📋 使い方URLをコピー</button>
+      <button class="btn copy" onclick="copyUrl('dashboard')">📋 マイページURLをコピー</button>
+      <button class="btn" onclick="openGeneratedUrl('welcome')" style="background:#5a7050">👁 動作確認で開く</button>
     </div>
+    <p style="font-size:11px;color:#c25b3f;margin-top:10px;line-height:1.7">★ <strong>「URL生成」ボタンを押した後に</strong>コピー or 動作確認できます。<br>　 入力を変えたら、もう一度「URL生成」を押してください。</p>
   </section>
 
   <!-- LINE TEMPLATE -->
@@ -351,28 +414,48 @@ ${dashboardUrl}
 わからないことあれば気軽に教えてくださいね☺️`;
 }
 
-function copyUrl(type){
-  const slug = document.getElementById('userInput').value.trim();
-  if(!slug){ showToast('参加者IDを入れてください'); return; }
-  const url = type === 'welcome' ? buildUrl(slug,'welcome') : buildUrl(slug,'dashboard');
-  navigator.clipboard.writeText(url);
-  showToast('URLをコピーしました ✓');
+// 表示中のURL textContent を直接コピー（name パラメータ含む）
+function copyByText(id, msg){
+  const el = document.getElementById(id);
+  if(!el){ showToast('要素なし'); return; }
+  const txt = el.textContent.trim();
+  if(!txt || txt === '—'){ showToast('先に「URL生成」ボタンを押してください'); return; }
+  navigator.clipboard.writeText(txt).then(()=>{
+    showToast(msg || 'コピーしました ✓');
+  }).catch(()=>{
+    // フォールバック：execCommand
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); showToast(msg || 'コピーしました ✓'); }
+    catch(e){ showToast('コピー失敗：URLを手動で選択してください'); }
+    document.body.removeChild(ta);
+  });
 }
-
+function copyUrl(type){ copyByText(type==='welcome'?'welcomeUrl':'dashboardUrl', (type==='welcome'?'使い方URL':'マイページURL')+'をコピーしました ✓'); }
 function copyTmpl(){
   const tmpl = document.getElementById('lineTmpl').textContent;
-  if(tmpl.startsWith('参加者ID')){ showToast('参加者IDを入れてください'); return; }
-  navigator.clipboard.writeText(tmpl);
-  showToast('LINEテンプレをコピーしました ✓');
+  if(tmpl.startsWith('参加者ID')){ showToast('先に「URL生成」ボタンを押してください'); return; }
+  navigator.clipboard.writeText(tmpl).then(()=>showToast('LINEテンプレをコピーしました ✓')).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = tmpl; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); showToast('コピーしました ✓'); } catch(e){}
+    document.body.removeChild(ta);
+  });
 }
-
 function copyMember(slug){
   navigator.clipboard.writeText(buildUrl(slug, 'welcome'));
   showToast('使い方URLをコピーしました ✓');
 }
-
 function openUrl(slug, page){
   window.open(buildUrl(slug, page), '_blank');
+}
+// 開発時の動作確認用
+function openGeneratedUrl(type){
+  const id = type==='welcome'?'welcomeUrl':'dashboardUrl';
+  const txt = document.getElementById(id).textContent.trim();
+  if(!txt || txt === '—'){ showToast('先に「URL生成」ボタンを押してください'); return; }
+  window.open(txt, '_blank');
 }
 
 let toastTimer;
@@ -599,6 +682,10 @@ function showMemberDetail(id){
   setTimeout(()=>loadComments(m.id), 100);
 }
 function closeMemberModal(){ document.getElementById('memberModalBg').style.display = 'none'; }
+
+// ヘルプモーダル
+function showHelp(){ document.getElementById('helpModalBg').style.display = 'flex'; }
+function closeHelp(){ document.getElementById('helpModalBg').style.display = 'none'; }
 
 // 起動時に管理者IDを復元
 setTimeout(()=>{
