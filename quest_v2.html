@@ -295,10 +295,14 @@ svg{image-rendering:pixelated}
   <div class="modal" id="modal"></div>
 </div>
 
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<!-- Supabase 設定（くみこが書き換え） -->
+<script src="supabase_config.js"></script>
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624h"></script>
-<script src="town3_data.js?v=20260624h"></script>
-<script src="town4_data.js?v=20260624h"></script>
+<script src="town2_data.js?v=20260624i"></script>
+<script src="town3_data.js?v=20260624i"></script>
+<script src="town4_data.js?v=20260624i"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -1478,6 +1482,9 @@ function showTown4Unlock(){
   flash.className = 'screen-flash';
   document.body.appendChild(flash);
   setTimeout(()=>flash.remove(), 800);
+  // 街3クリア = クラウドへ登録の絶好タイミング
+  const isCloudEnabled = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.enabled);
+  if(isCloudEnabled){ uploadMyProfile(); }  // バックグラウンドで送信
   setTimeout(()=>{
     showModal(`
       <h2 class="fanfare-text" style="font-size:24px">⚔ NEW AREA UNLOCKED ⚔</h2>
@@ -1487,6 +1494,7 @@ function showTown4Unlock(){
         <p style="color:var(--sakura);font-size:12.5px;line-height:1.95">他のRealize仲間と<br>強みをぶつけ合って 高め合おう</p>
       </div>
       <p style="color:var(--gold);font-size:12px;text-align:center">▼ 街4 がワープリストに 追加されました ▼</p>
+      ${isCloudEnabled ? '<p style="color:var(--mind);font-size:10.5px;text-align:center;margin-top:10px">☁ あなたのプロフィールをクラウドに登録中…<br>　ルミナリアで仲間と出会えます。</p>' : ''}
       <div class="modal-actions">
         <button class="btn" onclick="closeModal()">あとで</button>
         <button class="btn primary" onclick="closeModal();setTimeout(function(){warpTo('town4')},400)">▶ 街4 へ行く！</button>
@@ -1510,11 +1518,96 @@ function resetIjouchi(){
 }
 
 // ===== 街4 機能 =====
+// ===== Supabase クラウド連携 =====
+let _supabaseClient = null;
+function getSupabaseClient(){
+  if(_supabaseClient) return _supabaseClient;
+  if(typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.enabled) return null;
+  if(typeof supabase === 'undefined') return null;
+  try {
+    _supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    return _supabaseClient;
+  } catch(e){ console.warn('Supabase init failed', e); return null; }
+}
+
+// クラウドメンバーキャッシュ
+let _cloudMembers = null;
+
+// 自分のデータをクラウドに送信
+async function uploadMyProfile(){
+  const client = getSupabaseClient();
+  if(!client){ console.log('Supabase未設定：ローカルのみ'); return { ok:false, reason:'no_supabase' }; }
+  const payload = {
+    id: userKey,
+    name: state.name || 'なまえ未設定',
+    mbti: state.mbti || null,
+    role: state.role || null,
+    animal_key: state.animal || null,
+    ijouchi: state.progress.town3IjouchiStatement || null,
+    strengths_others: state.progress.strengthsFromOthers.filter(s=>s),
+    strengths_town2: state.progress.town2NpcStrengths.flat().filter(s=>s),
+    strengths_additional: (state.progress.additionalStrengths || []).map(s=>s.text||s),
+    my_strength_answer: state.progress.myStrengthAnswer || null,
+    current_goal: state.progress.currentGoal || null,
+    companion_level: getCompanionLevel(),
+    updated_at: new Date().toISOString()
+  };
+  try {
+    const { data, error } = await client.from('realize_members').upsert(payload, { onConflict: 'id' });
+    if(error){ console.warn('Upload error', error); return { ok:false, reason:error.message }; }
+    console.log('✅ クラウド登録成功', data);
+    return { ok:true };
+  } catch(e){ console.warn('Upload exception', e); return { ok:false, reason:e.message }; }
+}
+
+// クラウドから全メンバーを取得
+async function fetchAllMembers(){
+  const client = getSupabaseClient();
+  if(!client) return null;
+  try {
+    const { data, error } = await client.from('realize_members').select('*').neq('id', userKey).order('updated_at', { ascending:false }).limit(50);
+    if(error){ console.warn('Fetch error', error); return null; }
+    _cloudMembers = data || [];
+    return _cloudMembers;
+  } catch(e){ console.warn('Fetch exception', e); return null; }
+}
+
+// クラウドメンバーを内部形式（rival風）に変換
+function cloudMemberToRival(m){
+  return {
+    id: 'cloud_' + m.id,
+    isCloud: true,
+    name: m.name,
+    mbti: m.mbti || '?',
+    animalKey: m.animal_key || 'tamago',
+    ijouchi: m.ijouchi || '異常値発見中…',
+    strengths: [...(m.strengths_others || []).slice(0,2), ...(m.strengths_additional || []).slice(0,1)].filter(Boolean),
+    backstory: '同じ Realize の仲間。実在の参加者。',
+    currentGoal: m.current_goal,
+    companionLevel: m.companion_level
+  };
+}
+
 // ===== 街4：メンバーズボード =====
-function showMembersBoard(){
+async function showMembersBoard(){
   if(typeof TOWN4 === 'undefined') return;
-  const rivals = TOWN4.rivals || [];
-  // 自分のカード（あれば）
+  // クラウドメンバー取得（あれば）
+  let cloudRivals = [];
+  const isCloudEnabled = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.enabled);
+  if(isCloudEnabled){
+    // ローディング表示
+    showModal(`<h2>📋 メンバーズボード</h2><div class="sub">— CONNECTING —</div><p style="text-align:center;padding:20px;color:var(--mind)">クラウドから 仲間を呼び寄せ中…</p>`);
+    const members = await fetchAllMembers();
+    if(members && members.length > 0){
+      cloudRivals = members.map(cloudMemberToRival);
+    }
+  }
+  // 仮想メンバー（クラウドにいなければモック表示、あれば隠す）
+  const rivals = cloudRivals.length > 0 ? cloudRivals : (TOWN4.rivals || []);
+  const sourceLabel = cloudRivals.length > 0
+    ? `★ クラウドから ${cloudRivals.length}人 取得`
+    : (isCloudEnabled ? '★ クラウドに まだ誰もいない (モック表示)' : '★ ローカルモード (Supabase未設定)');
+  // 自分のカード
   const myCard = (state.mbti && state.animal) ? `
     <div onclick="showMemberProfile('me')" style="background:linear-gradient(135deg,#3a2a5a 0%,#1a1a3a 100%);border:3px solid var(--gold);padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px">
       <div style="font-size:9px;color:var(--gold);letter-spacing:0.2em;margin-bottom:4px">★ YOU ★</div>
@@ -1522,31 +1615,48 @@ function showMembersBoard(){
       <div style="font-size:11.5px;font-weight:bold;color:var(--sakura)">${escapeHtml(state.name)}</div>
       <div style="font-size:9px;color:var(--gold);margin-top:2px">${state.mbti} ／ ${escapeHtml(state.role)}</div>
     </div>` : '';
+  // クラウドキャッシュに保存（プロフィール表示用）
+  window._allCurrentRivals = rivals;
   const cards = rivals.map(r => `
-    <div onclick="showMemberProfile('${r.id}')" style="background:#1a1a2a;border:2px solid var(--msg-border);padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--msg-border)'">
+    <div onclick="showMemberProfile('${r.id}')" style="background:#1a1a2a;border:2px solid ${r.isCloud?'var(--mind)':'var(--msg-border)'};padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='${r.isCloud?'var(--mind)':'var(--msg-border)'}'">
       <div style="width:48px;height:48px;margin:0 auto 6px">${ANIMAL_SVG[r.animalKey] || ANIMAL_SVG.tamago}</div>
       <div style="font-size:11.5px;font-weight:bold">${escapeHtml(r.name)}</div>
       <div style="font-size:9px;color:var(--mind);margin-top:2px">${r.mbti} ／ ${escapeHtml(ANIMAL_NAME[r.animalKey] || '')}</div>
-      ${state.progress.rivalsBattled[r.id] ? '<div style="font-size:9px;color:var(--gold);margin-top:3px">★ 出会い済</div>' : ''}
+      ${r.isCloud ? '<div style="font-size:8px;color:var(--mind);margin-top:3px">☁ 実在の仲間</div>' : ''}
     </div>
   `).join('');
   showModal(`
     <h2>📋 ルミナリア メンバーズボード</h2>
     <div class="sub">— MEMBERS —</div>
-    <p style="font-size:11.5px;line-height:1.85">仲間のカードをタップすると、<br>その人の <span class="em">強み・異常値・今の目標</span> が見られる。</p>
+    <p style="font-size:10px;color:var(--mind);margin-bottom:8px">${sourceLabel}</p>
+    <p style="font-size:11.5px;line-height:1.85">仲間のカードをタップすると、<br><span class="em">強み・異常値・今の目標</span> が見られる。</p>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px">
       ${myCard}
       ${cards}
     </div>
-    <p style="font-size:10px;color:var(--mind);margin-top:14px;text-align:center">★ 街4を歩き回って 直接出会いに行くこともできる</p>
-    <div class="modal-actions"><button class="btn" onclick="closeModal()">街を歩く</button></div>
+    ${!isCloudEnabled ? '<p style="font-size:9.5px;color:var(--mind);margin-top:14px;line-height:1.85">★ Supabase を設定すると、Realize の他の参加者全員のリアルデータが ここに表示されます。<br>　設定方法は <a href="supabase_setup.html" style="color:var(--mind)">supabase_setup.html</a> 参照。</p>' : '<p style="font-size:10px;color:var(--mind);margin-top:14px;text-align:center">★ 街3クリアで自動的にあなたも仲間に登録されます</p>'}
+    <div class="modal-actions">
+      ${isCloudEnabled ? '<button class="btn" onclick="closeModal();uploadAndRefresh()">☁ 自分のデータを更新</button>' : ''}
+      <button class="btn" onclick="closeModal()">街を歩く</button>
+    </div>
   `);
+}
+async function uploadAndRefresh(){
+  showModal(`<h2>☁ クラウド同期中</h2><p style="text-align:center;padding:20px">自分のプロフィールを送信中…</p>`);
+  const result = await uploadMyProfile();
+  if(result.ok){
+    showModal(`<h2>✅ 同期完了！</h2><p>あなたのプロフィールが クラウドに保存されました。<br>他のメンバーにも あなたのカードが見えます。</p><div class="modal-actions"><button class="btn primary" onclick="closeModal();setTimeout(showMembersBoard,300)">メンバーズボードへ</button></div>`);
+  } else {
+    showModal(`<h2 class="red">⚠ 同期失敗</h2><p>${escapeHtml(result.reason || 'クラウド接続失敗')}</p><div class="modal-actions"><button class="btn" onclick="closeModal()">あとで</button></div>`);
+  }
 }
 function showMemberProfile(id){
   closeModal();
   setTimeout(()=>{
     if(id === 'me') return showMyProfile();
-    const r = TOWN4.rivals.find(x => x.id === id);
+    // クラウドメンバー or ローカルrival両対応
+    const all = window._allCurrentRivals || TOWN4.rivals;
+    const r = all.find(x => x.id === id) || TOWN4.rivals.find(x => x.id === id);
     if(!r) return;
     const battled = state.progress.rivalsBattled[r.id];
     showModal(`
