@@ -296,9 +296,9 @@ svg{image-rendering:pixelated}
 </div>
 
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624g"></script>
-<script src="town3_data.js?v=20260624g"></script>
-<script src="town4_data.js?v=20260624g"></script>
+<script src="town2_data.js?v=20260624h"></script>
+<script src="town3_data.js?v=20260624h"></script>
+<script src="town4_data.js?v=20260624h"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -1181,6 +1181,10 @@ function warpTo(tk){
     saveState();
     setTimeout(showTown2Welcome, 600);
   }
+  // 街4到着時：メンバーボード自動表示
+  if(tk === 'town4'){
+    setTimeout(showMembersBoard, 600);
+  }
 }
 function showTown2Welcome(){
   showModal(`
@@ -1506,19 +1510,87 @@ function resetIjouchi(){
 }
 
 // ===== 街4 機能 =====
+// ===== 街4：メンバーズボード =====
+function showMembersBoard(){
+  if(typeof TOWN4 === 'undefined') return;
+  const rivals = TOWN4.rivals || [];
+  // 自分のカード（あれば）
+  const myCard = (state.mbti && state.animal) ? `
+    <div onclick="showMemberProfile('me')" style="background:linear-gradient(135deg,#3a2a5a 0%,#1a1a3a 100%);border:3px solid var(--gold);padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px">
+      <div style="font-size:9px;color:var(--gold);letter-spacing:0.2em;margin-bottom:4px">★ YOU ★</div>
+      <div style="width:48px;height:48px;margin:0 auto 6px">${ANIMAL_SVG[state.animal]}</div>
+      <div style="font-size:11.5px;font-weight:bold;color:var(--sakura)">${escapeHtml(state.name)}</div>
+      <div style="font-size:9px;color:var(--gold);margin-top:2px">${state.mbti} ／ ${escapeHtml(state.role)}</div>
+    </div>` : '';
+  const cards = rivals.map(r => `
+    <div onclick="showMemberProfile('${r.id}')" style="background:#1a1a2a;border:2px solid var(--msg-border);padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--msg-border)'">
+      <div style="width:48px;height:48px;margin:0 auto 6px">${ANIMAL_SVG[r.animalKey] || ANIMAL_SVG.tamago}</div>
+      <div style="font-size:11.5px;font-weight:bold">${escapeHtml(r.name)}</div>
+      <div style="font-size:9px;color:var(--mind);margin-top:2px">${r.mbti} ／ ${escapeHtml(ANIMAL_NAME[r.animalKey] || '')}</div>
+      ${state.progress.rivalsBattled[r.id] ? '<div style="font-size:9px;color:var(--gold);margin-top:3px">★ 出会い済</div>' : ''}
+    </div>
+  `).join('');
+  showModal(`
+    <h2>📋 ルミナリア メンバーズボード</h2>
+    <div class="sub">— MEMBERS —</div>
+    <p style="font-size:11.5px;line-height:1.85">仲間のカードをタップすると、<br>その人の <span class="em">強み・異常値・今の目標</span> が見られる。</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px">
+      ${myCard}
+      ${cards}
+    </div>
+    <p style="font-size:10px;color:var(--mind);margin-top:14px;text-align:center">★ 街4を歩き回って 直接出会いに行くこともできる</p>
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">街を歩く</button></div>
+  `);
+}
+function showMemberProfile(id){
+  closeModal();
+  setTimeout(()=>{
+    if(id === 'me') return showMyProfile();
+    const r = TOWN4.rivals.find(x => x.id === id);
+    if(!r) return;
+    const battled = state.progress.rivalsBattled[r.id];
+    showModal(`
+      <h2>📖 ${escapeHtml(r.name)} のプロフィール</h2>
+      <div class="sub">— ${r.mbti} ・ ${escapeHtml(ANIMAL_NAME[r.animalKey] || '')} —</div>
+      <div style="text-align:center;margin-bottom:14px"><div style="display:inline-block;width:80px;height:80px;background:#1a1a2a;border:2px solid var(--gold);padding:4px">${ANIMAL_SVG[r.animalKey] || ANIMAL_SVG.tamago}</div></div>
+      <div style="background:linear-gradient(135deg,rgba(255,214,68,0.15) 0%,rgba(122,200,255,0.1) 100%);border:2px solid var(--gold);padding:14px;margin-bottom:14px;border-radius:4px">
+        <div style="font-size:10px;color:var(--gold);letter-spacing:0.25em;margin-bottom:6px">— 異常値 —</div>
+        <div style="font-size:13.5px;line-height:1.85;color:var(--white)">${escapeHtml(r.ijouchi || '')}</div>
+      </div>
+      <p class="em" style="margin-bottom:6px">💎 強み</p>
+      <ul style="padding-left:20px;margin-bottom:14px;line-height:1.85">
+        ${(r.strengths || []).map(s => `<li class="pink">${escapeHtml(s)}</li>`).join('')}
+      </ul>
+      ${r.currentGoal ? `<div style="background:rgba(122,200,255,0.12);border-left:3px solid var(--mind);padding:10px 12px;margin-bottom:14px"><div style="font-size:10px;color:var(--mind);letter-spacing:0.2em;margin-bottom:4px">🎯 今の目標</div><div style="font-size:12px;line-height:1.85">${escapeHtml(r.currentGoal)}</div></div>` : ''}
+      <p class="pink" style="font-size:11.5px;line-height:1.85">「${escapeHtml(r.backstory || '')}」</p>
+      ${battled ? `<p style="color:var(--gold);font-size:11px;text-align:center;margin-top:10px">★ 称号「${escapeHtml(r.reward || '')}」獲得済</p>` : ''}
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal();setTimeout(showMembersBoard,150)">← ボードへ</button>
+        <button class="btn primary" onclick='startRivalBattle(${JSON.stringify(r.id)})'>${battled ? 'もう一度対戦' : '⚔ 対戦する'}</button>
+      </div>
+    `);
+  }, 100);
+}
+function showMyProfile(){
+  const others = state.progress.strengthsFromOthers.filter(s=>s);
+  const town2 = state.progress.town2NpcStrengths.flat().filter(s=>s);
+  const additional = (state.progress.additionalStrengths || []).map(s=>s.text||s);
+  const allStrengths = [...others, ...town2, ...additional];
+  const ijouchi = state.progress.town3IjouchiStatement;
+  showModal(`
+    <h2>📖 ${escapeHtml(state.name)} のプロフィール</h2>
+    <div class="sub">— ${state.mbti || '未診断'} ・ ${escapeHtml(ANIMAL_NAME[state.animal] || '旅人')} —</div>
+    <div style="text-align:center;margin-bottom:14px"><div style="display:inline-block;width:80px;height:80px;background:#1a1a2a;border:2px solid var(--gold);padding:4px">${ANIMAL_SVG[state.animal] || ANIMAL_SVG.tamago}</div></div>
+    ${ijouchi ? `<div style="background:linear-gradient(135deg,rgba(255,214,68,0.15) 0%,rgba(122,200,255,0.1) 100%);border:2px solid var(--gold);padding:14px;margin-bottom:14px;border-radius:4px"><div style="font-size:10px;color:var(--gold);letter-spacing:0.25em;margin-bottom:6px">— あなたの異常値 —</div><div style="font-size:13.5px;line-height:1.85;color:var(--white)">${escapeHtml(ijouchi)}</div></div>` : '<p class="mind" style="margin-bottom:14px">★ 街3で異常値を発見しよう</p>'}
+    <p class="em" style="margin-bottom:6px">💎 強み (合計 ${allStrengths.length}個)</p>
+    ${allStrengths.length ? `<ul style="padding-left:20px;margin-bottom:14px;line-height:1.85">${allStrengths.map(s=>`<li class="pink">${escapeHtml(s)}</li>`).join('')}</ul>` : '<p class="mind" style="margin-bottom:14px">　まだない</p>'}
+    <p style="font-size:11px;color:var(--mind);text-align:center;line-height:1.85">本体サイトで設定した目標は<br>レポート → ダッシュボードから 確認できる</p>
+    <div class="modal-actions"><button class="btn" onclick="closeModal();setTimeout(showMembersBoard,150)">← ボードへ</button></div>
+  `);
+}
 function openRival(rival){
   if(state.currentTown !== 'town4' || typeof TOWN4 === 'undefined') return;
-  const battled = state.progress.rivalsBattled[rival.id];
-  showModal(`
-    <h2>🥊 ${escapeHtml(rival.name)}</h2>
-    <div class="sub">— ${escapeHtml(rival.mbti)} ・ ${escapeHtml(ANIMAL_NAME[rival.animalKey] || '')} —</div>
-    <div style="text-align:center;width:80px;height:80px;margin:0 auto 12px;background:#1a1a2a;border:2px solid var(--gold)">${ANIMAL_SVG[rival.animalKey] || ANIMAL_SVG.tamago}</div>
-    <p class="pink">「${escapeHtml(rival.backstory || '')}」</p>
-    <p class="em">異常値：${escapeHtml(rival.ijouchi || '')}</p>
-    <p>強み：${(rival.strengths || []).map(escapeHtml).join('・')}</p>
-    ${battled ? `<p class="mind">★ 対戦済み（称号「${escapeHtml(rival.reward || '')}」獲得）</p>` : ''}
-    <div class="modal-actions"><button class="btn" onclick="closeModal()">話を聞くだけ</button><button class="btn primary" onclick='startRivalBattle(${JSON.stringify(rival.id)})'>${battled ? 'もう一度対戦' : '対戦する'}</button></div>
-  `);
+  showMemberProfile(rival.id);
 }
 function startRivalBattle(rivalId){
   if(typeof TOWN4 === 'undefined') return;
@@ -1577,6 +1649,7 @@ function openExchange(ex){
 
 function openMenu(){
   if(currentModal) return;
+  const inTown4 = state.currentTown === 'town4';
   showModal(`
     <h2>📜 メニュー</h2>
     <div class="sub">— MENU —</div>
@@ -1584,7 +1657,8 @@ function openMenu(){
       <button class="choice" onclick="closeModal();setTimeout(openCompanionMenu,100)"><span class="head">🐾 A</span>自分の相棒</button>
       <button class="choice" onclick="closeModal();setTimeout(openStrengthsMenu,100)"><span class="head">💎 B</span>強み一覧</button>
       <button class="choice" onclick="closeModal();setTimeout(openReportMenu,100)"><span class="head">📊 C</span>レポート</button>
-      <button class="choice" onclick="closeModal();setTimeout(openWarp,100)"><span class="head">🚀 D</span>街ワープ</button>
+      ${inTown4 ? `<button class="choice" onclick="closeModal();setTimeout(showMembersBoard,100)"><span class="head">📋 D</span>メンバーズボード</button>` : ''}
+      <button class="choice" onclick="closeModal();setTimeout(openWarp,100)"><span class="head">🚀 ${inTown4?'E':'D'}</span>街ワープ</button>
     </div>
     <div class="modal-actions"><button class="btn" onclick="closeModal()">とじる</button><button class="btn danger" onclick="resetAll()">リセット</button></div>
   `);
