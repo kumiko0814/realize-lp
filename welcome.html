@@ -3,289 +3,370 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Re:alize ｜ あなただけの目標管理サイトへようこそ</title>
+<title>Re:alize 使い方ガイド</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#1a1a1a;--sub:#5a5a5a;--mute:#8b8278;
-  --bg:#fffaf6;--card:#fff;--line:#ece5d8;
-  --accent:#c25b3f;--accent-deep:#a64626;
-  --leaf:#7a9070;--leaf-deep:#5a7050;
-  --pink:#e8b6bc;--pink-light:#fdf2f4;
+  --bg:#fffaf6;--card:#fff;--line:#ece5d8;--line-soft:#f5eee2;
+  --accent:#c25b3f;--accent-deep:#a64626;--accent-soft:#fce4e0;
+  --leaf:#7a9070;--leaf-deep:#5a7050;--leaf-soft:#eef2e8;
+  --gold:#c9a574;--gold-deep:#a67a26;
+  --pink:#e8b6bc;--pink-soft:#fce4e6;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
-  font-family:"Yu Gothic","YuGothic","游ゴシック",sans-serif;
-  background:linear-gradient(180deg,#fffaf3 0%,#fdeede 100%);
-  color:var(--ink);line-height:1.85;letter-spacing:0.05em;
-  min-height:100vh;-webkit-font-smoothing:antialiased;font-feature-settings:"palt";
+  font-family:"Yu Gothic","YuGothic","Hiragino Kaku Gothic ProN",sans-serif;
+  color:var(--ink);background:var(--bg);
+  font-size:14px;line-height:1.95;letter-spacing:0.04em;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"palt";
 }
-.wrap{max-width:720px;margin:0 auto;padding:48px 24px 80px}
-@media(max-width:720px){.wrap{padding:32px 20px 64px}}
+.wrap{max-width:880px;margin:0 auto;padding:56px 24px 96px}
+@media(max-width:720px){.wrap{padding:32px 18px 64px}}
 
-/* HERO */
-.hero{text-align:center;margin-bottom:56px}
-.logo{
-  font-family:"Cormorant Garamond",serif;
-  font-size:36px;letter-spacing:0.25em;
-  color:var(--leaf-deep);font-weight:600;margin-bottom:14px;
-}
-.welcome{
-  display:inline-block;font-family:"Cormorant Garamond",serif;
-  font-style:italic;font-size:13px;letter-spacing:0.32em;
-  color:var(--accent);background:var(--pink-light);
-  padding:6px 22px;border-radius:999px;margin-bottom:24px;
-}
-h1{
-  font-family:"Yu Mincho","游明朝",serif;
-  font-size:28px;font-weight:500;line-height:1.65;
-  letter-spacing:0.06em;margin-bottom:20px;
-}
-h1 .em{color:var(--leaf-deep);font-weight:600}
-.lead{font-size:14px;color:var(--sub);line-height:2.1;letter-spacing:0.08em}
+/* HEADER */
+.head{text-align:center;margin-bottom:56px;padding-bottom:36px;border-bottom:1px solid var(--line)}
+.head .meta{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:12px;letter-spacing:0.35em;color:var(--mute);margin-bottom:14px}
+.head .logo{font-family:"Cormorant Garamond",serif;font-size:48px;font-weight:600;letter-spacing:0.04em;color:var(--accent);margin-bottom:6px;line-height:1}
+.head .logo .lower{font-style:italic;color:var(--leaf-deep)}
+.head h1{font-family:"Yu Mincho",serif;font-size:22px;font-weight:500;letter-spacing:0.08em;line-height:1.6;margin-bottom:10px;color:var(--ink)}
+.head .sub{font-size:13px;color:var(--sub);letter-spacing:0.08em}
 
-/* CARD */
-.card{
-  background:var(--card);border:1px solid var(--line);
-  border-radius:20px;padding:36px 32px;margin-bottom:20px;
+/* TOC */
+.toc{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:20px 26px;margin-bottom:48px;
 }
-@media(max-width:720px){.card{padding:28px 24px}}
+.toc h3{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:12px;letter-spacing:0.3em;color:var(--mute);margin-bottom:12px}
+.toc ol{padding-left:22px;font-size:13px;line-height:2.1}
+.toc a{color:var(--ink);text-decoration:none;transition:color 0.2s}
+.toc a:hover{color:var(--accent)}
 
-/* STEPS */
-.step{
-  display:grid;grid-template-columns:64px 1fr;gap:24px;
-  padding:20px 0;border-bottom:1px solid #f5eee2;align-items:start;
+/* SECTION */
+section{margin-bottom:64px;scroll-margin-top:20px}
+section h2{
+  font-family:"Yu Mincho",serif;font-size:22px;font-weight:600;letter-spacing:0.06em;
+  line-height:1.6;padding-bottom:16px;border-bottom:2px solid var(--leaf-deep);
+  display:flex;align-items:baseline;gap:16px;margin-bottom:22px;
 }
-.step:last-child{border-bottom:none}
-@media(max-width:720px){.step{grid-template-columns:1fr;gap:8px}}
-.step-num{
-  font-family:"Cormorant Garamond",serif;
-  font-size:42px;color:var(--accent);font-weight:500;line-height:1;
-}
-.step-num small{
-  display:block;font-size:10px;letter-spacing:0.3em;
-  color:var(--mute);margin-top:6px;font-style:italic;
-}
-.step h3{font-size:16px;font-weight:700;margin-bottom:10px;letter-spacing:0.05em}
-.step p{font-size:13.5px;color:var(--sub);line-height:2;letter-spacing:0.04em}
-.step .tip{
-  background:#fff8f0;border-left:3px solid var(--pink);
-  padding:10px 14px;font-size:12px;color:var(--sub);
-  margin-top:12px;border-radius:0 8px 8px 0;
-}
+section h2 .num{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;color:var(--leaf);letter-spacing:0.2em;font-weight:500}
+.lead{font-size:14px;color:var(--sub);line-height:2;letter-spacing:0.05em;margin-bottom:24px}
 
-/* CHARS PREVIEW */
-.chars{
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0;
+h3{font-size:16px;font-weight:700;margin:24px 0 10px;letter-spacing:0.06em;color:var(--leaf-deep);padding-left:14px;border-left:3px solid var(--leaf)}
+
+p{margin-bottom:12px}
+strong{color:var(--accent-deep);font-weight:700}
+em{color:var(--leaf-deep);font-style:normal;font-weight:600}
+
+ul,ol{padding-left:22px;margin-bottom:14px}
+ul li,ol li{margin-bottom:6px;line-height:2}
+
+/* CARDS */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+@media(max-width:720px){.feat-grid{grid-template-columns:1fr}}
+.feat{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:20px 18px;
 }
-@media(max-width:720px){.chars{gap:10px}}
-.char-side{
-  background:#fdfaf6;border:1px solid var(--line);
-  border-radius:14px;padding:16px;text-align:center;
+.feat .step-num{
+  display:inline-block;background:var(--accent);color:#fff;
+  font-family:"Cormorant Garamond",serif;font-style:italic;font-size:11px;
+  padding:3px 10px;border-radius:12px;letter-spacing:0.18em;margin-bottom:10px;
 }
-.char-side.fail{background:#f5ede2;border-color:#d8c8b0}
-.char-tag{
-  display:inline-block;font-family:"Cormorant Garamond",serif;
-  font-style:italic;font-size:10px;letter-spacing:0.25em;
-  padding:3px 12px;border-radius:999px;margin-bottom:8px;
+.feat h4{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--ink);letter-spacing:0.05em}
+.feat p{font-size:12.5px;color:var(--sub);line-height:1.9}
+
+/* キャラクター 10種 */
+.chars-section{
+  background:linear-gradient(135deg,#fffaf3 0%,var(--card) 100%);
+  border:1px solid var(--line);border-radius:14px;padding:28px 22px;margin:20px 0;
 }
-.char-side.success .char-tag{background:var(--accent);color:#fff}
-.char-side.fail .char-tag{background:#8a6e5c;color:#fff}
-.char-svg{width:90px;height:90px;margin:6px auto}
-.char-name{font-size:12px;font-weight:700;margin-bottom:4px}
-.char-desc{font-size:10px;color:var(--mute);letter-spacing:0.05em}
+.chars-section h3{padding:0;border:none;text-align:center;color:var(--leaf-deep);margin:0 0 6px;font-size:15px}
+.chars-section .sub-text{text-align:center;font-size:12px;color:var(--mute);margin-bottom:24px;letter-spacing:0.06em}
+.chars-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+@media(max-width:720px){.chars-grid{grid-template-columns:repeat(2,1fr)}}
+.char{
+  background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:14px 10px;text-align:center;transition:all 0.2s;
+}
+.char:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(0,0,0,0.06);border-color:var(--gold)}
+.char .icon{width:64px;height:64px;margin:0 auto 8px;background:#fff7ec;border:1px solid var(--line-soft);border-radius:8px;padding:6px}
+.char .icon svg{width:100%;height:100%;image-rendering:pixelated}
+.char .nm{font-size:13px;font-weight:700;letter-spacing:0.05em;margin-bottom:3px}
+.char .role{font-size:9.5px;color:var(--leaf-deep);letter-spacing:0.1em;margin-bottom:3px;font-weight:600}
+.char .mbti{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:9.5px;color:var(--mute);letter-spacing:0.18em}
+
+/* WARN */
+.warn-box{
+  background:#fdf6f3;border-left:3px solid var(--accent);
+  padding:16px 18px;margin:18px 0;border-radius:0 6px 6px 0;font-size:12.5px;line-height:1.95;
+}
+.warn-box strong{color:var(--accent-deep)}
+
+.tip-box{
+  background:var(--leaf-soft);border-left:3px solid var(--leaf-deep);
+  padding:16px 18px;margin:18px 0;border-radius:0 6px 6px 0;font-size:12.5px;line-height:1.95;
+}
 
 /* CTA */
-.cta-box{text-align:center;padding:48px 24px;background:#fff;border-radius:24px;border:1px solid var(--line);margin-top:32px}
-.cta-box h2{
-  font-family:"Yu Mincho",serif;font-size:20px;font-weight:500;
-  margin-bottom:24px;letter-spacing:0.06em;line-height:1.75;
+.cta-zone{
+  background:linear-gradient(135deg,var(--leaf-deep) 0%,var(--leaf) 100%);
+  color:#fff;padding:36px 28px;border-radius:16px;text-align:center;margin-top:48px;
 }
-.cta-box h2 .em{color:var(--leaf-deep);font-weight:600}
+.cta-zone h2{
+  font-family:"Yu Mincho",serif;font-size:22px;color:#fff;border:none;padding:0;margin-bottom:12px;
+  display:block;letter-spacing:0.08em;
+}
+.cta-zone .cta-sub{font-size:13px;color:#fff;opacity:0.9;line-height:1.95;letter-spacing:0.06em;margin-bottom:24px}
 .cta-btn{
-  display:inline-block;background:var(--accent);color:#fff;
-  font-family:inherit;font-size:14px;font-weight:700;letter-spacing:0.18em;
-  padding:18px 48px;border-radius:999px;text-decoration:none;
-  transition:all 0.3s;box-shadow:0 6px 20px rgba(194,91,63,0.25);
+  display:inline-block;background:#fff;color:var(--leaf-deep);
+  padding:16px 40px;border-radius:999px;text-decoration:none;
+  font-weight:700;font-size:14px;letter-spacing:0.2em;
+  transition:all 0.2s;box-shadow:0 4px 14px rgba(0,0,0,0.18);
 }
-.cta-btn:hover{background:var(--accent-deep);transform:translateY(-2px)}
-.cta-note{display:block;font-size:11px;color:var(--mute);margin-top:14px;letter-spacing:0.1em;font-family:"Cormorant Garamond",serif;font-style:italic}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.25)}
 
-/* FAQ */
-.faq-item{padding:18px 0;border-bottom:1px dashed var(--line)}
-.faq-item:last-child{border-bottom:none}
-.faq-q{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;padding-left:24px;position:relative}
-.faq-q::before{content:"Q.";position:absolute;left:0;top:-2px;color:var(--accent);font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600}
-.faq-a{font-size:12.5px;color:var(--sub);line-height:1.95;padding-left:24px}
-
-footer{text-align:center;font-size:11px;color:var(--mute);margin-top:48px;letter-spacing:0.1em}
+/* FOOTER */
+footer{
+  margin-top:64px;padding-top:32px;border-top:1px solid var(--line);
+  text-align:center;font-size:11px;color:var(--mute);letter-spacing:0.15em;
+}
 footer .serif{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--leaf);margin-bottom:6px;display:block}
 </style>
 </head>
 <body>
-
 <div class="wrap">
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="logo">Re:alize</div>
-    <div class="welcome">FOR YOU</div>
-    <h1><span class="em">あなただけの</span><br>目標管理サイトへ、ようこそ。</h1>
+  <!-- HEADER -->
+  <div class="head">
+    <div class="meta">— HOW TO USE —</div>
+    <div class="logo">Re<span class="lower">:alize</span></div>
+    <h1>使い方ガイド</h1>
+    <p class="sub">自分の目標を達成し、自分を心から愛せるようになるためのコミュニティ</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>— TABLE OF CONTENTS —</h3>
+    <ol>
+      <li><a href="#sec1">Re:alize とは</a></li>
+      <li><a href="#sec2">基本の使い方</a></li>
+      <li><a href="#sec3">RPGゲーム機能：自分自身の発掘</a></li>
+      <li><a href="#sec4">ダッシュボードとマイページ</a></li>
+    </ol>
+  </div>
+
+  <!-- ============ SEC 1 ============ -->
+  <section id="sec1">
+    <h2><span class="num">01</span>Re:alize とは</h2>
     <p class="lead">
-      毎週、ちょっとの数字を入れるだけ。<br>
-      キャラクター「ミー」が一緒に半年間、伴走します。
+      <strong>自分自身の目標を達成し、自分のことを心から愛せるようになるための</strong><br>
+      <em>「目標達成サポートコミュニティ」</em>です。
     </p>
-  </div>
+    <p>半年間、毎週ちょっとの数字を入れるだけ。<br>
+    一人で頑張るのではなく、仲間と一緒に「自分の異常値（誰にも負けない強み）」を見つけて磨いていきます。</p>
+    <div class="tip-box">
+      <strong>🌸 Re:alize のスタンス</strong><br>
+      ✦ 完璧主義ではなく <em>続けることを大切に</em><br>
+      ✦ 比較ではなく <em>自分の異常値を伸ばす</em><br>
+      ✦ 一人ではなく <em>仲間と共に走り抜ける</em>
+    </div>
+  </section>
 
-  <!-- STEPS -->
-  <div class="card">
-    <div class="step">
-      <div class="step-num">01<small>SET YOUR GOAL</small></div>
-      <div>
-        <h3>最初に「目標を設定」する</h3>
-        <p>
-          サイトを開いたら、まずは <strong>「目標を編集／設定する」</strong> を開いて、自分の大目標と KR（達成軸）を入れていきます。
-        </p>
-        <div class="tip">
-          📌 例：大目標「2028年に100日間 海外旅行に行く」／ KR1「健康管理」／ サブ「毎日1時間運動 CHA:45 COM:25」<br>
-          ＊ CHA = チャレンジ目標（理想） ／ COM = コミット目標（最低ライン）
+  <!-- ============ SEC 2 ============ -->
+  <section id="sec2">
+    <h2><span class="num">02</span>基本の使い方</h2>
+    <p class="lead">3つのステップで、半年間の伴走が始まります。</p>
+
+    <div class="feat-grid">
+      <div class="feat">
+        <span class="step-num">STEP 01</span>
+        <h4>🎯 OKR（目標）を設定</h4>
+        <p>自分自身の目標を <strong>3つまで</strong> 入力します。「いつまでに」「どの程度（定量的）に」「何を達成するか」を具体的に設定しましょう。</p>
+      </div>
+      <div class="feat">
+        <span class="step-num">STEP 02</span>
+        <h4>📅 毎週 追いかける</h4>
+        <p>設定した目標値を、<strong>毎週欠かさず</strong> 追いかけていきます。日々の入力でもOK。日曜には自動で振り返り画面が出ます。</p>
+      </div>
+      <div class="feat">
+        <span class="step-num">STEP 03</span>
+        <h4>👥 勉強会＆フォロー</h4>
+        <p>詳しい操作方法などは <strong>勉強会</strong> で説明します。その後のフォローアップも継続的に行っていきます。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SEC 3 ============ -->
+  <section id="sec3">
+    <h2><span class="num">03</span>RPGゲーム機能：自分自身の発掘</h2>
+    <p class="lead">
+      <strong>コーチング技術を用いた問い</strong> に答えていくことで、自分自身の強みや熱中できるものを発掘する RPG 機能が実装されています。
+    </p>
+
+    <h3>(a) 自己分析と診断</h3>
+    <p><em>MBTI診断</em> や客観的な性格分析を通じて、自分では気づかなかった <strong>異常値（特出した才能）</strong> や強みを見つけていきます。</p>
+
+    <h3>(b) キャラクターの育成</h3>
+    <p>ゲーム内には <em>10種類のキャラクター</em> が存在し、MBTI と自身の強みに基づいて分類されます。</p>
+
+    <!-- 10種類のキャラ -->
+    <div class="chars-section">
+      <h3>🌟 10種類のキャラクター</h3>
+      <p class="sub-text">あなたの相棒は、性格診断によって自動的に決まります</p>
+      <div class="chars-grid">
+        <!-- 1. ねこ -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="1" width="1" height="1" fill="#c45a8e"/><rect x="2" y="2" width="2" height="1" fill="#c45a8e"/><rect x="2" y="3" width="3" height="1" fill="#f78ac0"/><rect x="13" y="1" width="1" height="1" fill="#c45a8e"/><rect x="12" y="2" width="2" height="1" fill="#c45a8e"/><rect x="11" y="3" width="3" height="1" fill="#f78ac0"/><rect x="3" y="2" width="1" height="1" fill="#e63d6a"/><rect x="12" y="2" width="1" height="1" fill="#e63d6a"/><rect x="2" y="4" width="12" height="6" fill="#f78ac0"/><rect x="3" y="3" width="10" height="1" fill="#f78ac0"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="6" width="1" height="1" fill="#fff"/><rect x="11" y="6" width="1" height="1" fill="#fff"/><rect x="7" y="8" width="2" height="1" fill="#e63d6a"/><rect x="3" y="10" width="10" height="3" fill="#f78ac0"/><rect x="3" y="13" width="2" height="2" fill="#f78ac0"/><rect x="6" y="13" width="2" height="2" fill="#f78ac0"/><rect x="11" y="13" width="2" height="2" fill="#f78ac0"/></svg>
+          </div>
+          <div class="nm">ねこ</div>
+          <div class="role">遊び人 / 商人</div>
+          <div class="mbti">ENFP / ESFP</div>
+        </div>
+        <!-- 2. うさぎ -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="4" y="0" width="2" height="5" fill="#fff"/><rect x="10" y="0" width="2" height="5" fill="#fff"/><rect x="5" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="10" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="2" y="5" width="12" height="7" fill="#fff"/><rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#f6a0c4"/><rect x="3" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg>
+          </div>
+          <div class="nm">うさぎ</div>
+          <div class="role">吟遊詩人 / 踊り子</div>
+          <div class="mbti">INFP / ISFP</div>
+        </div>
+        <!-- 3. パンダ -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="8" fill="#fff"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="6" width="1" height="1" fill="#fff"/><rect x="11" y="6" width="1" height="1" fill="#fff"/><rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/><rect x="3" y="12" width="3" height="2" fill="#0e0e1a"/><rect x="10" y="12" width="3" height="2" fill="#0e0e1a"/></svg>
+          </div>
+          <div class="nm">パンダ</div>
+          <div class="role">預言者 / 僧侶</div>
+          <div class="mbti">INFJ / ENFJ</div>
+        </div>
+        <!-- 4. フクロウ -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="2" y="3" width="12" height="9" fill="#a87132"/><rect x="4" y="5" width="3" height="3" fill="#fff"/><rect x="9" y="5" width="3" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#ffd644"/><rect x="5" y="12" width="2" height="2" fill="#ffd644"/><rect x="9" y="12" width="2" height="2" fill="#ffd644"/></svg>
+          </div>
+          <div class="nm">フクロウ</div>
+          <div class="role">大賢者 / 魔法使い</div>
+          <div class="mbti">INTJ / INTP</div>
+        </div>
+        <!-- 5. キツネ -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="0" width="1" height="1" fill="#c25b3f"/><rect x="2" y="1" width="2" height="1" fill="#e6814a"/><rect x="2" y="2" width="3" height="1" fill="#e6814a"/><rect x="2" y="3" width="3" height="1" fill="#e6814a"/><rect x="13" y="0" width="1" height="1" fill="#c25b3f"/><rect x="12" y="1" width="2" height="1" fill="#e6814a"/><rect x="11" y="2" width="3" height="1" fill="#e6814a"/><rect x="11" y="3" width="3" height="1" fill="#e6814a"/><rect x="3" y="2" width="1" height="2" fill="#fff"/><rect x="12" y="2" width="1" height="2" fill="#fff"/><rect x="2" y="4" width="12" height="4" fill="#e6814a"/><rect x="3" y="8" width="10" height="2" fill="#e6814a"/><rect x="5" y="10" width="6" height="1" fill="#e6814a"/><rect x="4" y="8" width="8" height="2" fill="#fff"/><rect x="5" y="10" width="6" height="1" fill="#fff"/><rect x="4" y="6" width="2" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="1" fill="#0e0e1a"/><rect x="5" y="7" width="1" height="1" fill="#fff"/><rect x="10" y="7" width="1" height="1" fill="#fff"/><rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/><rect x="3" y="11" width="6" height="3" fill="#e6814a"/><rect x="3" y="13" width="6" height="1" fill="#fff"/><rect x="3" y="14" width="2" height="1" fill="#c25b3f"/><rect x="7" y="14" width="2" height="1" fill="#c25b3f"/><rect x="9" y="10" width="2" height="2" fill="#e6814a"/><rect x="11" y="9" width="3" height="3" fill="#e6814a"/><rect x="13" y="11" width="2" height="3" fill="#e6814a"/><rect x="12" y="14" width="3" height="1" fill="#e6814a"/><rect x="13" y="13" width="2" height="2" fill="#fff"/><rect x="12" y="14" width="3" height="1" fill="#fff"/></svg>
+          </div>
+          <div class="nm">キツネ</div>
+          <div class="role">軍師 / 占い師</div>
+          <div class="mbti">ENTJ / ENTP</div>
+        </div>
+        <!-- 6. シバイヌ -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="3" y="2" width="2" height="3" fill="#c89455"/><rect x="11" y="2" width="2" height="3" fill="#c89455"/><rect x="2" y="4" width="12" height="7" fill="#c89455"/><rect x="4" y="8" width="8" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/><rect x="6" y="10" width="1" height="1" fill="#e63d6a"/><rect x="9" y="10" width="1" height="1" fill="#e63d6a"/><rect x="3" y="11" width="2" height="3" fill="#c89455"/><rect x="11" y="11" width="2" height="3" fill="#c89455"/><rect x="12" y="3" width="2" height="3" fill="#a07840"/></svg>
+          </div>
+          <div class="nm">シバイヌ</div>
+          <div class="role">戦士 / 聖女</div>
+          <div class="mbti">ESTJ / ESFJ</div>
+        </div>
+        <!-- 7. リス -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="0" width="1" height="1" fill="#6a4a1f"/><rect x="2" y="1" width="2" height="2" fill="#a87132"/><rect x="8" y="0" width="1" height="1" fill="#6a4a1f"/><rect x="8" y="1" width="2" height="2" fill="#a87132"/><rect x="3" y="2" width="1" height="1" fill="#fcd5a3"/><rect x="9" y="2" width="1" height="1" fill="#fcd5a3"/><rect x="2" y="3" width="8" height="5" fill="#a87132"/><rect x="1" y="6" width="2" height="2" fill="#c89455"/><rect x="9" y="6" width="2" height="2" fill="#c89455"/><rect x="3" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="4" y="5" width="1" height="1" fill="#fff"/><rect x="8" y="5" width="1" height="1" fill="#fff"/><rect x="5" y="7" width="2" height="1" fill="#e63d6a"/><rect x="3" y="9" width="6" height="4" fill="#a87132"/><rect x="4" y="10" width="4" height="3" fill="#fcd5a3"/><rect x="5" y="11" width="2" height="2" fill="#a87132"/><rect x="5" y="9" width="2" height="2" fill="#6a4a1f"/><rect x="3" y="13" width="2" height="2" fill="#a87132"/><rect x="7" y="13" width="2" height="2" fill="#a87132"/><rect x="10" y="2" width="3" height="2" fill="#a87132"/><rect x="11" y="1" width="4" height="2" fill="#a87132"/><rect x="12" y="0" width="3" height="2" fill="#a87132"/><rect x="13" y="2" width="3" height="3" fill="#a87132"/><rect x="13" y="5" width="3" height="3" fill="#a87132"/><rect x="12" y="8" width="3" height="3" fill="#a87132"/><rect x="11" y="11" width="3" height="2" fill="#a87132"/></svg>
+          </div>
+          <div class="nm">リス</div>
+          <div class="role">武闘家</div>
+          <div class="mbti">ISTJ</div>
+        </div>
+        <!-- 8. ハムスター -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="3" y="1" width="2" height="2" fill="#c89a55"/><rect x="11" y="1" width="2" height="2" fill="#c89a55"/><rect x="3" y="2" width="2" height="1" fill="#f6a0c4"/><rect x="11" y="2" width="2" height="1" fill="#f6a0c4"/><rect x="3" y="3" width="10" height="6" fill="#ffd644"/><rect x="2" y="4" width="12" height="5" fill="#ffd644"/><rect x="0" y="6" width="3" height="3" fill="#fff5b8"/><rect x="13" y="6" width="3" height="3" fill="#fff5b8"/><rect x="4" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="5" width="1" height="1" fill="#fff"/><rect x="11" y="5" width="1" height="1" fill="#fff"/><rect x="7" y="7" width="2" height="1" fill="#f6a0c4"/><rect x="2" y="9" width="12" height="5" fill="#ffd644"/><rect x="3" y="10" width="10" height="4" fill="#fff5b8"/></svg>
+          </div>
+          <div class="nm">ハムスター</div>
+          <div class="role">薬師</div>
+          <div class="mbti">ISFJ</div>
+        </div>
+        <!-- 9. ペンギン -->
+        <div class="char">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="3" y="2" width="10" height="11" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="9" fill="#0e0e1a"/><rect x="4" y="6" width="8" height="6" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#e6814a"/><rect x="4" y="13" width="3" height="2" fill="#e6814a"/><rect x="9" y="13" width="3" height="2" fill="#e6814a"/></svg>
+          </div>
+          <div class="nm">ペンギン</div>
+          <div class="role">忍者 / 勇者</div>
+          <div class="mbti">ISTP / ESTP</div>
+        </div>
+        <!-- 10. たまご（未診断） -->
+        <div class="char" style="background:linear-gradient(180deg,#fffcf5 0%,#fdf2f4 100%);border-color:#e8d6a8">
+          <div class="icon">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="6" y="2" width="4" height="1" fill="#fff"/><rect x="5" y="3" width="6" height="1" fill="#fff"/><rect x="4" y="4" width="8" height="2" fill="#fff"/><rect x="3" y="6" width="10" height="5" fill="#fff"/><rect x="4" y="11" width="8" height="2" fill="#fff"/><rect x="5" y="13" width="6" height="1" fill="#fff"/><rect x="6" y="5" width="1" height="1" fill="#f6a0c4"/><rect x="9" y="6" width="1" height="1" fill="#ffd644"/><rect x="5" y="8" width="1" height="1" fill="#f6a0c4"/><rect x="10" y="9" width="1" height="1" fill="#ffd644"/><rect x="7" y="10" width="1" height="1" fill="#f6a0c4"/><rect x="7" y="7" width="2" height="1" fill="#c25b3f"/><rect x="8" y="8" width="1" height="1" fill="#c25b3f"/><rect x="7" y="9" width="1" height="1" fill="#c25b3f"/><rect x="7" y="11" width="1" height="1" fill="#c25b3f"/></svg>
+          </div>
+          <div class="nm">？？？</div>
+          <div class="role">未診断（旅人）</div>
+          <div class="mbti">UNDIAGNOSED</div>
         </div>
       </div>
     </div>
 
-    <div class="step">
-      <div class="step-num">02<small>WEEKLY INPUT</small></div>
-      <div>
-        <h3>毎週月曜の夜、5分だけ進捗を入力</h3>
-        <p>
-          サイトを開いて <strong>「今週の振り返り」</strong> に、今週何回できたかをポチッと数字で入れるだけ。「今週の進捗を保存して、ミーを育てる」を押すと、自動でキャラが反応します。
-        </p>
-        <div class="tip">
-          📌 ゼロでも構いません。空欄＝0として計算されます。<br>
-          📌 体調・育児・仕事の事情で休んだ週も、堂々と 0 で送信してOK。
-        </div>
-      </div>
+    <h3>(c) 育成の注意点</h3>
+    <div class="warn-box">
+      <strong>⚠ キャラクターが不気味化してしまう条件</strong><br>
+      目標達成が進んでいなかったり、強みの入力が不足していたりすると、<br>
+      キャラクターが <strong>不気味な姿に変化</strong> してしまったり、成長が止まってしまったりします。<br>
+      <br>
+      でも大丈夫。<em>1週間ちゃんと達成すれば、元の可愛い相棒に戻ります。</em>
     </div>
+  </section>
 
-    <div class="step">
-      <div class="step-num">03<small>WATCH MI GROW</small></div>
-      <div>
-        <h3>ミーが育っていく姿を見届ける</h3>
-        <p>
-          達成度が高ければ、ミーは <strong>たまご → 子猫 → 大人 → レインボー</strong> と成長します。<br>
-          逆に未達が続くと…？ こちらは見てのお楽しみ。
-        </p>
-      </div>
-    </div>
-  </div>
+  <!-- ============ SEC 4 ============ -->
+  <section id="sec4">
+    <h2><span class="num">04</span>ダッシュボードとマイページ</h2>
+    <p class="lead">ガイドを読んだら、いよいよマイページへ。</p>
 
-  <!-- CHARS -->
-  <div class="card">
-    <h3 style="font-size:14px;font-weight:700;margin-bottom:8px;letter-spacing:0.06em;text-align:center">2つのルートがあります</h3>
-    <p style="font-size:12px;color:var(--mute);text-align:center;margin-bottom:8px">達成率に応じて、左 or 右に育ちます</p>
-    <div class="chars">
-      <div class="char-side success">
-        <span class="char-tag">SUCCESS</span>
-        <svg class="char-svg" viewBox="0 0 200 200">
-          <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.12"/>
-          <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
-          <path d="M 100 96 C 64 96 56 114 56 128 C 56 154 80 168 100 168 C 120 168 144 154 144 128 C 144 114 136 96 100 96 Z" fill="#e8e2d6"/>
-          <path d="M 56 82 L 52 62 L 78 80 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round"/>
-          <path d="M 144 82 L 148 62 L 122 80 Z" fill="#c2bbb0" stroke="#3a342d" stroke-width="3.4" stroke-linejoin="round"/>
-          <path d="M 60 79 L 56 67 L 75 78 Z" fill="#f0b6c0"/>
-          <path d="M 140 79 L 144 67 L 125 78 Z" fill="#f0b6c0"/>
-          <circle cx="80" cy="104" r="4.5" fill="#3a342d"/>
-          <circle cx="120" cy="104" r="4.5" fill="#3a342d"/>
-          <path d="M 96 118 L 100 122 L 104 118 Z" fill="#3a342d"/>
-          <path d="M 94 126 Q 100 128 106 126" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <ellipse cx="60" cy="120" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.85"/>
-          <ellipse cx="140" cy="120" rx="6" ry="3.5" fill="#f0b6c0" opacity="0.85"/>
-          <ellipse cx="50" cy="166" rx="11" ry="6" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
-          <ellipse cx="80" cy="168" rx="11" ry="6" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
-          <ellipse cx="120" cy="168" rx="11" ry="6" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
-          <ellipse cx="150" cy="166" rx="11" ry="6" fill="#c2bbb0" stroke="#3a342d" stroke-width="2.8"/>
-          <path d="M 176 112 Q 198 100 188 76" stroke="#3a342d" stroke-width="3.5" fill="#c2bbb0" stroke-linejoin="round"/>
-        </svg>
-        <div class="char-name">ミー（順調ルート）</div>
-        <div class="char-desc">続けるとレインボーへ</div>
-      </div>
-      <div class="char-side fail">
-        <span class="char-tag">FAIL</span>
-        <svg class="char-svg" viewBox="0 0 200 200">
-          <ellipse cx="100" cy="178" rx="74" ry="6" fill="#000" opacity="0.18"/>
-          <path d="M 100 70 C 36 70 22 92 22 114 C 22 152 60 172 100 172 C 140 172 178 152 178 114 C 178 92 164 70 100 70 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.5" stroke-linejoin="round"/>
-          <ellipse cx="100" cy="124" rx="48" ry="34" fill="#c4baa6"/>
-          <circle cx="100" cy="138" r="2.5" fill="#8a6e5c"/>
-          <ellipse cx="100" cy="78" rx="36" ry="12" fill="#e8baa6"/>
-          <ellipse cx="92" cy="74" rx="10" ry="3" fill="#fff" opacity="0.6"/>
-          <path d="M 64 80 Q 60 60 84 72" fill="#3a342d" stroke="#3a342d" stroke-width="2.5" stroke-linejoin="round"/>
-          <path d="M 136 80 Q 140 60 116 72" fill="#3a342d" stroke="#3a342d" stroke-width="2.5" stroke-linejoin="round"/>
-          <path d="M 100 74 Q 98 64 102 60 Q 104 64 100 72" fill="#3a342d"/>
-          <path d="M 56 88 L 50 72 L 76 84 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round"/>
-          <path d="M 144 88 L 150 72 L 124 84 Z" fill="#a89e8c" stroke="#3a342d" stroke-width="3.2" stroke-linejoin="round"/>
-          <path d="M 72 106 L 88 106" stroke="#3a342d" stroke-width="3.5" stroke-linecap="round"/>
-          <path d="M 112 106 L 128 106" stroke="#3a342d" stroke-width="3.5" stroke-linecap="round"/>
-          <circle cx="80" cy="109" r="2.2" fill="#3a342d"/>
-          <circle cx="120" cy="109" r="2.2" fill="#3a342d"/>
-          <ellipse cx="100" cy="120" rx="5" ry="3.5" fill="#c4866e"/>
-          <path d="M 92 126 Q 78 128 70 122 Q 76 134 88 130" fill="#3a342d" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
-          <path d="M 108 126 Q 122 128 130 122 Q 124 134 112 130" fill="#3a342d" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
-          <path d="M 92 132 Q 100 128 108 132" stroke="#3a342d" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <path d="M 100 156 L 95 158 L 100 178 L 105 158 Z" fill="#8a4a3a" stroke="#3a342d" stroke-width="1.5" stroke-linejoin="round"/>
-          <ellipse cx="50" cy="166" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
-          <ellipse cx="74" cy="170" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
-          <ellipse cx="126" cy="170" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
-          <ellipse cx="150" cy="166" rx="10" ry="6" fill="#a89e8c" stroke="#3a342d" stroke-width="2.8"/>
-        </svg>
-        <div class="char-name">おやじ（未達ルート）</div>
-        <div class="char-desc">達成すれば、また戻れる</div>
-      </div>
-    </div>
-    <p style="font-size:11px;color:var(--mute);text-align:center;margin-top:14px;letter-spacing:0.06em">⚠ 直近4週の<strong>週報提出率</strong>と<strong>達成率</strong>で判定。達成し始めると、ちゃんとミーに戻ります。</p>
-  </div>
+    <h3>(a) ガイドの表示</h3>
+    <p>最初のダッシュボードに進む前に、<strong>この「使い方ガイド」が必ず表示</strong> されます。<br>いつでもこのページに戻って読み返せます。</p>
 
-  <!-- FAQ -->
-  <div class="card">
-    <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;letter-spacing:0.06em">よくある質問</h3>
-    <div class="faq-item">
-      <div class="faq-q">他の人に進捗を見られたりしますか？</div>
-      <div class="faq-a">いいえ。記録はあなたのブラウザの中にだけ保存されます。運営にも他の参加者にも見られません。</div>
+    <h3>(b) マイページへの移動</h3>
+    <p>下の <em>「マイページへ」ボタン</em> を押すとダッシュボードへ移動します。</p>
+
+    <h3>(c) 卵の孵化</h3>
+    <p>ダッシュボードの初期状態では、手元にあるのは <strong>「卵」のまま</strong> ストップしています。<br>
+    まずは <em>目標入力を完了</em> させてください。入力が終わると、RPGゲームを通じて <strong>その卵を孵化させる</strong> ことができます。</p>
+
+    <div class="tip-box">
+      <strong>🌸 流れのまとめ</strong><br>
+      ① 使い方ガイドを読む（このページ）<br>
+      ② マイページへ → 目標を3つ入力<br>
+      ③ RPGゲームでMBTI診断 → <strong>卵が孵化！</strong><br>
+      ④ 毎週、ちょっとの数字を入れて 相棒を育てる<br>
+      ⑤ 仲間（ルミナリア）で お互いの異常値を覗き合う
     </div>
-    <div class="faq-item">
-      <div class="faq-q">スマホとPCで同じ記録が見られますか？</div>
-      <div class="faq-a">いまのテスト版は、開いた端末ごとに記録が分かれます。最初に決めた端末（スマホ or PC）で続けて使うのがおすすめです。</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">途中で目標を変えてもいいですか？</div>
-      <div class="faq-a">もちろん。「目標を編集／設定する」からいつでも書き換え可能。Re:alizeでは「目標を変えてもOK」が文化です。</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">入力を忘れた週があったらどうなりますか？</div>
-      <div class="faq-a">大丈夫です。0として扱われるだけ。気づいたタイミングで戻って入力もできます。</div>
-    </div>
-  </div>
+  </section>
 
   <!-- CTA -->
-  <div class="cta-box">
-    <h2>準備はOK？<br><span class="em">マイページ</span>を開いてみましょう。</h2>
-    <a href="dashboard.html" class="cta-btn" id="goDashboard">マイページを開く →</a>
-    <span class="cta-note">— あなたとミーの半年間がはじまります —</span>
+  <div class="cta-zone">
+    <h2>準備はできましたか？</h2>
+    <p class="cta-sub">
+      まずはマイページで <strong style="color:#fff">目標を3つ</strong> 入力するところから始めましょう。<br>
+      入力が終わったら、RPGゲームで卵を孵化させて 相棒と一緒に半年間 走りましょう。
+    </p>
+    <a href="#" id="ctaBtn" class="cta-btn">▶ マイページへ</a>
   </div>
 
   <footer>
-    <span class="serif">— Re:alize Test Version —</span>
-    Operated by Merone Inc. ／ Copyright © 2026
+    <span class="serif">— Re:alize ／ Merone Inc. ／ 2026 —</span>
+    自分の目標を、自分のペースで、自分のために。
   </footer>
 
 </div>
 
 <script>
-// URLパラメータがあればdashboardにも引き継ぐ
+// URL params を引き継ぎ
 const params = new URLSearchParams(location.search);
-if(params.has('u')){
-  document.getElementById('goDashboard').href = 'dashboard.html?u=' + encodeURIComponent(params.get('u'));
-}
+const ctaBtn = document.getElementById('ctaBtn');
+ctaBtn.href = 'dashboard.html' + (params.toString() ? '?' + params.toString() : '');
 </script>
 
 </body>
