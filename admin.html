@@ -220,15 +220,24 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
 
     <div style="background:#fdf6f3;border:1px solid #f0d6cc;border-radius:10px;padding:14px 16px;margin-bottom:14px">
       <div style="font-size:12px;font-weight:700;color:#c25b3f;margin-bottom:8px">⚙ URL モード</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;background:#fff;padding:6px 12px;border-radius:6px;border:1px solid #ece5d8">
-          <input type="radio" name="urlMode" value="production" checked onchange="updateUrl()"> <strong>本番配布用</strong>（生徒に送る・実データ保存）
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;background:#fff;padding:8px 12px;border-radius:6px;border:1px solid #ece5d8">
+          <input type="radio" name="urlMode" value="production" checked onchange="updateUrl()">
+          <strong style="color:#c25b3f">🟢 本番配布用</strong>
+          <span style="color:#5a5a5a;font-size:11px">— 正式メンバーに送る・実データ保存・全機能利用可</span>
         </label>
-        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;background:#fff;padding:6px 12px;border-radius:6px;border:1px solid #ece5d8">
-          <input type="radio" name="urlMode" value="test" onchange="updateUrl()"> <strong>確認用</strong>（くみこ用・ID自動で test_ prefix付）
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;background:#fff;padding:8px 12px;border-radius:6px;border:1px solid #ece5d8">
+          <input type="radio" name="urlMode" value="demo" onchange="updateUrl()">
+          <strong style="color:#7a9070">🎮 体験版用</strong>
+          <span style="color:#5a5a5a;font-size:11px">— 営業・お試し用／卵受け取りまで／目標入力ロック</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;background:#fff;padding:8px 12px;border-radius:6px;border:1px solid #ece5d8">
+          <input type="radio" name="urlMode" value="test" onchange="updateUrl()">
+          <strong style="color:#5a7050">🧪 確認用</strong>
+          <span style="color:#5a5a5a;font-size:11px">— くみこ用・ID自動で test_ prefix付・本番データに混ざらない</span>
         </label>
       </div>
-      <p style="font-size:10.5px;color:#5a5a5a;margin-top:8px;line-height:1.7">★ 確認用URLは admin の「テスト」フィルタで非表示にできるので、本番データに混ざりません。</p>
+      <p style="font-size:10.5px;color:#5a5a5a;margin-top:8px;line-height:1.7">★ 体験版URLは <code>demo=1</code> 付き。<br>　 卵を受け取るまでのみ体験可・目標入力もロックされます。</p>
     </div>
     <div class="gen-row">
       <div>
@@ -384,6 +393,8 @@ function buildUrl(slug, page, extra){
   if(!slug) return '';
   const params = ['u=' + encodeURIComponent(actualId(slug))];
   if(extra && extra.name) params.push('name=' + encodeURIComponent(extra.name));
+  // 体験版モードは demo=1 を付与
+  if(getUrlMode() === 'demo') params.push('demo=1');
   return BASE + page + '.html?' + params.join('&');
 }
 
@@ -401,13 +412,38 @@ function updateUrl(){
   document.getElementById('welcomeUrl').textContent = welcomeUrl;
   document.getElementById('dashboardUrl').textContent = dashboardUrl;
   const mode = getUrlMode();
-  const intro = mode === 'test'
-    ? '（※確認用URL。本番データには影響しません）'
-    : '';
-  document.getElementById('lineTmpl').textContent =
-(dispName || '〜')+`さん、お疲れさまです🌿
+  let tmpl;
+  if(mode === 'demo'){
+    tmpl = (dispName || '〜')+`さん、お疲れさまです🌿
 
-Re:alize の目標管理サイト、お送りします${intro}！
+Re:alize の体験版URLをお送りします！
+
+✨ 体験版でできること
+・キャラクター育成サイトの雰囲気を体験
+・しみず博士から「不思議なたまご」を受け取る
+（※ MBTI診断・強み発掘・仲間との交流は本入会後にお楽しみいただけます）
+
+🟢 まず使い方の説明はこちら
+${welcomeUrl}
+
+🟡 マイページ（仮）
+${dashboardUrl}
+
+ご興味あれば、本入会のご案内もさせていただきますね😊`;
+  } else if(mode === 'test'){
+    tmpl = (dispName || '〜')+`さん（確認用）
+
+確認用URL。本番データには影響しません。
+
+🟢 使い方
+${welcomeUrl}
+
+🟡 マイページ
+${dashboardUrl}`;
+  } else {
+    tmpl = (dispName || '〜')+`さん、お疲れさまです🌿
+
+Re:alize の目標管理サイト、お送りします！
 
 🟢 まず使い方の説明はこちら
 ${welcomeUrl}
@@ -417,6 +453,8 @@ ${dashboardUrl}
 
 最初に「目標を編集／設定する」から、ご自身の大目標と数値目標を入れてみてください。
 わからないことあれば気軽に教えてくださいね☺️`;
+  }
+  document.getElementById('lineTmpl').textContent = tmpl;
 }
 
 // 表示中のURL textContent を直接コピー（name パラメータ含む）
