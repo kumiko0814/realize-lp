@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Re:alize Quest ｜ 異常値の冒険</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
@@ -23,7 +23,9 @@ html,body{height:100%;overflow:hidden}
 body{
   font-family:"DotGothic16","Yu Gothic",sans-serif;background:#000;color:var(--white);
   display:flex;align-items:center;justify-content:center;padding:8px;letter-spacing:0.04em;user-select:none;
+  touch-action:manipulation;-webkit-touch-callout:none;
 }
+.dpad-btn,.ab-btn{touch-action:none;-webkit-user-select:none}
 svg{image-rendering:pixelated}
 
 .frame{
@@ -275,11 +277,11 @@ svg{image-rendering:pixelated}
 
   <div class="controls">
     <div class="dpad">
-      <button class="dpad-btn up" onclick="move(0,-1)">▲</button>
-      <button class="dpad-btn left" onclick="move(-1,0)">◀</button>
+      <button class="dpad-btn up"    onmousedown="startMove(0,-1)" onmouseup="stopMove()" onmouseleave="stopMove()" ontouchstart="startMove(0,-1);event.preventDefault()" ontouchend="stopMove();event.preventDefault()" ontouchcancel="stopMove()">▲</button>
+      <button class="dpad-btn left"  onmousedown="startMove(-1,0)" onmouseup="stopMove()" onmouseleave="stopMove()" ontouchstart="startMove(-1,0);event.preventDefault()" ontouchend="stopMove();event.preventDefault()" ontouchcancel="stopMove()">◀</button>
       <button class="dpad-btn center"></button>
-      <button class="dpad-btn right" onclick="move(1,0)">▶</button>
-      <button class="dpad-btn down" onclick="move(0,1)">▼</button>
+      <button class="dpad-btn right" onmousedown="startMove(1,0)"  onmouseup="stopMove()" onmouseleave="stopMove()" ontouchstart="startMove(1,0);event.preventDefault()"  ontouchend="stopMove();event.preventDefault()" ontouchcancel="stopMove()">▶</button>
+      <button class="dpad-btn down"  onmousedown="startMove(0,1)"  onmouseup="stopMove()" onmouseleave="stopMove()" ontouchstart="startMove(0,1);event.preventDefault()"  ontouchend="stopMove();event.preventDefault()" ontouchcancel="stopMove()">▼</button>
     </div>
     <div class="ab-buttons">
       <button class="ab-btn" onclick="action()">A</button>
@@ -294,9 +296,9 @@ svg{image-rendering:pixelated}
 </div>
 
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624e"></script>
-<script src="town3_data.js?v=20260624e"></script>
-<script src="town4_data.js?v=20260624e"></script>
+<script src="town2_data.js?v=20260624f"></script>
+<script src="town3_data.js?v=20260624f"></script>
+<script src="town4_data.js?v=20260624f"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -769,6 +771,14 @@ function computeProgressNum(){
   if(state.progress.town3Cleared) n++;
   return n;
 }
+function getCompanionLevel(){
+  // 強みの数に応じてレベル算出
+  const others = state.progress.strengthsFromOthers.filter(s=>s).length;
+  const town2 = state.progress.town2NpcStrengths.flat().filter(s=>s).length;
+  const additional = (state.progress.additionalStrengths || []).length;
+  const ijouchi = state.progress.town3IjouchiStatement ? 5 : 0;
+  return Math.floor((others + town2 + additional * 2 + ijouchi) / 2) + 1;
+}
 function setMsg(t){
   document.getElementById('msgText').innerHTML = t.replace(/\n/g, '<br>') + ' <span class="cursor-tri">▼</span>';
 }
@@ -795,6 +805,21 @@ function move(dx, dy){
   }
   renderHero();
   showNearbyHint();
+}
+
+// 長押し継続移動（スマホ対応）
+let _moveInterval = null;
+function startMove(dx, dy){
+  if(currentModal) return;
+  move(dx, dy);
+  if(_moveInterval) clearInterval(_moveInterval);
+  _moveInterval = setInterval(()=>{
+    if(currentModal){ stopMove(); return; }
+    move(dx, dy);
+  }, 170);
+}
+function stopMove(){
+  if(_moveInterval){ clearInterval(_moveInterval); _moveInterval = null; }
 }
 function showNearbyHint(){
   const adj = nearbyFacility();
@@ -851,8 +876,9 @@ function action(){
     strength: () => openStrengthHouse(f.id),
     exit: () => openExit(f.to),
     npc: () => {
-      // 街2のNPCはドアとして扱い、家に入る
       if(state.currentTown === 'town2'){ enterIndoor(`${f.id}_house`); }
+      else if(state.currentTown === 'town3'){ openSage(f); }
+      else if(state.currentTown === 'town4'){ openRival(f); }
       else { openTownNpc(f); }
     },
     town2_npc_indoor: () => {
@@ -1147,13 +1173,17 @@ function openTownNpc(npc){
   if(state.currentTown !== 'town2' || typeof TOWN2 === 'undefined') return;
   const idx = TOWN2.npcs.findIndex(n => n.id === npc.id);
   const collected = state.progress.town2NpcStrengths[idx];
+  const additionalCount = (state.progress.additionalStrengths || []).length;
   if(collected && collected.length >= 2){
     showModal(`
       <h2>💬 ${escapeHtml(npc.name)}</h2>
       <p>${escapeHtml(npc.followUp || 'またね！')}</p>
-      <p class="em">あなたから聞いた強み：</p>
+      <p class="em">前にもらった強み：</p>
       <p class="pink">・${collected.map(escapeHtml).join('<br>・')}</p>
-      <div class="modal-actions"><button class="btn" onclick="closeModal()">わかれる</button></div>
+      <hr style="border:none;border-top:1px dashed #3a3a4a;margin:14px 0">
+      <p class="mind" style="font-size:11.5px;line-height:1.85">★ 他の人から褒められたこと、思い出したらいつでも教えて。<br>　ひとつ伝えるごとに、あなたの相棒が強くなる。</p>
+      <p style="font-size:10px;color:var(--gold)">★ 追加で集めた強み：${additionalCount}個</p>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">またね</button><button class="btn primary" onclick='openAdditionalStrengthDialog(${JSON.stringify(npc.id)},${JSON.stringify(npc.name)})'>✨ 強みを伝える</button></div>
     `); return;
   }
   showModal(`
@@ -1162,6 +1192,44 @@ function openTownNpc(npc){
     ${(npc.dialog || []).map(d => `<p>${escapeHtml(d)}</p>`).join('')}
     <div class="modal-actions"><button class="btn primary" onclick='receiveTown2Strengths(${JSON.stringify(npc.id)})'>強みを 聞く</button></div>
   `);
+}
+
+// 街2NPCに「他の人から褒められたこと」を伝えて強み追加
+function openAdditionalStrengthDialog(npcId, npcName){
+  showModal(`
+    <h2>💎 強みを伝える</h2>
+    <div class="sub">— SHARE A NEW STRENGTH —</div>
+    <p>${escapeHtml(npcName)}：「他にも 褒められたこと あるの？<br>　ぜんぶ 教えて。」</p>
+    <textarea class="modal-input modal-textarea" id="addStrInput" placeholder="例：「同僚から『細かい気配りがすごい』と言われた」「お母さんに『粘り強さは天才的』と褒められた」"></textarea>
+    <p style="font-size:10px;color:var(--mind);margin-top:6px">★ 強みを1つ伝えるごとに、相棒のレベルが上がる。</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">あとで</button>
+      <button class="btn primary" onclick='saveAdditionalStrength(${JSON.stringify(npcId)},${JSON.stringify(npcName)})'>伝える</button>
+    </div>
+  `);
+  setTimeout(()=>{ const el = document.getElementById('addStrInput'); if(el) el.focus(); }, 100);
+}
+function saveAdditionalStrength(npcId, npcName){
+  const v = document.getElementById('addStrInput').value.trim();
+  if(!v){ alert('1文字以上書いてね'); return; }
+  if(!state.progress.additionalStrengths) state.progress.additionalStrengths = [];
+  state.progress.additionalStrengths.push({ text:v, fromNpc:npcName, savedAt:'' });
+  saveState(); renderStatus(); closeModal();
+  const count = state.progress.additionalStrengths.length;
+  setTimeout(()=>{
+    showModal(`
+      <h2>✨ 強み +1！</h2>
+      <div class="sub">— STRENGTH ACQUIRED —</div>
+      <p class="pink">「${escapeHtml(v)}」</p>
+      <p>${escapeHtml(npcName)}：「それは すごい強み！ あなたが あなたで居ていい 理由のひとつだね。」</p>
+      <p class="em">★ 追加強みコレクション：${count}個</p>
+      <p style="color:var(--gold);font-size:14px">★ あなたの相棒が <span class="em">レベルアップ！</span></p>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal()">わかった</button>
+        <button class="btn primary" onclick='closeModal();setTimeout(function(){openAdditionalStrengthDialog(${JSON.stringify(npcId)},${JSON.stringify(npcName)})},150)'>もう一つ 伝える</button>
+      </div>
+    `);
+  }, 100);
 }
 function receiveTown2Strengths(npcId){
   const idx = TOWN2.npcs.findIndex(n => n.id === npcId);
@@ -1440,14 +1508,17 @@ function openMenu(){
   `);
 }
 function openCompanionMenu(){
+  const lv = getCompanionLevel();
   showModal(`
     <h2>🐾 自分の相棒</h2>
-    <div class="sub">— COMPANION —</div>
+    <div class="sub">— COMPANION ・ Lv.${lv} —</div>
     <div class="role-card">
       <div class="you-are">YOU ARE</div>
       ${state.mbti ? `<div class="mbti">${state.mbti}</div><div class="role-name">${state.role}</div>` : '<div class="role-name">未診断（旅人）</div>'}
       ${state.animal ? `<div class="animal">${ANIMAL_SVG[state.animal]}</div>` : `<div class="animal">${ANIMAL_SVG.tamago}</div>`}
       ${state.mbti ? `<div class="desc">${ROLE_DESCS[state.mbti] || ''}</div>` : '<div class="desc">MBTIの館で診断を受けて、相棒を見つけよう。</div>'}
+      <p style="color:var(--gold);font-size:14px;margin-top:14px;letter-spacing:0.15em">★ レベル ${lv}</p>
+      <p style="color:var(--mind);font-size:10.5px;line-height:1.85;letter-spacing:0.06em">強みを集めるほど 相棒が強くなる<br>街2の住人に「他から褒められたこと」を伝えてレベルアップ！</p>
     </div>
     <div class="modal-actions"><button class="btn" onclick="closeModal();setTimeout(openMenu,100)">← メニューへ</button></div>
   `);
@@ -1455,15 +1526,19 @@ function openCompanionMenu(){
 function openStrengthsMenu(){
   const others = state.progress.strengthsFromOthers.filter(s=>s);
   const town2 = state.progress.town2NpcStrengths.flat().filter(s=>s);
+  const additional = state.progress.additionalStrengths || [];
   const ijouchi = state.progress.town3IjouchiStatement;
   const myAns = state.progress.myStrengthAnswer;
+  const lv = getCompanionLevel();
   showModal(`
     <h2>💎 強み一覧</h2>
-    <div class="sub">— STRENGTHS —</div>
+    <div class="sub">— STRENGTHS — 相棒Lv.${lv} —</div>
     <p class="em">🏘 街1：他者からの強み (${others.length}/5)</p>
     ${others.length ? `<ul style="padding-left:20px;margin-bottom:14px;line-height:1.85">${others.map(s=>`<li class="pink">${escapeHtml(s)}</li>`).join('')}</ul>` : '<p class="mind" style="margin-bottom:14px">　まだ集めていない</p>'}
     <p class="em">⚔ 街2：3人からの強み (${town2.length}/6)</p>
     ${town2.length ? `<ul style="padding-left:20px;margin-bottom:14px;line-height:1.85">${town2.map(s=>`<li class="pink">${escapeHtml(s)}</li>`).join('')}</ul>` : '<p class="mind" style="margin-bottom:14px">　まだ集めていない</p>'}
+    <p class="em">✨ 追加で集めた強み (${additional.length}個)</p>
+    ${additional.length ? `<ul style="padding-left:20px;margin-bottom:14px;line-height:1.85">${additional.map(s=>`<li class="pink">${escapeHtml(s.text||s)}${s.fromNpc?` <span style="color:var(--mind);font-size:10px">（${escapeHtml(s.fromNpc)}に伝えた）</span>`:''}</li>`).join('')}</ul>` : '<p class="mind" style="margin-bottom:14px">　街2の住人（かなみ・ひかる・えり）に話せば いつでも追加できる</p>'}
     ${myAns ? `<p class="em">👑 ジム戦の答え</p><p class="pink" style="margin-bottom:14px;padding-left:14px">${escapeHtml(myAns)}</p>` : ''}
     ${ijouchi ? `<div class="synth-result"><div class="label">— あなたの異常値 —</div><div class="statement">${escapeHtml(ijouchi)}</div></div>` : ''}
     <div class="modal-actions"><button class="btn" onclick="closeModal();setTimeout(openMenu,100)">← メニューへ</button></div>
