@@ -976,13 +976,17 @@ const ANIMAL_SVG = {
 
 // quest.htmlのlocalStorageからMBTIを読み取る
 function getMBTIFromQuest(){
-  const questKey = 're_alize_quest_' + userKey;
-  const raw = localStorage.getItem(questKey);
+  // quest_v2 を優先、なければ旧 quest
+  const v2 = localStorage.getItem('re_alize_quest_v2_' + userKey);
+  if(v2){ try { const d = JSON.parse(v2); if(d.mbti) return d.mbti; } catch(e){} }
+  const v1 = localStorage.getItem('re_alize_quest_' + userKey);
+  if(v1){ try { const d = JSON.parse(v1); return d.mbti || null; } catch(e){} }
+  return null;
+}
+function getQuestV2Data(){
+  const raw = localStorage.getItem('re_alize_quest_v2_' + userKey);
   if(!raw) return null;
-  try {
-    const d = JSON.parse(raw);
-    return d.mbti || null;
-  } catch(e){ return null; }
+  try { return JSON.parse(raw); } catch(e){ return null; }
 }
 
 const MOOD_SUCCESS = {

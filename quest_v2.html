@@ -294,9 +294,9 @@ svg{image-rendering:pixelated}
 </div>
 
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624b"></script>
-<script src="town3_data.js?v=20260624b"></script>
-<script src="town4_data.js?v=20260624b"></script>
+<script src="town2_data.js?v=20260624c"></script>
+<script src="town3_data.js?v=20260624c"></script>
+<script src="town4_data.js?v=20260624c"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -348,7 +348,7 @@ const ROLE_DESCS = {
 // タイル: 10=床, 11=壁, 12=本棚, 13=机, 14=卵スタンド, 15=玄関ドア, 16=絨毯, 17=書類束, 18=植物, 19=モニター
 const INDOORS = {
   professor_lab: {
-    name: "オーキド博士の研究所",
+    name: "しみず博士の研究所",
     description: "卵を授ける場所",
     isIndoor: true,
     map: [
@@ -375,8 +375,120 @@ const INDOORS = {
       '10,11': { type: 'indoor_exit' }
     },
     labels: [
-      { x: 8, y: 5, text: '🧑‍🔬 博士' },
+      { x: 8, y: 5, text: '🧑‍🔬 しみず博士' },
       { x: 9, y: 10, text: '↓ 出口' }
+    ]
+  },
+  // 街2のNPC家（3軒・共通レイアウト）
+  npc1_house: {
+    name: "アカリさんの家",
+    isIndoor: true,
+    map: [
+      [11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11],
+      [11,12,12,11,11,18,11,11,11,11,11,11,11,11,18,11,13,13,13,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,16,16,16,16,16,16,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,16,16,16,16,16,16,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,11,11,11,11,11,11,11,11,15,15,11,11,11,11,11,11,11,11,11]
+    ],
+    spawnPos: { x: 9, y: 10 },
+    facilities: {
+      '9,5':  { type: 'town2_npc_indoor', npcId: 'npc1' },
+      '10,5': { type: 'town2_npc_indoor', npcId: 'npc1' },
+      '9,11': { type: 'indoor_exit' },
+      '10,11':{ type: 'indoor_exit' }
+    },
+    labels: [{ x:9, y:10, text:'↓ 出口' }]
+  },
+  npc2_house: {
+    name: "ミドリさんの家",
+    isIndoor: true,
+    map: [
+      [11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11],
+      [11,13,13,11,18,11,11,11,11,11,11,11,11,11,18,11,12,12,12,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,16,16,16,16,16,16,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,16,16,16,16,16,16,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,11,11,11,11,11,11,11,11,15,15,11,11,11,11,11,11,11,11,11]
+    ],
+    spawnPos: { x: 9, y: 10 },
+    facilities: {
+      '9,5':  { type: 'town2_npc_indoor', npcId: 'npc2' },
+      '10,5': { type: 'town2_npc_indoor', npcId: 'npc2' },
+      '9,11': { type: 'indoor_exit' },
+      '10,11':{ type: 'indoor_exit' }
+    },
+    labels: [{ x:9, y:10, text:'↓ 出口' }]
+  },
+  npc3_house: {
+    name: "ハナさんの家",
+    isIndoor: true,
+    map: [
+      [11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11],
+      [11,12,12,11,18,11,11,11,11,11,11,11,11,11,18,11,18,12,12,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,16,16,16,16,16,16,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,16,16,16,16,16,16,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,11,11,11,11,11,11,11,11,15,15,11,11,11,11,11,11,11,11,11]
+    ],
+    spawnPos: { x: 9, y: 10 },
+    facilities: {
+      '9,5':  { type: 'town2_npc_indoor', npcId: 'npc3' },
+      '10,5': { type: 'town2_npc_indoor', npcId: 'npc3' },
+      '9,11': { type: 'indoor_exit' },
+      '10,11':{ type: 'indoor_exit' }
+    },
+    labels: [{ x:9, y:10, text:'↓ 出口' }]
+  },
+  // 街2のジム内部（トレーナー手前 → ジムリーダー奥）
+  town2_gym: {
+    name: "強み発掘ジム",
+    isIndoor: true,
+    map: [
+      [11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11],
+      [11,11,12,12,12,11,11,11,11,11,11,11,11,11,11,11,12,12,11,11],
+      [11,16,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,16,11],
+      [11,16,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,16,11],
+      [11,16,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,16,11],
+      [11,11,11,10,10,10,10,11,11,11,11,11,11,10,10,10,10,11,11,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,11,11,11,11,11,11,11,11,15,15,11,11,11,11,11,11,11,11,11]
+    ],
+    spawnPos: { x: 9, y: 10 },
+    facilities: {
+      '9,8':  { type: 'gym_trainer_indoor' },
+      '10,8': { type: 'gym_trainer_indoor' },
+      '9,3':  { type: 'gym_leader_indoor' },
+      '10,3': { type: 'gym_leader_indoor' },
+      '9,11': { type: 'indoor_exit' },
+      '10,11':{ type: 'indoor_exit' }
+    },
+    labels: [
+      { x:8, y:7, text:'⚔ トレーナー' },
+      { x:8, y:2, text:'👑 リーダー' },
+      { x:9, y:10, text:'↓ 出口' }
     ]
   }
 };
@@ -504,6 +616,29 @@ function saveState(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
 
 // SVG
 function heroSVG(){return `<svg class="hero-body" viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="5" y="1" width="6" height="1" fill="#f78ac0"/><rect x="4" y="2" width="8" height="2" fill="#f78ac0"/><rect x="4" y="4" width="2" height="1" fill="#c45a8e"/><rect x="10" y="4" width="2" height="1" fill="#c45a8e"/><rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/><rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="6" width="2" height="1" fill="#e63d6a"/><rect x="4" y="5" width="1" height="3" fill="#f78ac0"/><rect x="10" y="5" width="1" height="3" fill="#f78ac0"/><rect x="5" y="7" width="5" height="5" fill="#e63d6a"/><rect x="4" y="8" width="1" height="3" fill="#e63d6a"/><rect x="10" y="8" width="1" height="3" fill="#e63d6a"/><rect x="5" y="9" width="5" height="1" fill="#ffd644"/><rect x="5" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="8" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="5" y="14" width="2" height="1" fill="#0e0e1a"/><rect x="8" y="14" width="2" height="1" fill="#0e0e1a"/></svg>`;}
+
+// しみず博士（白衣＋眼鏡）
+function professorSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="4" y="1" width="8" height="2" fill="#2a1a0a"/><rect x="3" y="2" width="10" height="1" fill="#2a1a0a"/><rect x="5" y="3" width="6" height="3" fill="#fcd1a3"/><rect x="4" y="4" width="1" height="2" fill="#fcd1a3"/><rect x="11" y="4" width="1" height="2" fill="#fcd1a3"/><rect x="4" y="5" width="3" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="3" height="1" fill="#0e0e1a"/><rect x="5" y="5" width="1" height="1" fill="#fff"/><rect x="10" y="5" width="1" height="1" fill="#fff"/><rect x="7" y="6" width="2" height="1" fill="#e8b893"/><rect x="6" y="7" width="4" height="1" fill="#5a1a1a"/><rect x="4" y="8" width="8" height="4" fill="#fff"/><rect x="3" y="9" width="1" height="3" fill="#fff"/><rect x="12" y="9" width="1" height="3" fill="#fff"/><rect x="7" y="8" width="2" height="3" fill="#3a76d6"/><rect x="7" y="9" width="2" height="1" fill="#a02448"/><rect x="5" y="10" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="10" width="1" height="1" fill="#0e0e1a"/><rect x="11" y="10" width="2" height="1" fill="#ffd644"/><rect x="5" y="12" width="2" height="2" fill="#3a3a3a"/><rect x="8" y="12" width="2" height="2" fill="#3a3a3a"/><rect x="5" y="14" width="2" height="1" fill="#1a1a1a"/><rect x="8" y="14" width="2" height="1" fill="#1a1a1a"/></svg>`;}
+
+// 街2 NPC アバター（主人公と同じ立体感、色違い）
+function npcAvatarSVG(npcId){
+  const palettes = {
+    npc1: { hair:'#a87132', hairD:'#6a4a1f', dress:'#3a76d6', dressD:'#1e4f9a', belt:'#ffd644' },  // 茶髪・青ドレス
+    npc2: { hair:'#7a4a8a', hairD:'#4a2a5a', dress:'#5fbb5f', dressD:'#3a8a3a', belt:'#fff' },     // 紫髪・緑ドレス
+    npc3: { hair:'#fcd5e6', hairD:'#f6a0c4', dress:'#a02448', dressD:'#7a1a3a', belt:'#ffd644' }   // 桜髪・赤ドレス
+  };
+  const p = palettes[npcId] || palettes.npc1;
+  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="5" y="1" width="6" height="1" fill="${p.hair}"/><rect x="4" y="2" width="8" height="2" fill="${p.hair}"/><rect x="4" y="4" width="2" height="1" fill="${p.hairD}"/><rect x="10" y="4" width="2" height="1" fill="${p.hairD}"/><rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/><rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="6" width="2" height="1" fill="#e63d6a"/><rect x="4" y="5" width="1" height="3" fill="${p.hair}"/><rect x="10" y="5" width="1" height="3" fill="${p.hair}"/><rect x="5" y="7" width="5" height="5" fill="${p.dress}"/><rect x="4" y="8" width="1" height="3" fill="${p.dress}"/><rect x="10" y="8" width="1" height="3" fill="${p.dress}"/><rect x="5" y="9" width="5" height="1" fill="${p.belt}"/><rect x="5" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="8" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="5" y="14" width="2" height="1" fill="#0e0e1a"/><rect x="8" y="14" width="2" height="1" fill="#0e0e1a"/></svg>`;
+}
+
+// ジムリーダー（紫髪ツインテール）
+function gymLeaderAvatarSVG(){
+  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="2" width="2" height="6" fill="#7a4a8a"/><rect x="11" y="2" width="2" height="6" fill="#7a4a8a"/><rect x="2" y="6" width="2" height="4" fill="#7a4a8a"/><rect x="12" y="6" width="2" height="4" fill="#7a4a8a"/><rect x="5" y="1" width="6" height="1" fill="#7a4a8a"/><rect x="4" y="2" width="8" height="2" fill="#7a4a8a"/><rect x="4" y="4" width="2" height="1" fill="#4a2a5a"/><rect x="10" y="4" width="2" height="1" fill="#4a2a5a"/><rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/><rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="6" width="2" height="1" fill="#e63d6a"/><rect x="5" y="7" width="5" height="5" fill="#a02448"/><rect x="4" y="8" width="1" height="3" fill="#a02448"/><rect x="10" y="8" width="1" height="3" fill="#a02448"/><rect x="5" y="9" width="5" height="1" fill="#ffd644"/><rect x="7" y="11" width="2" height="1" fill="#ffd644"/><rect x="5" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="8" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="5" y="14" width="2" height="1" fill="#0e0e1a"/><rect x="8" y="14" width="2" height="1" fill="#0e0e1a"/></svg>`;
+}
+// ジムトレーナー（金髪ポニーテール）
+function gymTrainerAvatarSVG(){
+  return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="11" y="3" width="2" height="6" fill="#ffd644"/><rect x="12" y="2" width="2" height="2" fill="#ffd644"/><rect x="5" y="1" width="6" height="1" fill="#ffd644"/><rect x="4" y="2" width="8" height="2" fill="#ffd644"/><rect x="4" y="4" width="2" height="1" fill="#c89a1a"/><rect x="10" y="4" width="2" height="1" fill="#c89a1a"/><rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/><rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="6" width="2" height="1" fill="#e63d6a"/><rect x="4" y="5" width="1" height="3" fill="#ffd644"/><rect x="10" y="5" width="1" height="3" fill="#ffd644"/><rect x="5" y="7" width="5" height="5" fill="#3a76d6"/><rect x="4" y="8" width="1" height="3" fill="#3a76d6"/><rect x="10" y="8" width="1" height="3" fill="#3a76d6"/><rect x="5" y="9" width="5" height="1" fill="#fff"/><rect x="5" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="8" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="5" y="14" width="2" height="1" fill="#0e0e1a"/><rect x="8" y="14" width="2" height="1" fill="#0e0e1a"/></svg>`;
+}
 function houseSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="6" width="12" height="8" fill="#fcd5a3"/><rect x="1" y="5" width="14" height="2" fill="#a02448"/><rect x="0" y="4" width="16" height="1" fill="#7a1a3a"/><rect x="3" y="3" width="10" height="2" fill="#a02448"/><rect x="7" y="9" width="2" height="5" fill="#6a3010"/><rect x="4" y="8" width="2" height="2" fill="#7ac8ff"/><rect x="10" y="8" width="2" height="2" fill="#7ac8ff"/></svg>`;}
 function professorHouseSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="6" width="12" height="8" fill="#d8c8ee"/><rect x="1" y="5" width="14" height="2" fill="#4a2a5a"/><rect x="0" y="4" width="16" height="1" fill="#2a1a3a"/><rect x="3" y="3" width="10" height="2" fill="#4a2a5a"/><rect x="7" y="8" width="2" height="6" fill="#2a1a3a"/><rect x="4" y="8" width="2" height="2" fill="#ffd644"/><rect x="10" y="8" width="2" height="2" fill="#ffd644"/><rect x="6" y="9" width="4" height="1" fill="#fff"/></svg>`;}
 function towerSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="6" y="1" width="4" height="1" fill="#a02448"/><rect x="5" y="2" width="6" height="2" fill="#a02448"/><rect x="4" y="4" width="8" height="2" fill="#7a4a8a"/><rect x="3" y="6" width="10" height="8" fill="#7a4a8a"/><rect x="7" y="8" width="2" height="3" fill="#0e0e1a"/><rect x="6" y="10" width="1" height="1" fill="#ffd644"/><rect x="9" y="10" width="1" height="1" fill="#ffd644"/></svg>`;}
@@ -582,6 +717,27 @@ function renderStage(){
     lb.textContent = l.text;
     stage.appendChild(lb);
   });
+  // 屋内 NPC/博士/トレーナー アバターを描画
+  const drawn = new Set();
+  Object.entries(space.facilities || {}).forEach(([key, f]) => {
+    let avatarSvg = null;
+    let avatarKey = null;
+    if(f.type === 'professor_indoor'){ avatarSvg = professorSVG(); avatarKey = 'prof'; }
+    else if(f.type === 'town2_npc_indoor'){ avatarSvg = npcAvatarSVG(f.npcId); avatarKey = f.npcId; }
+    else if(f.type === 'gym_trainer_indoor'){ avatarSvg = gymTrainerAvatarSVG(); avatarKey = 'gtr'; }
+    else if(f.type === 'gym_leader_indoor'){ avatarSvg = gymLeaderAvatarSVG(); avatarKey = 'gld'; }
+    if(avatarSvg && !drawn.has(avatarKey)){
+      drawn.add(avatarKey);
+      const [fx, fy] = key.split(',').map(Number);
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.style.left = (fx * 5) + '%';
+      tile.style.top = (fy * (100/ROWS)) + '%';
+      tile.style.zIndex = 5;
+      tile.innerHTML = avatarSvg;
+      stage.appendChild(tile);
+    }
+  });
 }
 function renderHero(){
   const h = document.getElementById('hero');
@@ -644,7 +800,7 @@ function showNearbyHint(){
   const adj = nearbyFacility();
   if(!adj){ setMsg('▼ 探索中…'); return; }
   const labels = {
-    professor:'🧑‍🔬 博士の家', professor_door:'🚪 研究所の入口', professor_indoor:'🧑‍🔬 オーキド博士',
+    professor:'🧑‍🔬 博士の家', professor_door:'🚪 研究所の入口', professor_indoor:'🧑‍🔬 しみず博士',
     egg_pedestal:'🥚 たまごスタンド', indoor_exit:'🚪 玄関（外へ）',
     mbti_hall:'🏰 MBTIの館', strength:'👥 町人の家',
     exit:'🚪 街の出口', npc:'💬 ' + (adj.f.name || '町人'),
@@ -694,8 +850,18 @@ function action(){
     mbti_hall: openMbtiHall,
     strength: () => openStrengthHouse(f.id),
     exit: () => openExit(f.to),
-    npc: () => openTownNpc(f),
-    gym_door: () => openGymDoor(f.gym),
+    npc: () => {
+      // 街2のNPCはドアとして扱い、家に入る
+      if(state.currentTown === 'town2'){ enterIndoor(`${f.id}_house`); }
+      else { openTownNpc(f); }
+    },
+    town2_npc_indoor: () => {
+      const npc = TOWN2.npcs.find(n => n.id === f.npcId);
+      if(npc) openTownNpc(npc);
+    },
+    gym_door: () => enterIndoor('town2_gym'),
+    gym_trainer_indoor: () => openGymDoor(TOWN2.gym),
+    gym_leader_indoor: () => openGymLeader(TOWN2.gym),
     gym_leader: () => openGymLeader(f.gym),
     sage: () => openSage(f),
     synthesizer: () => openSynthesizer(f),
@@ -758,9 +924,9 @@ function openProfessor(){
   state.progress.professorMet = true; saveState(); renderStatus();
   if(!state.progress.eggReceived){
     showModal(`
-      <h2>🧑‍🔬 オーキド博士の家</h2>
+      <h2>🧑‍🔬 しみず博士の家</h2>
       <div class="sub">— PROFESSOR —</div>
-      <p>博士：「おお、${escapeHtml(state.name)}さん！ 待っていたぞ。」</p>
+      <p>しみず博士：「おお、${escapeHtml(state.name)}さん！ 待っていたぞ。」</p>
       <p>「キミにはこれから 自分自身の <span class="em">異常値</span> ―― 誰にも負けない強みを 見つける旅に出てもらう。」</p>
       <p>「まずはこの <span class="pink">不思議なたまご</span> を 受け取ってほしい。」</p>
       <div style="text-align:center;margin:14px 0">
@@ -772,23 +938,23 @@ function openProfessor(){
   }
   if(!state.progress.hatched){
     showModal(`
-      <h2>🧑‍🔬 博士</h2>
-      <p>博士：「たまごは持ったか。北の <span class="em">MBTIの館</span> で診断を受けてくるんじゃ。」</p>
+      <h2>🧑‍🔬 しみず博士</h2>
+      <p>しみず博士：「たまごは持ったか。北の <span class="em">MBTIの館</span> で診断を受けてくるんじゃ。」</p>
       <div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>
     `); return;
   }
   const others = state.progress.strengthsFromOthers.filter(s=>s).length;
   if(others < 5){
     showModal(`
-      <h2>🧑‍🔬 博士</h2>
-      <p>博士：「たまごが ${escapeHtml(ANIMAL_NAME[state.animal])} に孵ったか！素晴らしい。」</p>
+      <h2>🧑‍🔬 しみず博士</h2>
+      <p>しみず博士：「たまごが ${escapeHtml(ANIMAL_NAME[state.animal])} に孵ったか！素晴らしい。」</p>
       <p>「あとは <span class="em">5人の町人</span> から強みを聞き出すこと。現在 ${others}/5。」</p>
       <div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>
     `);
   } else {
     showModal(`
-      <h2>🧑‍🔬 博士</h2>
-      <p>博士：「素晴らしい！ 5人の声を集めたな。<br>南の <span class="em">街2への出口</span> から、次の街へ向かいなさい。」</p>
+      <h2>🧑‍🔬 しみず博士</h2>
+      <p>しみず博士：「素晴らしい！ 5人の声を集めたな。<br>南の <span class="em">街2への出口</span> から、次の街へ向かいなさい。」</p>
       <div class="modal-actions"><button class="btn primary" onclick="closeModal()">出発する</button></div>
     `);
   }
@@ -813,7 +979,7 @@ function receiveEgg(){
         <span class="egg-sparkle" style="bottom:20px;right:20%;animation-delay:0.9s">✧</span>
         <p style="color:var(--gold);font-size:14px;letter-spacing:0.1em;margin-top:14px">不思議な たまごを 受け取った！</p>
       </div>
-      <p>博士：「キミの 性格次第で、中身が変わる…」</p>
+      <p>しみず博士：「キミの 性格次第で、中身が変わる…」</p>
       <p>「研究所を出て、北の <span class="em">MBTIの館</span> で診断を受けに行きなさい。」</p>
       <div class="modal-actions">
         <button class="btn primary" onclick="closeModal()">わかった！</button>
@@ -1258,19 +1424,63 @@ function openExchange(ex){
 
 function openMenu(){
   if(currentModal) return;
-  const t = currentTownData();
   showModal(`
     <h2>📜 メニュー</h2>
+    <div class="sub">— MENU —</div>
+    <div class="choice-list">
+      <button class="choice" onclick="closeModal();setTimeout(openCompanionMenu,100)"><span class="head">🐾 A</span>自分の相棒</button>
+      <button class="choice" onclick="closeModal();setTimeout(openStrengthsMenu,100)"><span class="head">💎 B</span>強み一覧</button>
+      <button class="choice" onclick="closeModal();setTimeout(openReportMenu,100)"><span class="head">📊 C</span>レポート</button>
+      <button class="choice" onclick="closeModal();setTimeout(openWarp,100)"><span class="head">🚀 D</span>街ワープ</button>
+    </div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">とじる</button><button class="btn danger" onclick="resetAll()">リセット</button></div>
+  `);
+}
+function openCompanionMenu(){
+  showModal(`
+    <h2>🐾 自分の相棒</h2>
+    <div class="sub">— COMPANION —</div>
     <div class="role-card">
       <div class="you-are">YOU ARE</div>
       ${state.mbti ? `<div class="mbti">${state.mbti}</div><div class="role-name">${state.role}</div>` : '<div class="role-name">未診断（旅人）</div>'}
-      ${state.animal ? `<div class="animal">${ANIMAL_SVG[state.animal]}</div>` : ''}
+      ${state.animal ? `<div class="animal">${ANIMAL_SVG[state.animal]}</div>` : `<div class="animal">${ANIMAL_SVG.tamago}</div>`}
+      ${state.mbti ? `<div class="desc">${ROLE_DESCS[state.mbti] || ''}</div>` : '<div class="desc">MBTIの館で診断を受けて、相棒を見つけよう。</div>'}
     </div>
-    <p>★ 現在地：${t.name}</p>
-    <p>★ 進行度：${computeProgressNum()} / 10</p>
-    <p>★ 街1 ${state.progress.town1Cleared ? '◯' : '進行中'} ／ 街2 ${state.progress.town2GymCleared ? '◯' : '×'} ／ 街3 ${state.progress.town3Cleared ? '◯' : '×'}</p>
-    ${state.progress.town3IjouchiStatement ? `<div class="synth-result"><div class="label">— あなたの異常値 —</div><div class="statement" style="font-size:13px">${escapeHtml(state.progress.town3IjouchiStatement)}</div></div>` : ''}
-    <div class="modal-actions"><button class="btn" onclick="closeModal()">とじる</button><button class="btn" onclick="closeModal();openWarp()">🚀 ワープ</button><button class="btn danger" onclick="resetAll()">全リセット</button></div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal();setTimeout(openMenu,100)">← メニューへ</button></div>
+  `);
+}
+function openStrengthsMenu(){
+  const others = state.progress.strengthsFromOthers.filter(s=>s);
+  const town2 = state.progress.town2NpcStrengths.flat().filter(s=>s);
+  const ijouchi = state.progress.town3IjouchiStatement;
+  const myAns = state.progress.myStrengthAnswer;
+  showModal(`
+    <h2>💎 強み一覧</h2>
+    <div class="sub">— STRENGTHS —</div>
+    <p class="em">🏘 街1：他者からの強み (${others.length}/5)</p>
+    ${others.length ? `<ul style="padding-left:20px;margin-bottom:14px;line-height:1.85">${others.map(s=>`<li class="pink">${escapeHtml(s)}</li>`).join('')}</ul>` : '<p class="mind" style="margin-bottom:14px">　まだ集めていない</p>'}
+    <p class="em">⚔ 街2：3人からの強み (${town2.length}/6)</p>
+    ${town2.length ? `<ul style="padding-left:20px;margin-bottom:14px;line-height:1.85">${town2.map(s=>`<li class="pink">${escapeHtml(s)}</li>`).join('')}</ul>` : '<p class="mind" style="margin-bottom:14px">　まだ集めていない</p>'}
+    ${myAns ? `<p class="em">👑 ジム戦の答え</p><p class="pink" style="margin-bottom:14px;padding-left:14px">${escapeHtml(myAns)}</p>` : ''}
+    ${ijouchi ? `<div class="synth-result"><div class="label">— あなたの異常値 —</div><div class="statement">${escapeHtml(ijouchi)}</div></div>` : ''}
+    <div class="modal-actions"><button class="btn" onclick="closeModal();setTimeout(openMenu,100)">← メニューへ</button></div>
+  `);
+}
+function openReportMenu(){
+  const url = 'dashboard.html?u=' + encodeURIComponent(userKey) + '&name=' + encodeURIComponent(state.name);
+  showModal(`
+    <h2>📊 レポート</h2>
+    <div class="sub">— REPORT —</div>
+    <p>★ 進行度：<span class="em">${computeProgressNum()} / 10</span></p>
+    <p>★ 街1：${state.progress.town1Cleared ? '<span class="em">◯ 完了</span>' : '進行中'}</p>
+    <p>★ 街2：${state.progress.town2GymCleared ? '<span class="em">◯ ジム制覇</span>' : (state.progress.town2GymOpen ? 'ジム挑戦可' : '探索中')}</p>
+    <p>★ 街3：${state.progress.town3Cleared ? '<span class="em">◯ 異常値発見</span>' : '未到達'}</p>
+    <p>★ 街4：${Object.keys(state.progress.rivalsBattled||{}).length}人と対戦</p>
+    <hr style="border:none;border-top:1px dashed #3a3a4a;margin:14px 0">
+    <p style="color:var(--mind);font-size:11px;line-height:1.85">★ <span class="em">Realize 本体サイト</span> で<br>　ミーの成長・週次OKR管理ができる：</p>
+    <p style="text-align:center;margin:10px 0"><a href="${url}" target="_blank" style="display:inline-block;background:var(--mind);color:var(--msg-bg);padding:8px 16px;text-decoration:none;font-weight:bold;letter-spacing:0.1em">▶ ダッシュボードを開く</a></p>
+    <p style="color:var(--mind);font-size:10px;letter-spacing:0.06em">→ MBTI診断・異常値・強みは<br>　自動的に本体サイトに反映されます。</p>
+    <div class="modal-actions"><button class="btn" onclick="closeModal();setTimeout(openMenu,100)">← メニューへ</button></div>
   `);
 }
 function resetAll(){
