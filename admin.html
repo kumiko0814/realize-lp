@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re:alize ｜ 管理者ボード</title>
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase_config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;--sub:#5a5a5a;--mute:#8b8278;
+  --bg:#fffaf6;--card:#fff;--line:#ece5d8;
+  --accent:#c25b3f;--leaf:#7a9070;--leaf-deep:#5a7050;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Yu Gothic","YuGothic",sans-serif;
+  background:var(--bg);color:var(--ink);
+  line-height:1.7;letter-spacing:0.04em;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;padding:32px 24px 64px}
+.head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 24px;background:#fff;border:1px solid var(--line);
+  border-radius:18px;margin-bottom:24px;
+}
+.logo{font-family:"Cormorant Garamond",serif;font-size:20px;letter-spacing:0.25em;color:var(--leaf-deep);font-weight:600}
+.tag{font-size:11px;color:var(--accent);letter-spacing:0.2em;background:#fdf2f4;padding:4px 12px;border-radius:999px}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px 28px;margin-bottom:18px}
+h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
+.sub{font-size:12px;color:var(--mute);margin-bottom:18px;line-height:1.85}
+
+.gen-row{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:14px;align-items:end}
+.gen-row label{display:block;font-size:11px;color:var(--mute);letter-spacing:0.15em;margin-bottom:6px}
+.gen-row input{
+  width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+  font-family:inherit;font-size:14px;outline:none;
+}
+.gen-row input:focus{border-color:var(--accent)}
+.btn{
+  background:var(--leaf-deep);color:#fff;border:none;padding:12px 24px;
+  font-family:inherit;font-size:13px;font-weight:600;letter-spacing:0.1em;
+  border-radius:10px;cursor:pointer;transition:all 0.25s;white-space:nowrap;
+}
+.btn:hover{background:var(--leaf);transform:translateY(-1px)}
+.btn.copy{background:var(--accent)}
+.btn.copy:hover{background:#a64626}
+
+.url-display{
+  background:#fdf6f3;border:1px solid #f0e5dc;border-radius:10px;
+  padding:14px 16px;font-family:"SF Mono","Menlo",monospace;
+  font-size:12px;word-break:break-all;color:var(--ink);margin:14px 0;
+}
+.tmpl-box{
+  background:#fdfaf6;border:1px solid var(--line);border-radius:10px;
+  padding:18px 20px;font-size:13px;line-height:1.95;
+  white-space:pre-wrap;font-family:"Yu Gothic",sans-serif;
+  color:var(--ink);margin:10px 0;letter-spacing:0.04em;
+}
+
+.member-list{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;
+}
+@media(max-width:720px){.member-list{grid-template-columns:1fr}}
+.member-row{
+  display:flex;justify-content:space-between;align-items:center;
+  background:#fdf6f3;border:1px solid #f0e5dc;border-radius:8px;
+  padding:10px 14px;font-size:12px;
+}
+.member-row .name{font-weight:600}
+.member-row .id{color:var(--mute);font-family:"SF Mono","Menlo",monospace;font-size:10px;letter-spacing:0.05em}
+
+.link-buttons{display:flex;gap:8px;align-items:center}
+.btn-mini{
+  background:#fff;border:1px solid var(--line);color:var(--ink);
+  font-family:inherit;font-size:10px;padding:4px 10px;
+  border-radius:6px;cursor:pointer;transition:all 0.2s;letter-spacing:0.06em;
+}
+.btn-mini:hover{border-color:var(--accent);color:var(--accent)}
+.btn-mini.copy{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-mini.copy:hover{background:#a64626}
+
+.section-divider{
+  height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);
+  margin:32px 0 20px;
+}
+
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--leaf-deep);color:#fff;padding:12px 24px;
+  border-radius:999px;font-size:13px;letter-spacing:0.1em;
+  box-shadow:0 8px 28px rgba(0,0,0,0.2);
+  opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:1000;
+}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="head">
+    <div class="logo">Re:alize</div>
+    <div class="tag">ADMIN BOARD</div>
+  </header>
+
+  <!-- ===== 新セクション：全員の進捗（Supabase連動） ===== -->
+  <section class="card" id="memberDashSection">
+    <h2 style="display:flex;justify-content:space-between;align-items:center">
+      <span>📊 全メンバーの進捗 <span style="color:var(--mute);font-size:12px;font-weight:400;font-family:'Cormorant Garamond',serif;font-style:italic" id="memberCount">— 読み込み中 —</span></span>
+      <button class="btn" onclick="loadMembers()" style="font-size:12px;padding:8px 16px">↻ 更新</button>
+    </h2>
+    <p class="sub">Supabaseに登録されている全参加者の進捗をリアルタイム表示。各カードをクリックで詳細表示。</p>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <label style="font-size:11px;color:var(--mute);letter-spacing:0.1em">並び替え：</label>
+      <select id="sortBy" onchange="renderMembers()" style="padding:6px 10px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:12px">
+        <option value="updated_at">最終更新（新しい順）</option>
+        <option value="achievement_rate">達成率（高い順）</option>
+        <option value="current_week">現在週（進んでいる順）</option>
+        <option value="name">名前順</option>
+      </select>
+      <label style="font-size:11px;color:var(--mute);letter-spacing:0.1em;margin-left:10px">絞り込み：</label>
+      <select id="filterMbti" onchange="renderMembers()" style="padding:6px 10px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:12px">
+        <option value="">全員</option>
+        <option value="diagnosed">MBTI診断済</option>
+        <option value="undiagnosed">未診断</option>
+        <option value="ijouchi">異常値発見済</option>
+      </select>
+      <button onclick="exportCSV()" style="padding:6px 12px;border:1px solid var(--line);background:transparent;border-radius:6px;font-family:inherit;font-size:12px;cursor:pointer;margin-left:auto">📥 CSVエクスポート</button>
+    </div>
+    <div id="memberDash">
+      <p style="text-align:center;padding:30px;color:var(--mute);font-size:12px">クラウドからデータ取得中…</p>
+    </div>
+  </section>
+
+  <!-- メンバー詳細モーダル -->
+  <div id="memberModalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeMemberModal()">
+    <div id="memberModal" style="background:#fff;border-radius:16px;padding:32px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.2)"></div>
+  </div>
+
+  <!-- URL GENERATOR -->
+  <section class="card">
+    <h2>① 個別URLジェネレーター</h2>
+    <p class="sub">参加者の名前（英字推奨）を入力すると、その人だけの専用URLとLINE送付テンプレが出ます。</p>
+
+    <div class="gen-row">
+      <div>
+        <label>参加者の英字ID（例：mizutani, saeki, kanami）</label>
+        <input id="userInput" placeholder="mizutani" oninput="updateUrl()"/>
+      </div>
+      <button class="btn" onclick="updateUrl()">URL生成</button>
+    </div>
+
+    <div>
+      <label style="font-size:11px;color:var(--mute);letter-spacing:0.15em;display:block;margin-bottom:6px">使い方説明ページ（最初に送る）</label>
+      <div class="url-display" id="welcomeUrl">—</div>
+    </div>
+    <div>
+      <label style="font-size:11px;color:var(--mute);letter-spacing:0.15em;display:block;margin-bottom:6px">マイページ（直接アクセスもOK）</label>
+      <div class="url-display" id="dashboardUrl">—</div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn copy" onclick="copyUrl('welcome')">使い方URLをコピー</button>
+      <button class="btn copy" onclick="copyUrl('dashboard')">マイページURLをコピー</button>
+    </div>
+  </section>
+
+  <!-- LINE TEMPLATE -->
+  <section class="card">
+    <h2>② LINE送付テンプレ（コピペでそのまま使える）</h2>
+    <p class="sub">参加者個別LINEに、このまま送ってください。URLは上のIDで自動で埋まります。</p>
+
+    <div class="tmpl-box" id="lineTmpl">参加者IDを入れると、ここにテンプレが出ます</div>
+    <button class="btn copy" onclick="copyTmpl()">テンプレをコピー</button>
+  </section>
+
+  <!-- MEMBER LIST -->
+  <section class="card">
+    <h2>③ 既存参加者リスト（3期メンバー）</h2>
+    <p class="sub">既存OKRシートの参加者一覧。各人のIDからURLを生成済み。</p>
+    <div class="member-list" id="memberList"></div>
+  </section>
+
+  <!-- TEST ACCOUNTS -->
+  <section class="card">
+    <h2>④ お試し用URL（くみこ・翔ちゃん用）</h2>
+    <p class="sub">テスト動作確認用。誰でも使えるサンプル。</p>
+    <div class="member-list">
+      <div class="member-row">
+        <div>
+          <div class="name">くみこ（テスト）</div>
+          <div class="id">u=kumiko-test</div>
+        </div>
+        <div class="link-buttons">
+          <button class="btn-mini" onclick="openUrl('kumiko-test','welcome')">説明</button>
+          <button class="btn-mini" onclick="openUrl('kumiko-test','dashboard')">開く</button>
+          <button class="btn-mini copy" onclick="copyMember('kumiko-test')">📋</button>
+        </div>
+      </div>
+      <div class="member-row">
+        <div>
+          <div class="name">翔ちゃん（テスト）</div>
+          <div class="id">u=sho-test</div>
+        </div>
+        <div class="link-buttons">
+          <button class="btn-mini" onclick="openUrl('sho-test','welcome')">説明</button>
+          <button class="btn-mini" onclick="openUrl('sho-test','dashboard')">開く</button>
+          <button class="btn-mini copy" onclick="copyMember('sho-test')">📋</button>
+        </div>
+      </div>
+      <div class="member-row">
+        <div>
+          <div class="name">ゲスト（誰でも）</div>
+          <div class="id">u=guest</div>
+        </div>
+        <div class="link-buttons">
+          <button class="btn-mini" onclick="openUrl('guest','welcome')">説明</button>
+          <button class="btn-mini" onclick="openUrl('guest','dashboard')">開く</button>
+          <button class="btn-mini copy" onclick="copyMember('guest')">📋</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- HELP -->
+  <section class="card">
+    <h2>テスト配布の進め方（推奨）</h2>
+    <ol style="padding-left:24px;font-size:13px;line-height:2;color:var(--sub)">
+      <li>まず <strong>「④ お試し用URL」</strong> で動作確認（くみこ＆翔ちゃんで触る）</li>
+      <li>気になる調整があれば、その場でフィードバック</li>
+      <li>OKなら <strong>「③ 既存参加者リスト」</strong> から数人にテスト配布（5〜10名くらい）</li>
+      <li>1週間で「使いやすい？」「迷った？」を回収</li>
+      <li>反応見て、本配布 or 追加機能（グラフ／カウントダウン）開発の判断</li>
+    </ol>
+  </section>
+
+</div>
+
+<div class="toast" id="toast">コピーしました ✓</div>
+
+<script>
+const BASE = location.origin + location.pathname.replace('distribute.html','');
+
+const MEMBERS = [
+  {name:'水谷萌', id:'mizutani'},
+  {name:'佐伯真由美', id:'saeki'},
+  {name:'宇野瞳（HITOMI）', id:'hitomi'},
+  {name:'堂佛聡子', id:'dobutsu'},
+  {name:'森恵子（もりけいこ）', id:'mori'},
+  {name:'大山可奈子（かなこ）', id:'oyama'},
+  {name:'小倉可奈未（Kanami）', id:'kanami'},
+  {name:'石川愛子（ちゅん太郎）', id:'chuntaro'},
+  {name:'福島Butt尚子', id:'fukushima'},
+  {name:'牧野優子', id:'makino'},
+  {name:'宮田佳菜子（kana）', id:'kana'},
+  {name:'北澤実果子（Kitazawa）', id:'kitazawa'},
+  {name:'岩田佳子', id:'iwata'},
+  {name:'湯浅郁子（いくさん）', id:'iku'},
+  {name:'石原あさみ', id:'ishihara'},
+  {name:'米本恵美子（のの）', id:'nono'},
+  {name:'原田惇子（はらだあつこ）', id:'harada'},
+  {name:'田原まり子', id:'tahara'},
+  {name:'上鶴清美（きよみ）', id:'kiyomi'},
+  {name:'園田泰葉', id:'sonoda'},
+  {name:'岡野潤子（JUNKO）', id:'junko'},
+  {name:'池田駿人', id:'ikeda'},
+  {name:'上田ひかる', id:'ueda'}
+];
+
+function buildUrl(slug, page){
+  if(!slug) return '';
+  return BASE + page + '.html?u=' + encodeURIComponent(slug);
+}
+
+function updateUrl(){
+  const slug = document.getElementById('userInput').value.trim();
+  if(!slug){
+    document.getElementById('welcomeUrl').textContent = '—';
+    document.getElementById('dashboardUrl').textContent = '—';
+    document.getElementById('lineTmpl').textContent = '参加者IDを入れると、ここにテンプレが出ます';
+    return;
+  }
+  const welcomeUrl = buildUrl(slug, 'welcome');
+  const dashboardUrl = buildUrl(slug, 'dashboard');
+  document.getElementById('welcomeUrl').textContent = welcomeUrl;
+  document.getElementById('dashboardUrl').textContent = dashboardUrl;
+  document.getElementById('lineTmpl').textContent =
+`〜さん、お疲れさまです🌿
+
+Re:alizeの目標管理サイト、テスト配布させてください！
+
+ミーというキャラクターが、毎週の進捗に応じて育っていきます。
+（達成率が低いと、おやじ化していくのでお気をつけて…！笑）
+
+🟢 まず使い方の説明はこちら
+${welcomeUrl}
+
+🟡 マイページ（毎週ここに進捗を入力）
+${dashboardUrl}
+
+最初に「目標を編集／設定する」から、ご自身の大目標とKRを入れてみてください。
+わからないことあれば気軽に教えてくださいね☺️`;
+}
+
+function copyUrl(type){
+  const slug = document.getElementById('userInput').value.trim();
+  if(!slug){ showToast('参加者IDを入れてください'); return; }
+  const url = type === 'welcome' ? buildUrl(slug,'welcome') : buildUrl(slug,'dashboard');
+  navigator.clipboard.writeText(url);
+  showToast('URLをコピーしました ✓');
+}
+
+function copyTmpl(){
+  const tmpl = document.getElementById('lineTmpl').textContent;
+  if(tmpl.startsWith('参加者ID')){ showToast('参加者IDを入れてください'); return; }
+  navigator.clipboard.writeText(tmpl);
+  showToast('LINEテンプレをコピーしました ✓');
+}
+
+function copyMember(slug){
+  navigator.clipboard.writeText(buildUrl(slug, 'welcome'));
+  showToast('使い方URLをコピーしました ✓');
+}
+
+function openUrl(slug, page){
+  window.open(buildUrl(slug, page), '_blank');
+}
+
+let toastTimer;
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toast.classList.remove('show'), 2000);
+}
+
+// Render member list
+const list = document.getElementById('memberList');
+MEMBERS.forEach(m => {
+  const row = document.createElement('div');
+  row.className = 'member-row';
+  row.innerHTML = `
+    <div>
+      <div class="name">${m.name}</div>
+      <div class="id">u=${m.id}</div>
+    </div>
+    <div class="link-buttons">
+      <button class="btn-mini" onclick="openUrl('${m.id}','welcome')">説明</button>
+      <button class="btn-mini" onclick="openUrl('${m.id}','dashboard')">開く</button>
+      <button class="btn-mini copy" onclick="copyMember('${m.id}')">📋</button>
+    </div>
+  `;
+  list.appendChild(row);
+});
+
+/* ===================================
+   全メンバー進捗ダッシュボード（Supabase）
+   =================================== */
+const ANIMAL_SVG_ADMIN = {
+  neko: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="1" height="1" fill="#c45a8e"/><rect x="2" y="2" width="2" height="1" fill="#c45a8e"/><rect x="2" y="3" width="3" height="1" fill="#f78ac0"/><rect x="13" y="1" width="1" height="1" fill="#c45a8e"/><rect x="12" y="2" width="2" height="1" fill="#c45a8e"/><rect x="11" y="3" width="3" height="1" fill="#f78ac0"/><rect x="2" y="4" width="12" height="6" fill="#f78ac0"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="1" fill="#e63d6a"/><rect x="3" y="10" width="10" height="3" fill="#f78ac0"/><rect x="3" y="13" width="2" height="2" fill="#f78ac0"/><rect x="6" y="13" width="2" height="2" fill="#f78ac0"/><rect x="11" y="13" width="2" height="2" fill="#f78ac0"/></svg>',
+  usagi: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="4" y="0" width="2" height="5" fill="#fff"/><rect x="10" y="0" width="2" height="5" fill="#fff"/><rect x="5" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="10" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="2" y="5" width="12" height="7" fill="#fff"/><rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#f6a0c4"/></svg>',
+  panda: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="8" fill="#fff"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/></svg>',
+  fukurou: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="2" y="3" width="12" height="9" fill="#a87132"/><rect x="4" y="5" width="3" height="3" fill="#fff"/><rect x="9" y="5" width="3" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#ffd644"/></svg>',
+  kitsune: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="3" height="3" fill="#e6814a"/><rect x="11" y="1" width="3" height="3" fill="#e6814a"/><rect x="2" y="4" width="12" height="6" fill="#e6814a"/><rect x="4" y="8" width="8" height="2" fill="#fff"/></svg>',
+  shibainu: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="2" width="2" height="3" fill="#c89455"/><rect x="11" y="2" width="2" height="3" fill="#c89455"/><rect x="2" y="4" width="12" height="7" fill="#c89455"/><rect x="4" y="8" width="8" height="3" fill="#fff"/></svg>',
+  risu: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="2" height="2" fill="#a87132"/><rect x="8" y="1" width="2" height="2" fill="#a87132"/><rect x="2" y="3" width="8" height="5" fill="#a87132"/><rect x="3" y="9" width="6" height="4" fill="#a87132"/></svg>',
+  hamster: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="1" width="2" height="2" fill="#c89a55"/><rect x="11" y="1" width="2" height="2" fill="#c89a55"/><rect x="3" y="3" width="10" height="6" fill="#ffd644"/><rect x="2" y="4" width="12" height="5" fill="#ffd644"/></svg>',
+  penguin: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="2" width="10" height="11" fill="#0e0e1a"/><rect x="4" y="6" width="8" height="6" fill="#fff"/></svg>',
+  tamago: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="6" y="2" width="4" height="1" fill="#fff"/><rect x="5" y="3" width="6" height="1" fill="#fff"/><rect x="3" y="6" width="10" height="5" fill="#fff"/><rect x="7" y="7" width="2" height="1" fill="#c25b3f"/></svg>'
+};
+const ANIMAL_NAME_ADMIN = {neko:'ねこ',usagi:'うさぎ',panda:'パンダ',fukurou:'フクロウ',kitsune:'キツネ',shibainu:'シバイヌ',risu:'リス',hamster:'ハムスター',penguin:'ペンギン',tamago:'たまご'};
+
+let _supaAdmin = null;
+function getSupaAdmin(){
+  if(_supaAdmin) return _supaAdmin;
+  if(typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.enabled) return null;
+  if(typeof supabase === 'undefined') return null;
+  try { _supaAdmin = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey); return _supaAdmin; } catch(e){ return null; }
+}
+
+let _allMembers = [];
+async function loadMembers(){
+  const dash = document.getElementById('memberDash');
+  const count = document.getElementById('memberCount');
+  const client = getSupaAdmin();
+  if(!client){
+    dash.innerHTML = '<p style="text-align:center;padding:30px;color:#c25b3f">⚠ Supabaseが未設定です。<br>supabase_config.js を確認してください。</p>';
+    count.textContent = '— 未接続 —';
+    return;
+  }
+  dash.innerHTML = '<p style="text-align:center;padding:30px;color:#8b8278">クラウドからデータ取得中…</p>';
+  try {
+    const { data, error } = await client.from('realize_members').select('*').order('updated_at', { ascending:false });
+    if(error){ dash.innerHTML = '<p style="text-align:center;padding:30px;color:#c25b3f">エラー：' + error.message + '</p>'; return; }
+    _allMembers = data || [];
+    count.textContent = '— ' + _allMembers.length + ' 名 参加中 —';
+    renderMembers();
+  } catch(e){
+    dash.innerHTML = '<p style="text-align:center;padding:30px;color:#c25b3f">通信エラー：' + e.message + '</p>';
+  }
+}
+
+function renderMembers(){
+  const dash = document.getElementById('memberDash');
+  let list = _allMembers.slice();
+  const filter = document.getElementById('filterMbti').value;
+  if(filter === 'diagnosed') list = list.filter(m => m.mbti);
+  else if(filter === 'undiagnosed') list = list.filter(m => !m.mbti);
+  else if(filter === 'ijouchi') list = list.filter(m => m.ijouchi);
+  const sortBy = document.getElementById('sortBy').value;
+  list.sort((a,b) => {
+    if(sortBy === 'name') return (a.name||'').localeCompare(b.name||'');
+    if(sortBy === 'achievement_rate') return (b.achievement_rate||0) - (a.achievement_rate||0);
+    if(sortBy === 'current_week') return (b.current_week||0) - (a.current_week||0);
+    return new Date(b.updated_at||0) - new Date(a.updated_at||0);
+  });
+  if(list.length === 0){
+    dash.innerHTML = '<p style="text-align:center;padding:30px;color:#8b8278">該当する参加者がいません</p>';
+    return;
+  }
+  dash.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">' + list.map(m => {
+    const animal = (m.animal_key && ANIMAL_SVG_ADMIN[m.animal_key]) ? m.animal_key : 'tamago';
+    const rate = m.achievement_rate || 0;
+    const week = m.current_week || 0;
+    const strengthsTotal = ((m.strengths_others||[]).length + (m.strengths_town2||[]).length + (m.strengths_additional||[]).length);
+    const updated = m.updated_at ? new Date(m.updated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+    return `
+      <div onclick='showMemberDetail(${JSON.stringify(m.id)})' style="background:#fdfbf6;border:1px solid #ece5d8;border-radius:12px;padding:14px 12px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='#c25b3f';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#ece5d8';this.style.transform='translateY(0)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:46px;height:46px;background:#fff7ec;border:1px solid #ece5d8;border-radius:8px;padding:4px;flex-shrink:0">${ANIMAL_SVG_ADMIN[animal]}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:13px;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeAdmin(m.name||'匿名')}</div>
+            <div style="font-size:10px;color:#5a7050;letter-spacing:0.08em">${m.mbti || '未診断'} ／ ${ANIMAL_NAME_ADMIN[animal]}</div>
+          </div>
+        </div>
+        <div style="height:6px;background:#ece5d8;border-radius:3px;margin-bottom:4px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,#7a9070 0%,#c9a574 100%);width:${rate}%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#5a5a5a;letter-spacing:0.04em;margin-bottom:6px">
+          <span>達成率 ${rate}%</span><span>Week ${week}</span>
+        </div>
+        <div style="display:flex;gap:8px;font-size:9.5px;color:#8b8278;border-top:1px dashed #f5eee2;padding-top:6px;margin-top:4px">
+          <span>💎${strengthsTotal}</span>
+          <span>${m.ijouchi ? '⭐済' : '⭐未'}</span>
+          <span>Lv.${m.companion_level || 1}</span>
+          <span style="margin-left:auto;font-size:8.5px">${updated}</span>
+        </div>
+      </div>
+    `;
+  }).join('') + '</div>';
+}
+
+function showMemberDetail(id){
+  const m = _allMembers.find(x => x.id === id);
+  if(!m) return;
+  const animal = (m.animal_key && ANIMAL_SVG_ADMIN[m.animal_key]) ? m.animal_key : 'tamago';
+  const allStrengths = [...(m.strengths_others||[]),...(m.strengths_town2||[]),...(m.strengths_additional||[])].filter(Boolean);
+  const okr = m.okr_data || {};
+  const krsList = (okr.krs || []).filter(kr => kr.name || (kr.subs && kr.subs.some(s=>s.name)));
+  document.getElementById('memberModal').innerHTML = `
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="width:88px;height:88px;margin:0 auto 10px;background:#fff7ec;border:2px solid #c9a574;border-radius:12px;padding:6px">${ANIMAL_SVG_ADMIN[animal]}</div>
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:4px">${escapeAdmin(m.name||'匿名')}</h3>
+      <div style="font-size:11px;color:#5a7050;letter-spacing:0.2em">${m.mbti || '未診断'} ・ ${ANIMAL_NAME_ADMIN[animal]}</div>
+      <div style="font-size:10px;color:#8b8278;margin-top:4px">ID: <code style="background:#f5eee2;padding:2px 6px;border-radius:4px">${escapeAdmin(m.id)}</code></div>
+    </div>
+    ${m.ijouchi ? `<div style="background:linear-gradient(135deg,#fff7ec 0%,#fef3e0 100%);border:2px solid #c9a574;padding:14px;border-radius:8px;margin-bottom:14px"><div style="font-size:9.5px;color:#a67a26;letter-spacing:0.25em;margin-bottom:6px">— 異常値 —</div><div style="font-size:13px;line-height:1.85">${escapeAdmin(m.ijouchi)}</div></div>` : ''}
+    <div style="background:#fdfbf6;border:1px solid #ece5d8;border-radius:8px;padding:14px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📅 現在の週</span><span style="font-weight:700">Week ${m.current_week||0} / 26</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📊 達成率</span><span style="font-weight:700;color:#c25b3f">${m.achievement_rate||0}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📝 提出率</span><span style="font-weight:700">${m.submission_rate||0}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="color:#5a5a5a">🐾 相棒レベル</span><span style="font-weight:700">Lv.${m.companion_level||1}</span></div>
+    </div>
+    ${krsList.length ? `<h4 style="font-size:13px;color:#5a7050;margin-bottom:6px">🎯 OKR目標</h4>${krsList.map((kr,i) => `<div style="background:#fff;border:1px solid #f5eee2;padding:10px 12px;border-radius:6px;margin-bottom:6px"><div style="font-weight:700;font-size:12px">GOAL ${i+1}：${escapeAdmin(kr.name||'')}</div>${(kr.subs||[]).map(s=>s.name?`<div style="font-size:11px;color:#5a5a5a;margin-top:4px">・${escapeAdmin(s.name)}（CHA:${s.cha||0}／COM:${s.com||0}）</div>`:'').join('')}</div>`).join('')}` : ''}
+    ${allStrengths.length ? `<h4 style="font-size:13px;color:#5a7050;margin:14px 0 6px">💎 強み (${allStrengths.length}個)</h4><ul style="padding-left:20px;font-size:11.5px;line-height:1.85">${allStrengths.slice(0,15).map(s=>`<li>${escapeAdmin(s)}</li>`).join('')}${allStrengths.length>15?`<li style="color:#8b8278">…他 ${allStrengths.length-15}個</li>`:''}</ul>` : ''}
+    <div style="font-size:10px;color:#8b8278;text-align:right;margin-top:14px">最終更新：${m.updated_at ? new Date(m.updated_at).toLocaleString('ja-JP') : '—'}</div>
+    <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+      <button onclick="window.open('dashboard.html?u=${encodeURIComponent(m.id)}&name=${encodeURIComponent(m.name||'')}','_blank')" style="flex:1;background:#5a7050;color:#fff;border:none;padding:10px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">📊 ダッシュボードを開く</button>
+      <button onclick="window.open('quest_v2.html?u=${encodeURIComponent(m.id)}&name=${encodeURIComponent(m.name||'')}','_blank')" style="flex:1;background:#c25b3f;color:#fff;border:none;padding:10px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">🎮 ゲームを開く</button>
+      <button onclick="closeMemberModal()" style="background:#1a1a1a;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">閉じる</button>
+    </div>
+  `;
+  document.getElementById('memberModalBg').style.display = 'flex';
+}
+function closeMemberModal(){ document.getElementById('memberModalBg').style.display = 'none'; }
+
+function exportCSV(){
+  if(!_allMembers.length){ alert('データがありません'); return; }
+  const headers = ['ID','名前','MBTI','動物','異常値','現在週','達成率','提出率','相棒Lv','他者強み','街2強み','追加強み','OKR','最終更新'];
+  const rows = _allMembers.map(m => [
+    m.id, m.name||'', m.mbti||'', ANIMAL_NAME_ADMIN[m.animal_key]||'',
+    m.ijouchi||'', m.current_week||0, m.achievement_rate||0, m.submission_rate||0, m.companion_level||1,
+    (m.strengths_others||[]).join('｜'), (m.strengths_town2||[]).join('｜'), (m.strengths_additional||[]).join('｜'),
+    JSON.stringify(m.okr_data||{}), m.updated_at||''
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['﻿' + csv], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'realize_members_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+function escapeAdmin(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+setTimeout(loadMembers, 500);
+setInterval(loadMembers, 300000); // 5分ごと自動更新
+</script>
+
+</body>
+</html>
