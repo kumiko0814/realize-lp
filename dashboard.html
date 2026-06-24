@@ -803,8 +803,27 @@ const DEFAULT_KRS = [];
 const isDemo = (new URLSearchParams(location.search)).get('demo') === '1';
 
 function loadState(){
+  // ?reset=1 で完全クリア
+  if((new URLSearchParams(location.search)).get('reset') === '1'){
+    localStorage.removeItem(storageKey);
+  }
   const raw = localStorage.getItem(storageKey);
-  if(raw){ try{ return JSON.parse(raw); }catch(e){} }
+  if(raw){
+    try{
+      const loaded = JSON.parse(raw);
+      // 古いサンプルKRが残っている場合、正規版なら空に置き換える（マイグレーション）
+      if(!isDemo && loaded.krs && loaded.krs.length === 3){
+        const looksLikeOldSample = loaded.krs.some(kr =>
+          kr.name && (kr.name.includes('健康管理') || kr.name.includes('副収入') || kr.name.includes('視野'))
+        );
+        if(looksLikeOldSample){
+          loaded.krs = [];
+          localStorage.setItem(storageKey, JSON.stringify(loaded));
+        }
+      }
+      return loaded;
+    }catch(e){}
+  }
   return {
     userName: '', startDate: new Date().toISOString().slice(0,10),
     currentWeek: 1, goal: '',
