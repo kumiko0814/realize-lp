@@ -1374,11 +1374,13 @@ function render(){
   else if(route === 'fail') walker.classList.add(stage === 2 ? 'mode-drift' : 'mode-static');
   else walker.classList.add(stage >= 2 ? 'mode-walk' : 'mode-bounce');
 
-  // SVG（MBTI連動 Phase 0）
+  // SVG（ゲーム進捗連動）
   const mbti = getMBTIFromQuest();
   const animal = mbti ? MBTI_TO_ANIMAL[mbti] : null;
   const stageNum = String(stage + 1).padStart(2, '0');
   const badge = document.getElementById('routeBadge');
+  const questData = getQuestV2Data() || {};
+  const eggReceived = questData.progress && questData.progress.eggReceived;
 
   if(route === 'fail'){
     // 失敗 → おやじ化（既存5段階）
@@ -1387,21 +1389,33 @@ function render(){
     document.getElementById('stageLabel').textContent = `STAGE ${stageNum} — ${OJI_NAMES[stage]}`;
     badge.textContent = 'WARNING — おじ化進行中';
   } else if(animal){
-    // MBTI診断済み → 固有動物
+    // MBTI診断済み → 固有動物（孵化済み）
     document.getElementById('kittenSvg').innerHTML = ANIMAL_SVG[animal];
     document.getElementById('kittenName').textContent = ANIMAL_NAME[animal];
     document.getElementById('stageLabel').textContent = `★ ${mbti} — ${ANIMAL_ROLE[animal]}`;
     badge.textContent = `SUCCESS — ${ANIMAL_NAME[animal]}と旅中`;
-  } else {
-    // MBTI未診断 → たまご（quest.htmlへ誘導）
+  } else if(eggReceived){
+    // 卵受領済み・MBTI未診断 → たまご
     document.getElementById('kittenSvg').innerHTML = ANIMAL_SVG['tamago'];
+    document.getElementById('kittenName').textContent = '不思議なたまご';
+    document.getElementById('stageLabel').textContent = `STAGE 02 — MBTI診断で孵化させよう`;
+    badge.textContent = 'QUEST — 次は MBTIの館へ';
+  } else {
+    // 卵未受領 → ？？？ + 案内
+    document.getElementById('kittenSvg').innerHTML = '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="105" r="62" fill="#f5eee2"/><text x="100" y="125" text-anchor="middle" font-size="56" fill="#bfb6a0" font-family="Cormorant Garamond, serif" font-weight="700">?</text></svg>';
     document.getElementById('kittenName').textContent = '？？？';
-    document.getElementById('stageLabel').textContent = `UNDIAGNOSED — ふしぎなたまご`;
-    badge.textContent = 'QUEST — MBTI診断でキャラ決定';
+    document.getElementById('stageLabel').textContent = `STAGE 01 — まだ相棒がいません`;
+    badge.textContent = 'QUEST — 卵を受け取ろう';
   }
 
-  // mood
-  document.getElementById('moodText').textContent = getMood(route, stage);
+  // mood（ゲーム未着手時は卵案内）
+  if(!animal && !eggReceived){
+    document.getElementById('moodText').innerHTML = '▶ <strong style="color:#c25b3f">ゲームであなただけの卵を受け取りましょう！</strong><br>右下の「⚔ NEW RPG ▶ PLAY」から始められます。';
+  } else if(!animal && eggReceived){
+    document.getElementById('moodText').innerHTML = '▶ <strong style="color:#c25b3f">卵を受け取った！</strong><br>次は <strong>MBTIの館</strong> で診断を受けると、相棒が孵化します。';
+  } else {
+    document.getElementById('moodText').textContent = getMood(route, stage);
+  }
 
   // pace
   const paceCard = document.getElementById('paceCard');
@@ -1409,10 +1423,10 @@ function render(){
   document.getElementById('paceLabel').textContent = route === 'fail' ? '✕' : (stage >= 3 ? '◎' : (stage >= 2 ? '○' : '△'));
   document.getElementById('paceDesc').textContent = route === 'fail' ? '直近の進捗低め' : '直近4週で判定';
 
-  renderWeeklyInputs();
-  renderKREdit();
-  renderKRProgress();
-  renderHistory();
+  try { renderWeeklyInputs(); } catch(e){ console.error('renderWeeklyInputs err:', e); }
+  try { renderKREdit(); } catch(e){ console.error('renderKREdit err:', e); }
+  try { renderKRProgress(); } catch(e){ console.error('renderKRProgress err:', e); }
+  try { renderHistory(); } catch(e){ console.error('renderHistory err:', e); }
 }
 
 function renderWeeklyInputs(){
