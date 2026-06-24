@@ -527,11 +527,23 @@ body{
 
 <div class="app">
 
+  <!-- STEP 1 強調バナー（目標未入力 or 体験版時に表示） -->
+  <div id="step1Banner" style="display:none;background:linear-gradient(135deg,#c25b3f 0%,#a64626 100%);color:#fff;padding:22px 24px;border-radius:14px;margin-bottom:24px;box-shadow:0 4px 16px rgba(194,91,63,0.25)">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="background:#fff;color:#c25b3f;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;font-weight:700;letter-spacing:0.2em;padding:6px 16px;border-radius:24px;white-space:nowrap">STEP 01</div>
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:17px;font-weight:700;letter-spacing:0.06em;margin-bottom:4px;line-height:1.4">📌 まずは目標を <span style="color:#ffd644">3つまで</span> 入力しましょう</div>
+        <div style="font-size:12px;line-height:1.85;opacity:0.95" id="step1BannerSub">「いつまでに」「どの程度」「何を達成するか」を具体的に。<br>入力が完了すると、RPGゲームで卵が孵化します。</div>
+      </div>
+      <button onclick="document.getElementById('krEditHead').click();document.getElementById('krEditBody').scrollIntoView({behavior:'smooth',block:'center'})" style="background:#fff;color:#c25b3f;border:none;padding:12px 20px;border-radius:24px;font-family:inherit;font-weight:700;letter-spacing:0.1em;font-size:13px;cursor:pointer;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15)">▼ 目標を入力する</button>
+    </div>
+  </div>
+
   <!-- HEADER -->
   <header class="app-header">
     <div class="app-title">
       <div class="app-logo">Re:alize</div>
-      <div class="app-logo-sub">ミー育成 OKRダッシュボード</div>
+      <div class="app-logo-sub">OKR ダッシュボード <span id="demoLabel" style="display:none;color:#c25b3f;font-size:11px;margin-left:8px;background:#fce4e0;padding:2px 8px;border-radius:12px;letter-spacing:0.1em">体験版</span></div>
     </div>
     <div class="user-info">
       <input id="userNameInput" placeholder="お名前" value=""/>
@@ -656,6 +668,10 @@ body{
       </div>
       <div id="krEditList"></div>
       <button class="btn-add" id="btnAddKR">＋ KRを追加する（最大3つ）</button>
+      <div id="demoLockOverlay" style="display:none;background:#fdf6f3;border:2px dashed #c25b3f;padding:20px;border-radius:12px;margin-top:14px;text-align:center">
+        <p style="font-size:13.5px;font-weight:700;color:#c25b3f;margin-bottom:6px">🔒 体験版では目標入力はできません</p>
+        <p style="font-size:11.5px;color:#5a5a5a;line-height:1.85">本入会されたメンバーは、ここに「いつまでに／どの程度／何を達成」を3つまで自由に入力できます。<br>体験版ではサンプル目標が入った状態でお試しください。</p>
+      </div>
     </div>
   </section>
 
@@ -768,7 +784,8 @@ const userKey = params.get('u') || 'guest';
 const storageKey = 're_alize_v2_' + userKey;
 const TOTAL_WEEKS = 26;
 
-const DEFAULT_KRS = [
+// 体験版（demo=1）でのみ使うサンプル
+const DEMO_KRS = [
   {name:'KR1：健康管理', subs:[
     {name:'毎日1時間は運動する', cha:45, com:25, history:[]},
     {name:'毎日日記を書く', cha:150, com:100, history:[]}
@@ -780,13 +797,18 @@ const DEFAULT_KRS = [
     {name:'週1で新しい人に会う', cha:50, com:27, history:[]}
   ]}
 ];
+// 正規版は空でスタート
+const DEFAULT_KRS = [];
+// 体験版判定
+const isDemo = (new URLSearchParams(location.search)).get('demo') === '1';
 
 function loadState(){
   const raw = localStorage.getItem(storageKey);
   if(raw){ try{ return JSON.parse(raw); }catch(e){} }
   return {
     userName: '', startDate: new Date().toISOString().slice(0,10),
-    currentWeek: 1, goal: '', krs: JSON.parse(JSON.stringify(DEFAULT_KRS))
+    currentWeek: 1, goal: '',
+    krs: isDemo ? JSON.parse(JSON.stringify(DEMO_KRS)) : JSON.parse(JSON.stringify(DEFAULT_KRS))
   };
 }
 function saveState(s){ localStorage.setItem(storageKey, JSON.stringify(s)); }
@@ -1487,10 +1509,46 @@ function bindKREdit(){
 document.getElementById('btnSaveWeek').addEventListener('click', saveWeek);
 
 document.getElementById('btnAddKR').addEventListener('click', () => {
-  if(state.krs.length >= 3){ alert('KRは最大3つまでです'); return; }
+  if(isDemo){ alert('体験版では目標入力はできません。本入会後に編集可能になります。'); return; }
+  if(state.krs.length >= 3){ alert('目標は最大3つまでです'); return; }
   state.krs.push({name:`KR${state.krs.length+1}：`, subs:[{name:'', cha:0, com:0, history:[]}]});
   saveState(state); render();
 });
+
+// 起動時に Step1 バナーと 体験版ロックの制御
+function updateStep1AndDemoLock(){
+  const banner = document.getElementById('step1Banner');
+  const demoLabel = document.getElementById('demoLabel');
+  const demoLock = document.getElementById('demoLockOverlay');
+  const btnAdd = document.getElementById('btnAddKR');
+  const krEditList = document.getElementById('krEditList');
+  if(isDemo){
+    if(demoLabel) demoLabel.style.display = '';
+    if(demoLock) demoLock.style.display = 'block';
+    if(btnAdd) btnAdd.style.display = 'none';
+    // 入力フィールドを readonly に
+    if(krEditList){
+      krEditList.querySelectorAll('input,textarea').forEach(el => {
+        el.readOnly = true;
+        el.style.background = '#f5eee2';
+        el.style.color = '#8b8278';
+      });
+      krEditList.querySelectorAll('button').forEach(el => el.style.display = 'none');
+    }
+    if(banner){
+      banner.style.display = 'block';
+      banner.querySelector('div div div').innerHTML = '🎮 体験版モードです';
+      banner.querySelector('#step1BannerSub').innerHTML = 'サンプル目標が入った状態で、ゲーム機能をお試しいただけます。<br>本入会後は ご自身の目標を3つまで入力できます。';
+      banner.querySelector('button').style.display = 'none';
+    }
+  } else {
+    const isEmpty = !state.krs || state.krs.length === 0 || state.krs.every(kr => kr.subs.every(s => !s.name || !s.cha));
+    if(banner) banner.style.display = isEmpty ? 'block' : 'none';
+  }
+}
+const _origRender = render;
+render = function(){ _origRender(); updateStep1AndDemoLock(); };
+setTimeout(updateStep1AndDemoLock, 100);
 
 document.getElementById('goalInput').addEventListener('input', e => {
   state.goal = e.target.value;
