@@ -300,9 +300,9 @@ svg{image-rendering:pixelated}
 <!-- Supabase 設定（くみこが書き換え） -->
 <script src="supabase_config.js"></script>
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624k"></script>
-<script src="town3_data.js?v=20260624k"></script>
-<script src="town4_data.js?v=20260624k"></script>
+<script src="town2_data.js?v=20260624l"></script>
+<script src="town3_data.js?v=20260624l"></script>
+<script src="town4_data.js?v=20260624l"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -625,8 +625,8 @@ function saveState(){
 }
 
 // ===== 自動クラウド同期＋復元 =====
-let _syncTimer = null;
-let _isSyncing = false;
+var _syncTimer = null;
+var _isSyncing = false;
 function scheduleCloudSync(){
   if(typeof getSupabaseClient !== 'function') return;
   if(!getSupabaseClient || !getSupabaseClient()) return;
@@ -1604,7 +1604,7 @@ function resetIjouchi(){
 
 // ===== 街4 機能 =====
 // ===== Supabase クラウド連携 =====
-let _supabaseClient = null;
+var _supabaseClient = null;
 function getSupabaseClient(){
   if(_supabaseClient) return _supabaseClient;
   if(typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.enabled) return null;

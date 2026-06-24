@@ -802,8 +802,21 @@ const DEFAULT_KRS = [];
 // 体験版判定
 const isDemo = (new URLSearchParams(location.search)).get('demo') === '1';
 
+function normalizeKrs(krs){
+  if(!Array.isArray(krs)) krs = [];
+  // 各KRに subs を必ず1つ用意
+  krs.forEach(kr => {
+    if(!kr.subs || !Array.isArray(kr.subs) || kr.subs.length === 0){
+      kr.subs = [{ name:'', cha:0, com:0, history:[] }];
+    }
+  });
+  // 3枠固定
+  while(krs.length < 3){
+    krs.push({ name:'', subs:[{ name:'', cha:0, com:0, history:[] }] });
+  }
+  return krs.slice(0,3);
+}
 function loadState(){
-  // ?reset=1 で完全クリア
   if((new URLSearchParams(location.search)).get('reset') === '1'){
     localStorage.removeItem(storageKey);
   }
@@ -811,24 +824,25 @@ function loadState(){
   if(raw){
     try{
       const loaded = JSON.parse(raw);
-      // 古いサンプルKRが残っている場合、正規版なら空に置き換える（マイグレーション）
+      // 古いサンプル排除（正規版）
       if(!isDemo && loaded.krs && loaded.krs.length === 3){
         const looksLikeOldSample = loaded.krs.some(kr =>
           kr.name && (kr.name.includes('健康管理') || kr.name.includes('副収入') || kr.name.includes('視野'))
         );
-        if(looksLikeOldSample){
-          loaded.krs = [];
-          localStorage.setItem(storageKey, JSON.stringify(loaded));
-        }
+        if(looksLikeOldSample){ loaded.krs = []; }
       }
+      // 必ず3枠化
+      loaded.krs = normalizeKrs(loaded.krs);
+      localStorage.setItem(storageKey, JSON.stringify(loaded));
       return loaded;
     }catch(e){}
   }
   const fresh = {
     userName: '', startDate: new Date().toISOString().slice(0,10),
     currentWeek: 1, goal: '',
-    krs: isDemo ? JSON.parse(JSON.stringify(DEMO_KRS)) : JSON.parse(JSON.stringify(DEFAULT_KRS))
+    krs: isDemo ? JSON.parse(JSON.stringify(DEMO_KRS)) : []
   };
+  fresh.krs = normalizeKrs(fresh.krs);
   return fresh;
 }
 function saveState(s){ localStorage.setItem(storageKey, JSON.stringify(s)); }
@@ -1258,6 +1272,8 @@ function hasAnyEntry(){
    ============================================================ */
 
 function render(){
+  // 必ず3つのKR枠を確保
+  if(typeof ensureKrSlots === 'function') ensureKrSlots();
   // header
   document.getElementById('userNameInput').value = state.userName || '';
   document.getElementById('weekLabel').textContent = `— Week ${state.currentWeek} / ${TOTAL_WEEKS} —`;
@@ -1353,16 +1369,7 @@ function renderWeeklyInputs(){
 
 // 常に3つのKR枠を確保（空でも表示）
 function ensureKrSlots(){
-  if(!Array.isArray(state.krs)) state.krs = [];
-  while(state.krs.length < 3){
-    state.krs.push({ name:'', subs:[{ name:'', cha:0, com:0, history:[] }] });
-  }
-  if(state.krs.length > 3) state.krs = state.krs.slice(0,3);
-  state.krs.forEach(kr => {
-    if(!Array.isArray(kr.subs) || kr.subs.length === 0){
-      kr.subs = [{ name:'', cha:0, com:0, history:[] }];
-    }
-  });
+  state.krs = normalizeKrs(state.krs);
 }
 
 function renderKREdit(){
