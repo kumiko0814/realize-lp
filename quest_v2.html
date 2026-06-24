@@ -300,9 +300,9 @@ svg{image-rendering:pixelated}
 <!-- Supabase 設定（くみこが書き換え） -->
 <script src="supabase_config.js"></script>
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624l"></script>
-<script src="town3_data.js?v=20260624l"></script>
-<script src="town4_data.js?v=20260624l"></script>
+<script src="town2_data.js?v=20260625a"></script>
+<script src="town3_data.js?v=20260625a"></script>
+<script src="town4_data.js?v=20260625a"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -310,6 +310,28 @@ const userKey = params.get('u') || 'guest';
 const userName = (params.get('name') || '').trim();
 const storageKey = 're_alize_quest_v2_' + userKey;
 if(params.get('reset') === '1'){ localStorage.removeItem(storageKey); }
+const IS_DEMO = params.get('demo') === '1';
+
+// 体験版制限モーダル
+function showDemoLimit(){
+  showModal(`
+    <h2 style="color:var(--gold)">🎮 体験版はここまで</h2>
+    <div class="sub">— DEMO LIMIT —</div>
+    <p>体験版でプレイできるのは <span class="em">博士から卵を受け取るところ</span> までです。</p>
+    <p class="pink">本入会後、続きが楽しめます：</p>
+    <ul style="padding-left:22px;font-size:11.5px;line-height:1.95;margin:10px 0">
+      <li>🏰 MBTI診断で 10種類のキャラに孵化</li>
+      <li>👥 5人の町人から「あなたの強み」を聞き出す</li>
+      <li>⚔ 強み発掘の街でジムリーダーに挑戦</li>
+      <li>🧙 異常値の谷で 自分だけの異常値を発見</li>
+      <li>🌟 ルミナリアで Realize 仲間と交流</li>
+    </ul>
+    <p style="color:var(--sakura);font-size:11.5px;margin-top:14px">★ もしご興味あれば、ぜひ Realize にご参加ください！</p>
+    <div class="modal-actions">
+      <button class="btn primary" onclick="closeModal()">わかった</button>
+    </div>
+  `);
+}
 const COLS = 20, ROWS = 12;
 
 const MBTI_TO_ANIMAL = {'ENFP':'neko','ESFP':'neko','INFP':'usagi','ISFP':'usagi','INFJ':'panda','ENFJ':'panda','INTJ':'fukurou','INTP':'fukurou','ENTJ':'kitsune','ENTP':'kitsune','ESTJ':'shibainu','ESFJ':'shibainu','ISTJ':'risu','ISFJ':'hamster','ISTP':'penguin','ESTP':'penguin'};
@@ -838,14 +860,14 @@ function renderHero(){
   h.className = 'walk facing-' + (state.dir === 'left' ? 'left' : 'right');
 }
 function renderStatus(){
-  document.getElementById('heroName').textContent = state.name + 'さん';
+  document.getElementById('heroName').textContent = state.name + 'さん' + (IS_DEMO ? ' 🎮DEMO' : '');
   document.getElementById('heroRole').textContent = state.mbti ? '— ' + state.role + ' —' : '— 旅人 —';
   if(state.indoors && INDOORS[state.indoors.id]){
     document.getElementById('townLabel').textContent = `🏠 ${INDOORS[state.indoors.id].name}`;
   } else {
     const town = currentTownData();
     const townNum = { town1:'1', town2:'2', town3:'3', town4:'4' }[state.currentTown] || '1';
-    document.getElementById('townLabel').textContent = `🏘 街${townNum}：${town.name}`;
+    document.getElementById('townLabel').textContent = `🏘 街${townNum}：${town.name}` + (IS_DEMO ? '（体験版）' : '');
   }
   document.getElementById('progressNum').textContent = computeProgressNum();
 }
@@ -955,6 +977,14 @@ function action(){
   const adj = nearbyFacility();
   if(!adj){ setMsg('▼ ここには何もない…'); return; }
   const f = adj.f;
+  // 体験版：卵受領後は博士の家・卵スタンド・玄関出入りのみ許可
+  if(IS_DEMO && state.progress.eggReceived){
+    const allowedInDemo = ['professor_door','professor_indoor','egg_pedestal','indoor_exit'];
+    if(!allowedInDemo.includes(f.type)){
+      showDemoLimit();
+      return;
+    }
+  }
   const handlers = {
     professor: openProfessor,
     professor_door: () => enterIndoor('professor_lab'),
@@ -1103,8 +1133,19 @@ function receiveEgg(){
         <span class="egg-sparkle" style="bottom:20px;right:20%;animation-delay:0.9s">✧</span>
         <p style="color:var(--gold);font-size:14px;letter-spacing:0.1em;margin-top:14px">不思議な たまごを 受け取った！</p>
       </div>
-      <p>しみず博士：「キミの 性格次第で、中身が変わる…」</p>
-      <p>「研究所を出て、北の <span class="em">MBTIの館</span> で診断を受けに行きなさい。」</p>
+      ${IS_DEMO ? `
+        <p style="color:var(--gold);font-size:13px">🎮 体験版はここまでです！</p>
+        <p class="pink">本入会後、卵を孵化させて自分の相棒と一緒に半年間の旅が始まります。</p>
+        <p style="font-size:11px;color:var(--mind);line-height:1.85">続きでできること：<br>
+        ・MBTI診断で10種類のキャラに孵化<br>
+        ・他者からの強み発掘<br>
+        ・ジムリーダーバトル<br>
+        ・異常値の発見<br>
+        ・Realize仲間と交流</p>
+      ` : `
+        <p>しみず博士：「キミの 性格次第で、中身が変わる…」</p>
+        <p>「研究所を出て、北の <span class="em">MBTIの館</span> で診断を受けに行きなさい。」</p>
+      `}
       <div class="modal-actions">
         <button class="btn primary" onclick="closeModal()">わかった！</button>
       </div>
@@ -1238,6 +1279,7 @@ function openExit(targetTown){
 // ===== ワープ =====
 function openWarp(){
   if(currentModal) return;
+  if(IS_DEMO){ showDemoLimit(); return; }
   const towns = getTowns();
   const unlocked = {
     town1: true,
