@@ -158,6 +158,48 @@ svg{image-rendering:pixelated}
 .synth-result{background:linear-gradient(135deg,rgba(255,214,68,0.18) 0%,rgba(122,200,255,0.15) 100%);border:2px solid var(--gold);padding:20px;margin:14px 0;text-align:center;border-radius:4px}
 .synth-result .label{font-size:11px;color:var(--gold);letter-spacing:0.3em;margin-bottom:8px}
 .synth-result .statement{font-size:16px;color:var(--white);line-height:1.95;letter-spacing:0.06em}
+
+/* 屋内マップ用 */
+.stage-wrap.indoor{background:#3a2a1a;border-color:var(--gold)}
+.indoor-floor{background:repeating-linear-gradient(45deg,#8a6a3a,#8a6a3a 6px,#7a5a2a 6px,#7a5a2a 12px)}
+.indoor-wall{background:#3a2a1a;border:1px solid #1a0a00}
+
+/* ポケモン風 演出 */
+.screen-flash{position:fixed;inset:0;background:#fff;z-index:10000;opacity:0;animation:screenFlash 0.8s ease-out;pointer-events:none}
+@keyframes screenFlash{0%{opacity:0}25%{opacity:0.95}100%{opacity:0}}
+
+.egg-presentation{
+  text-align:center;padding:30px 20px;
+  background:radial-gradient(circle at 50% 40%, #ffd644 0%, transparent 60%);
+  border:3px solid var(--gold);margin:14px 0;
+}
+.egg-floater{
+  width:120px;height:120px;margin:0 auto 16px;
+  animation:eggFloat 2.4s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px #ffd644);
+}
+@keyframes eggFloat{
+  0%,100%{transform:translateY(0) rotate(-5deg)}
+  50%{transform:translateY(-20px) rotate(5deg)}
+}
+.egg-sparkle{
+  position:absolute;font-size:18px;color:var(--gold);
+  animation:sparkle 1.5s ease-out infinite;pointer-events:none;
+}
+@keyframes sparkle{
+  0%{transform:scale(0) rotate(0deg);opacity:0}
+  50%{opacity:1}
+  100%{transform:scale(1.5) rotate(180deg);opacity:0}
+}
+.fanfare-text{
+  font-size:18px;color:var(--gold);letter-spacing:0.3em;
+  text-shadow:3px 3px 0 var(--dress-d);margin-bottom:8px;
+  animation:fanfare 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes fanfare{
+  from{transform:scale(0.5);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
 </style>
 </head>
 <body>
@@ -252,9 +294,9 @@ svg{image-rendering:pixelated}
 </div>
 
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624a"></script>
-<script src="town3_data.js?v=20260624a"></script>
-<script src="town4_data.js?v=20260624a"></script>
+<script src="town2_data.js?v=20260624b"></script>
+<script src="town3_data.js?v=20260624b"></script>
+<script src="town4_data.js?v=20260624b"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -302,6 +344,43 @@ const ROLE_DESCS = {
   'ESTP':'飛び込んで道を切り開く、行動の戦士。','ESFP':'場の空気を読み、人と人をつなぐ才能の人。'
 };
 
+// ===== 屋内マップ（INDOORS）=====
+// タイル: 10=床, 11=壁, 12=本棚, 13=机, 14=卵スタンド, 15=玄関ドア, 16=絨毯, 17=書類束, 18=植物, 19=モニター
+const INDOORS = {
+  professor_lab: {
+    name: "オーキド博士の研究所",
+    description: "卵を授ける場所",
+    isIndoor: true,
+    map: [
+      [11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11],
+      [11,12,12,12,11,19,19,11,17,17,17,11,18,11,12,12,12,12,12,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,14,10,10,10,10,10,10,10,10,10,10,10,14,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,16,16,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,16,16,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,13,13,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
+      [11,11,11,11,11,11,11,11,11,15,15,11,11,11,11,11,11,11,11,11]
+    ],
+    spawnPos: { x: 9, y: 10 },
+    facilities: {
+      '9,6': { type: 'professor_indoor' },
+      '10,6': { type: 'professor_indoor' },
+      '3,4': { type: 'egg_pedestal' },
+      '15,4': { type: 'egg_pedestal' },
+      '9,11': { type: 'indoor_exit' },
+      '10,11': { type: 'indoor_exit' }
+    },
+    labels: [
+      { x: 8, y: 5, text: '🧑‍🔬 博士' },
+      { x: 9, y: 10, text: '↓ 出口' }
+    ]
+  }
+};
+
 // Town1 マップ
 const TOWN1 = {
   name: "はじまりの町",
@@ -322,7 +401,7 @@ const TOWN1 = {
   ],
   spawnPos: { x: 11, y: 7 },
   facilities: {
-    '10,6':  { type: 'professor' },
+    '10,6':  { type: 'professor_door' },
     '13,1':  { type: 'mbti_hall' },
     '3,4':   { type: 'strength', id: 0 },
     '7,4':   { type: 'strength', id: 1 },
@@ -357,6 +436,10 @@ function getTowns(){
   };
 }
 function currentTownData(){ return getTowns()[state.currentTown] || TOWN1; }
+function currentSpaceData(){
+  if(state.indoors && INDOORS[state.indoors.id]) return INDOORS[state.indoors.id];
+  return currentTownData();
+}
 
 function defaultState(){
   return {
@@ -385,6 +468,7 @@ function defaultState(){
       rivalsBattled: {}
     },
     visitedTowns: { town1: true, town2: false, town3: false, town4: false },
+    indoors: null,
     lastVisit: null
   };
 }
@@ -429,15 +513,38 @@ function treeSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges"
 function flowerSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="7" y="8" width="2" height="6" fill="#3a8a3a"/><rect x="6" y="5" width="4" height="3" fill="#fcd5e6"/><rect x="7" y="6" width="2" height="1" fill="#ffd644"/></svg>`;}
 function pathSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#c8a060"/></svg>`;}
 
+// 屋内タイル
+function floorSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#8a6a3a"/><rect x="0" y="0" width="16" height="1" fill="#6a4a1a"/><rect x="0" y="8" width="16" height="1" fill="#6a4a1a"/><rect x="6" y="2" width="1" height="5" fill="#7a5a2a" opacity="0.6"/><rect x="12" y="10" width="1" height="5" fill="#7a5a2a" opacity="0.6"/></svg>`;}
+function wallSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#3a2a1a"/><rect x="0" y="0" width="16" height="1" fill="#1a0a00"/><rect x="0" y="15" width="16" height="1" fill="#1a0a00"/><rect x="2" y="4" width="3" height="2" fill="#5a3a1a"/><rect x="9" y="10" width="3" height="2" fill="#5a3a1a"/></svg>`;}
+function bookshelfSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#6a3010"/><rect x="0" y="0" width="16" height="1" fill="#3a1a00"/><rect x="0" y="5" width="16" height="1" fill="#3a1a00"/><rect x="0" y="10" width="16" height="1" fill="#3a1a00"/><rect x="0" y="15" width="16" height="1" fill="#3a1a00"/><rect x="1" y="1" width="2" height="4" fill="#a02448"/><rect x="4" y="1" width="2" height="4" fill="#3a76d6"/><rect x="7" y="1" width="2" height="4" fill="#5fbb5f"/><rect x="10" y="1" width="2" height="4" fill="#ffd644"/><rect x="13" y="1" width="2" height="4" fill="#f6a0c4"/><rect x="1" y="6" width="2" height="4" fill="#5fbb5f"/><rect x="4" y="6" width="2" height="4" fill="#ffd644"/><rect x="7" y="6" width="2" height="4" fill="#a02448"/><rect x="10" y="6" width="2" height="4" fill="#7a4a8a"/><rect x="13" y="6" width="2" height="4" fill="#3a76d6"/><rect x="1" y="11" width="2" height="4" fill="#7a4a8a"/><rect x="4" y="11" width="2" height="4" fill="#3a76d6"/><rect x="7" y="11" width="2" height="4" fill="#f6a0c4"/><rect x="10" y="11" width="2" height="4" fill="#5fbb5f"/><rect x="13" y="11" width="2" height="4" fill="#ffd644"/></svg>`;}
+function deskSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="4" width="16" height="6" fill="#8a4020"/><rect x="0" y="3" width="16" height="1" fill="#5a2010"/><rect x="0" y="10" width="16" height="1" fill="#3a1000"/><rect x="2" y="11" width="2" height="5" fill="#5a2010"/><rect x="12" y="11" width="2" height="5" fill="#5a2010"/><rect x="3" y="5" width="4" height="3" fill="#fff"/><rect x="4" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="3" height="2" fill="#ffd644"/></svg>`;}
+function eggPedestalSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="11" width="10" height="3" fill="#4a4a5a"/><rect x="2" y="14" width="12" height="2" fill="#3a3a4a"/><rect x="4" y="10" width="8" height="1" fill="#5a5a6a"/><rect x="6" y="3" width="4" height="1" fill="#fff"/><rect x="5" y="4" width="6" height="1" fill="#fff"/><rect x="4" y="5" width="8" height="4" fill="#fff"/><rect x="5" y="9" width="6" height="1" fill="#fff"/><rect x="6" y="6" width="1" height="1" fill="#f6a0c4"/><rect x="9" y="7" width="1" height="1" fill="#ffd644"/><rect x="7" y="8" width="1" height="1" fill="#c25b3f"/><rect x="3" y="4" width="1" height="2" fill="#ffd644" opacity="0.6"/><rect x="12" y="6" width="1" height="2" fill="#ffd644" opacity="0.6"/></svg>`;}
+function indoorExitSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#3a2a1a"/><rect x="3" y="2" width="10" height="14" fill="#5a3010"/><rect x="3" y="2" width="10" height="1" fill="#2a1000"/><rect x="3" y="15" width="10" height="1" fill="#2a1000"/><rect x="3" y="2" width="1" height="14" fill="#2a1000"/><rect x="12" y="2" width="1" height="14" fill="#2a1000"/><rect x="11" y="8" width="1" height="2" fill="#ffd644"/><rect x="6" y="10" width="4" height="2" fill="#1a0a00"/><rect x="0" y="14" width="3" height="2" fill="#5fbb5f"/><rect x="13" y="14" width="3" height="2" fill="#5fbb5f"/></svg>`;}
+function carpetSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#8a6a3a"/><rect x="1" y="1" width="14" height="14" fill="#a02448"/><rect x="2" y="2" width="12" height="12" fill="#c25b3f"/><rect x="6" y="6" width="4" height="4" fill="#ffd644"/></svg>`;}
+function documentsSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#8a6a3a"/><rect x="2" y="6" width="6" height="8" fill="#fff"/><rect x="2" y="7" width="6" height="1" fill="#7ac8ff"/><rect x="3" y="9" width="4" height="1" fill="#0e0e1a" opacity="0.3"/><rect x="3" y="11" width="4" height="1" fill="#0e0e1a" opacity="0.3"/><rect x="8" y="8" width="6" height="6" fill="#fce4a0"/><rect x="9" y="9" width="4" height="1" fill="#0e0e1a" opacity="0.3"/><rect x="9" y="11" width="3" height="1" fill="#0e0e1a" opacity="0.3"/></svg>`;}
+function plantSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#8a6a3a"/><rect x="5" y="10" width="6" height="5" fill="#a02448"/><rect x="4" y="10" width="8" height="1" fill="#7a1a3a"/><rect x="6" y="3" width="4" height="5" fill="#2e6e2e"/><rect x="4" y="4" width="8" height="4" fill="#5fbb5f"/><rect x="5" y="2" width="2" height="3" fill="#3a8a3a"/><rect x="9" y="2" width="2" height="3" fill="#3a8a3a"/></svg>`;}
+function monitorSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="0" y="0" width="16" height="16" fill="#6a3010"/><rect x="2" y="2" width="12" height="9" fill="#1a1a2a"/><rect x="3" y="3" width="10" height="7" fill="#3a76d6"/><rect x="4" y="4" width="3" height="1" fill="#7ac8ff"/><rect x="4" y="6" width="6" height="1" fill="#fff"/><rect x="4" y="8" width="4" height="1" fill="#ffd644"/><rect x="6" y="11" width="4" height="2" fill="#3a3a4a"/><rect x="4" y="13" width="8" height="1" fill="#5a3a1a"/></svg>`;}
+
 function renderStage(){
-  const town = currentTownData();
-  const map = town.map;
+  const space = currentSpaceData();
+  const map = space.map;
   const stage = document.getElementById('stage');
+  const wrap = document.querySelector('.stage-wrap');
   stage.innerHTML = '';
+  // 屋内なら背景を変える
+  if(space.isIndoor){
+    wrap.classList.add('indoor');
+    // 床全面を最初に敷く
+    stage.style.background = '#8a6a3a';
+  } else {
+    wrap.classList.remove('indoor');
+    stage.style.background = '';
+  }
   for(let y = 0; y < ROWS; y++){
     for(let x = 0; x < COLS; x++){
       const v = map[y][x];
-      if(v === 0) continue;
+      // 屋内モードでは 10 (床) は描画スキップしてOK
+      if(v === 0 || (space.isIndoor && v === 10)) continue;
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.style.left = (x * 5) + '%';
@@ -452,11 +559,22 @@ function renderStage(){
       else if(v === 9) svg = exitSVG();
       else if(v === 5) svg = gymSVG();
       else if(v === 4) svg = `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="10" width="12" height="3" fill="#7ac8ff"/><rect x="2" y="13" width="12" height="1" fill="#3a76d6"/></svg>`;
+      // 屋内タイル
+      else if(v === 10) svg = floorSVG();
+      else if(v === 11) svg = wallSVG();
+      else if(v === 12) svg = bookshelfSVG();
+      else if(v === 13) svg = deskSVG();
+      else if(v === 14) svg = eggPedestalSVG();
+      else if(v === 15) svg = indoorExitSVG();
+      else if(v === 16) svg = carpetSVG();
+      else if(v === 17) svg = documentsSVG();
+      else if(v === 18) svg = plantSVG();
+      else if(v === 19) svg = monitorSVG();
       tile.innerHTML = svg;
       stage.appendChild(tile);
     }
   }
-  (town.labels || []).forEach(l => {
+  (space.labels || []).forEach(l => {
     const lb = document.createElement('div');
     lb.className = 'label-tile';
     lb.style.left = (l.x * 5 + 1) + '%';
@@ -475,9 +593,13 @@ function renderHero(){
 function renderStatus(){
   document.getElementById('heroName').textContent = state.name + 'さん';
   document.getElementById('heroRole').textContent = state.mbti ? '— ' + state.role + ' —' : '— 旅人 —';
-  const town = currentTownData();
-  const townNum = { town1:'1', town2:'2', town3:'3', town4:'4' }[state.currentTown] || '1';
-  document.getElementById('townLabel').textContent = `🏘 街${townNum}：${town.name}`;
+  if(state.indoors && INDOORS[state.indoors.id]){
+    document.getElementById('townLabel').textContent = `🏠 ${INDOORS[state.indoors.id].name}`;
+  } else {
+    const town = currentTownData();
+    const townNum = { town1:'1', town2:'2', town3:'3', town4:'4' }[state.currentTown] || '1';
+    document.getElementById('townLabel').textContent = `🏘 街${townNum}：${town.name}`;
+  }
   document.getElementById('progressNum').textContent = computeProgressNum();
 }
 function computeProgressNum(){
@@ -497,8 +619,13 @@ function setMsg(t){
 
 function canMoveTo(x, y){
   if(x < 0 || x >= COLS || y < 0 || y >= ROWS) return false;
-  const map = currentTownData().map;
+  const space = currentSpaceData();
+  const map = space.map;
   const v = map[y][x];
+  if(space.isIndoor){
+    // 屋内では床(10)、絨毯(16)、玄関(15) を通れる
+    return v === 10 || v === 16 || v === 15;
+  }
   return v === 0 || v === 6 || v === 7;
 }
 function move(dx, dy){
@@ -517,8 +644,10 @@ function showNearbyHint(){
   const adj = nearbyFacility();
   if(!adj){ setMsg('▼ 探索中…'); return; }
   const labels = {
-    professor:'🧑‍🔬 博士の家', mbti_hall:'🏰 MBTIの館', strength:'👥 町人の家',
-    exit:'🚪 出口', npc:'💬 ' + (adj.f.name || '町人'),
+    professor:'🧑‍🔬 博士の家', professor_door:'🚪 研究所の入口', professor_indoor:'🧑‍🔬 オーキド博士',
+    egg_pedestal:'🥚 たまごスタンド', indoor_exit:'🚪 玄関（外へ）',
+    mbti_hall:'🏰 MBTIの館', strength:'👥 町人の家',
+    exit:'🚪 街の出口', npc:'💬 ' + (adj.f.name || '町人'),
     gym_door:'⚔ ジム入口', gym_leader:'👑 ジムリーダーの間',
     sage:'🧙 ' + (adj.f.name || '賢者'), synthesizer:'✨ 集約者',
     rival:'🥊 ' + (adj.f.name || 'メンバー'), exchange:'📜 メッセージ掲示板'
@@ -526,7 +655,7 @@ function showNearbyHint(){
   setMsg(`▼ ${labels[adj.f.type] || '何かありそう'}\n  Aボタンで しらべる。`);
 }
 function nearbyFacility(){
-  const town = currentTownData();
+  const town = currentSpaceData();
   const dirs = [[0,-1],[0,1],[-1,0],[1,0],[0,0]];
   for(const [dx, dy] of dirs){
     const x = state.pos.x + dx, y = state.pos.y + dy;
@@ -557,7 +686,12 @@ function action(){
   if(!adj){ setMsg('▼ ここには何もない…'); return; }
   const f = adj.f;
   const handlers = {
-    professor: openProfessor, mbti_hall: openMbtiHall,
+    professor: openProfessor,
+    professor_door: () => enterIndoor('professor_lab'),
+    professor_indoor: openProfessor,
+    egg_pedestal: showEggPedestal,
+    indoor_exit: exitIndoor,
+    mbti_hall: openMbtiHall,
     strength: () => openStrengthHouse(f.id),
     exit: () => openExit(f.to),
     npc: () => openTownNpc(f),
@@ -569,6 +703,43 @@ function action(){
     exchange: () => openExchange(f)
   };
   if(handlers[f.type]) handlers[f.type]();
+}
+
+// ===== 屋内マップ enter/exit =====
+function enterIndoor(id){
+  const indoor = INDOORS[id];
+  if(!indoor) return;
+  state.indoors = {
+    id,
+    returnPos: { x: state.pos.x, y: state.pos.y, town: state.currentTown }
+  };
+  state.pos = Object.assign({}, indoor.spawnPos);
+  saveState();
+  renderStage(); renderHero(); renderStatus();
+  setMsg(`▼ <span class="em">${indoor.name}</span> に入った。`);
+  // 自動で博士イベント発火（卵未受領の時のみ）
+  if(id === 'professor_lab' && !state.progress.eggReceived){
+    setTimeout(()=>{
+      setMsg('▼ 奥に <span class="em">博士</span> がいる。\n  Aボタンで話しかけよう。');
+    }, 400);
+  }
+}
+function exitIndoor(){
+  if(!state.indoors) return;
+  const ret = state.indoors.returnPos;
+  state.currentTown = ret.town;
+  state.pos = { x: ret.x, y: ret.y };
+  state.indoors = null;
+  saveState();
+  renderStage(); renderHero(); renderStatus();
+  setMsg('▼ 外に出た。');
+}
+function showEggPedestal(){
+  if(state.progress.eggReceived){
+    setMsg('▼ 空っぽの卵スタンド。\n  キミは すでに卵を持っている。');
+  } else {
+    setMsg('▼ <span class="em">不思議なたまご</span> がきらきら輝いている…\n  博士に話しかけて 受け取ろう。');
+  }
 }
 
 let currentModal = null;
@@ -623,14 +794,32 @@ function openProfessor(){
   }
 }
 function receiveEgg(){
-  state.progress.eggReceived = true; saveState(); renderStatus(); closeModal();
+  closeModal();
+  // フラッシュ演出
+  const flash = document.createElement('div');
+  flash.className = 'screen-flash';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(), 800);
   setTimeout(()=>{
+    state.progress.eggReceived = true;
+    saveState(); renderStatus();
     showModal(`
-      <h2>✨ たまごを手にいれた！</h2>
-      <p>北の <span class="em">MBTIの館</span> で診断を受けよう。</p>
-      <div class="modal-actions"><button class="btn primary" onclick="closeModal()">わかった</button></div>
+      <div class="egg-presentation" style="position:relative">
+        <div class="fanfare-text">★ たまごを手にいれた！ ★</div>
+        <div class="egg-floater">${ANIMAL_SVG.tamago}</div>
+        <span class="egg-sparkle" style="top:10px;left:20%;animation-delay:0s">✦</span>
+        <span class="egg-sparkle" style="top:30px;right:25%;animation-delay:0.3s">✧</span>
+        <span class="egg-sparkle" style="bottom:40px;left:15%;animation-delay:0.6s">✦</span>
+        <span class="egg-sparkle" style="bottom:20px;right:20%;animation-delay:0.9s">✧</span>
+        <p style="color:var(--gold);font-size:14px;letter-spacing:0.1em;margin-top:14px">不思議な たまごを 受け取った！</p>
+      </div>
+      <p>博士：「キミの 性格次第で、中身が変わる…」</p>
+      <p>「研究所を出て、北の <span class="em">MBTIの館</span> で診断を受けに行きなさい。」</p>
+      <div class="modal-actions">
+        <button class="btn primary" onclick="closeModal()">わかった！</button>
+      </div>
     `);
-  }, 300);
+  }, 500);
 }
 
 function openMbtiHall(){
