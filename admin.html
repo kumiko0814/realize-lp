@@ -257,6 +257,11 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
       <button class="btn" onclick="openGeneratedUrl('welcome')" style="background:#5a7050">👁 動作確認で開く</button>
     </div>
     <p style="font-size:11px;color:#c25b3f;margin-top:10px;line-height:1.7">★ <strong>「URL生成」ボタンを押した後に</strong>コピー or 動作確認できます。<br>　 入力を変えたら、もう一度「URL生成」を押してください。</p>
+    <div style="background:#fff8e8;border:1px solid #ffd644;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:11px;line-height:1.85;color:#5a3a00">
+      <strong>⚠ 既存IDに注意</strong>：<br>
+      過去にテストで使ったID（例：<code style="background:#fff;padding:1px 6px;border-radius:3px">shimizu</code>）を本番で再利用すると、前のデータが復元されます。<br>
+      → 「📊 全メンバーの進捗」セクションで既存IDを確認できます。リセットしたい場合は、該当カードを開いて「☠ クラウドデータを完全削除」を実行してください。
+    </div>
   </section>
 
   <!-- LINE TEMPLATE -->
@@ -676,6 +681,10 @@ function showMemberDetail(id){
       <button onclick="window.open(BASE + 'quest_v2.html?u=${encodeURIComponent(m.id)}&name=${encodeURIComponent(m.name||'')}','_blank')" style="flex:1;background:#c25b3f;color:#fff;border:none;padding:10px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">🎮 ゲームを開く</button>
       <button onclick="closeMemberModal()" style="background:#1a1a1a;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">閉じる</button>
     </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px dashed #ece5d8">
+      <button onclick='deleteMember(${JSON.stringify(m.id)},${JSON.stringify(m.name||"")})' style="width:100%;background:transparent;color:#c25b3f;border:1px dashed #c25b3f;padding:8px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:11px">☠ このメンバーのクラウドデータを完全削除（リセット）</button>
+      <p style="font-size:10px;color:#8b8278;margin-top:6px;line-height:1.6">★ 「テストで使ったIDで本番配布したい」場合に使用。<br>　 削除後、本人が再度ゲームをプレイすると 新規データで登録されます。</p>
+    </div>
   `;
   document.getElementById('memberModalBg').style.display = 'flex';
   // 既存コメント読み込み
@@ -686,6 +695,23 @@ function closeMemberModal(){ document.getElementById('memberModalBg').style.disp
 // ヘルプモーダル
 function showHelp(){ document.getElementById('helpModalBg').style.display = 'flex'; }
 function closeHelp(){ document.getElementById('helpModalBg').style.display = 'none'; }
+
+// メンバーをクラウドから削除
+async function deleteMember(id, name){
+  if(!confirm('「' + name + '」(' + id + ') のクラウドデータを完全削除します。\n\n・進捗データ\n・強み・異常値\n・OKR目標\n・受信したメッセージ\n\nが全て消えます。よろしいですか？')) return;
+  const client = getSupaAdmin();
+  if(!client){ alert('Supabase未接続'); return; }
+  try {
+    // メンバー本体削除
+    const { error: e1 } = await client.from('realize_members').delete().eq('id', id);
+    if(e1){ alert('削除エラー：' + e1.message); return; }
+    // 受信コメントも削除
+    await client.from('realize_comments').delete().eq('target_id', id);
+    showToast('☑ 削除しました：' + name);
+    closeMemberModal();
+    loadMembers();
+  } catch(e){ alert('通信エラー：' + e.message); }
+}
 
 // 起動時に管理者IDを復元
 setTimeout(()=>{
