@@ -104,8 +104,8 @@ const TOWN2 = {
     // ---- NPC3: ハナ（元気な花屋のお姉さん） ----
     {
       id: "npc3",
-      x: 7,
-      y: 7,
+      x: 2,
+      y: 6,
       name: "ハナ",
       portrait: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 16 16" shape-rendering="crispEdges">
   <!-- 肌 -->
