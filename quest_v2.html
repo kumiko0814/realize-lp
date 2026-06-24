@@ -294,9 +294,9 @@ svg{image-rendering:pixelated}
 </div>
 
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624c"></script>
-<script src="town3_data.js?v=20260624c"></script>
-<script src="town4_data.js?v=20260624c"></script>
+<script src="town2_data.js?v=20260624d"></script>
+<script src="town3_data.js?v=20260624d"></script>
+<script src="town4_data.js?v=20260624d"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -381,7 +381,7 @@ const INDOORS = {
   },
   // 街2のNPC家（3軒・共通レイアウト）
   npc1_house: {
-    name: "アカリさんの家",
+    name: "かなみさんの家",
     isIndoor: true,
     map: [
       [11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11],
@@ -407,7 +407,7 @@ const INDOORS = {
     labels: [{ x:9, y:10, text:'↓ 出口' }]
   },
   npc2_house: {
-    name: "ミドリさんの家",
+    name: "ひかるさんの家",
     isIndoor: true,
     map: [
       [11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11],
@@ -433,7 +433,7 @@ const INDOORS = {
     labels: [{ x:9, y:10, text:'↓ 出口' }]
   },
   npc3_house: {
-    name: "ハナさんの家",
+    name: "えりさんの家",
     isIndoor: true,
     map: [
       [11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11],
@@ -468,7 +468,7 @@ const INDOORS = {
       [11,16,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,16,11],
       [11,16,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,16,11],
       [11,16,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,16,11],
-      [11,11,11,10,10,10,10,11,11,11,11,11,11,10,10,10,10,11,11,11],
+      [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
       [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
       [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
       [11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11],
@@ -1274,8 +1274,11 @@ function submitBattleAnswer(){
     <p class="pink">あなたの答え：「${escapeHtml(v)}」</p>
     <p>${escapeHtml(TOWN2.gym.leader.name)}：「${escapeHtml(battle.winMessage || '見事だ！')}」</p>
     <p class="em">★ ${escapeHtml(battle.rewardItem || '強みのバッジ')} 獲得！</p>
-    <p>次は <span class="em">街3</span> へ。</p>
-    <div class="modal-actions"><button class="btn primary" onclick="closeModal();setTimeout(openWarp, 300)">街3へワープ</button><button class="btn" onclick="closeModal()">あとで</button></div>
+    <p>次の旅は <span class="em">街3：異常値の谷</span> へ。<br>自分自身の異常値を発掘しよう。</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">あとで</button>
+      <button class="btn primary" onclick="closeModal();setTimeout(function(){ warpTo('town3'); }, 300)">▶ 街3へ ワープ！</button>
+    </div>
   `);
 }
 function abandonBattle(){
