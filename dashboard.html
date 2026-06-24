@@ -667,7 +667,7 @@ body{
         <input id="goalInput" placeholder="例：2028年に100日間 海外旅行に行く"/>
       </div>
       <div id="krEditList"></div>
-      <button class="btn-add" id="btnAddKR">＋ KRを追加する（最大3つ）</button>
+      <button class="btn-add" id="btnAddKR" style="display:none">＋ KRを追加する（最大3つ）</button>
       <div id="demoLockOverlay" style="display:none;background:#fdf6f3;border:2px dashed #c25b3f;padding:20px;border-radius:12px;margin-top:14px;text-align:center">
         <p style="font-size:13.5px;font-weight:700;color:#c25b3f;margin-bottom:6px">🔒 体験版では目標入力はできません</p>
         <p style="font-size:11.5px;color:#5a5a5a;line-height:1.85">本入会されたメンバーは、ここに「いつまでに／どの程度／何を達成」を3つまで自由に入力できます。<br>体験版ではサンプル目標が入った状態でお試しください。</p>
@@ -713,7 +713,7 @@ body{
         <h3 style="font-family:'DotGothic16',sans-serif;font-size:18px;font-weight:normal;letter-spacing:0.05em;margin-bottom:6px;color:#fcd5e6">異常値のカケラを求めて</h3>
         <p style="font-size:12px;line-height:1.85;color:#c8c8d8;letter-spacing:0.04em">MBTI診断・5人からの強み発掘・問いかけの泉。<strong style="color:#ffd644">自分と他者の声を集めて</strong>本当の強みを見つけるドラクエ風RPG。BGM＆マインドゲージ付き。</p>
       </div>
-      <a href="quest.html" id="ijouchiLink" style="font-family:'DotGothic16',sans-serif;background:#e63d6a;color:#fff;border:3px solid #fcd5e6;padding:14px 24px;text-decoration:none;letter-spacing:0.15em;font-size:13px;white-space:nowrap;transition:all 0.2s">▶ PLAY</a>
+      <a href="quest_v2.html" id="ijouchiLink" style="font-family:'DotGothic16',sans-serif;background:#e63d6a;color:#fff;border:3px solid #fcd5e6;padding:14px 24px;text-decoration:none;letter-spacing:0.15em;font-size:13px;white-space:nowrap;transition:all 0.2s">▶ PLAY</a>
     </div>
   </section>
 
@@ -824,11 +824,12 @@ function loadState(){
       return loaded;
     }catch(e){}
   }
-  return {
+  const fresh = {
     userName: '', startDate: new Date().toISOString().slice(0,10),
     currentWeek: 1, goal: '',
     krs: isDemo ? JSON.parse(JSON.stringify(DEMO_KRS)) : JSON.parse(JSON.stringify(DEFAULT_KRS))
   };
+  return fresh;
 }
 function saveState(s){ localStorage.setItem(storageKey, JSON.stringify(s)); }
 
@@ -1350,9 +1351,23 @@ function renderWeeklyInputs(){
   }
 }
 
+// 常に3つのKR枠を確保（空でも表示）
+function ensureKrSlots(){
+  if(!Array.isArray(state.krs)) state.krs = [];
+  while(state.krs.length < 3){
+    state.krs.push({ name:'', subs:[{ name:'', cha:0, com:0, history:[] }] });
+  }
+  if(state.krs.length > 3) state.krs = state.krs.slice(0,3);
+  state.krs.forEach(kr => {
+    if(!Array.isArray(kr.subs) || kr.subs.length === 0){
+      kr.subs = [{ name:'', cha:0, com:0, history:[] }];
+    }
+  });
+}
+
 function renderKREdit(){
-  // demoモード時はプレースホルダー表示なのでスキップ
   if(typeof isDemoMode !== 'undefined' && isDemoMode) return;
+  ensureKrSlots();
   const list = document.getElementById('krEditList');
   if(!list) return;
   document.getElementById('goalInput').value = state.goal || '';
@@ -1360,31 +1375,32 @@ function renderKREdit(){
   state.krs.forEach((kr, krIdx) => {
     const block = document.createElement('div');
     block.className = 'kr-block';
-    let subRows = `
-      <div class="sub-row">
-        <div class="head" style="text-align:left">サブ目標名</div>
-        <div class="head">CHA</div>
-        <div class="head">COM</div>
-        <div></div>
-      </div>
-    `;
+    block.style.cssText = 'background:#fdfbf6;border:1px solid var(--line);border-radius:12px;padding:18px 18px;margin-bottom:14px';
+    let subRows = '';
     kr.subs.forEach((sub, subIdx) => {
       subRows += `
-        <div class="sub-row">
-          <input type="text" placeholder="例：毎日1時間運動" value="${escapeHtml(sub.name || '')}" data-edit="sub-name" data-kr="${krIdx}" data-sub="${subIdx}"/>
-          <input type="number" min="0" placeholder="45" value="${sub.cha || ''}" data-edit="sub-cha" data-kr="${krIdx}" data-sub="${subIdx}"/>
-          <input type="number" min="0" placeholder="25" value="${sub.com || ''}" data-edit="sub-com" data-kr="${krIdx}" data-sub="${subIdx}"/>
-          <button class="btn-tiny" data-act="del-sub" data-kr="${krIdx}" data-sub="${subIdx}">×</button>
+        <div style="background:#fff;border:1px solid var(--line-soft);border-radius:8px;padding:12px 14px;margin-bottom:8px">
+          <div style="font-size:10.5px;color:var(--mute);letter-spacing:0.18em;margin-bottom:6px">▼ 数値目標 ${subIdx+1}</div>
+          <input type="text" placeholder="どんなアクション？（例：毎日1時間運動する）" value="${escapeHtml(sub.name || '')}" data-edit="sub-name" data-kr="${krIdx}" data-sub="${subIdx}" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:5px;font-family:inherit;margin-bottom:8px"/>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <label style="display:block;font-size:10px;color:var(--accent);letter-spacing:0.1em;margin-bottom:3px;font-weight:600">🎯 チャレンジ目標数値</label>
+              <input type="number" min="0" step="0.5" placeholder="例：45" value="${sub.cha || ''}" data-edit="sub-cha" data-kr="${krIdx}" data-sub="${subIdx}" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:5px;font-family:inherit;text-align:right"/>
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;color:var(--leaf-deep);letter-spacing:0.1em;margin-bottom:3px;font-weight:600">✅ コミット目標数値</label>
+              <input type="number" min="0" step="0.5" placeholder="例：25" value="${sub.com || ''}" data-edit="sub-com" data-kr="${krIdx}" data-sub="${subIdx}" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:5px;font-family:inherit;text-align:right"/>
+            </div>
+          </div>
+          ${kr.subs.length > 1 ? `<button class="btn-tiny" data-act="del-sub" data-kr="${krIdx}" data-sub="${subIdx}" style="margin-top:8px;font-size:10px;background:transparent;border:1px solid var(--mute);color:var(--mute);padding:3px 10px;border-radius:12px;cursor:pointer">✕ この数値目標を削除</button>` : ''}
         </div>
       `;
     });
     block.innerHTML = `
-      <div class="kr-name-row">
-        <input type="text" placeholder="KR1：健康管理 など" value="${escapeHtml(kr.name || '')}" data-edit="kr-name" data-kr="${krIdx}"/>
-        <button class="btn-tiny" data-act="del-kr" data-kr="${krIdx}">削除</button>
-      </div>
+      <div style="background:var(--accent);color:#fff;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;font-weight:700;letter-spacing:0.2em;padding:4px 14px;border-radius:14px;display:inline-block;margin-bottom:12px">GOAL ${krIdx+1}</div>
+      <input type="text" placeholder="目標 ${krIdx+1}（例：健康管理／副収入を作る／視野を広げる）" value="${escapeHtml(kr.name || '')}" data-edit="kr-name" data-kr="${krIdx}" style="width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:6px;font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px"/>
       ${subRows}
-      ${kr.subs.length < 3 ? `<button class="btn-add" data-act="add-sub" data-kr="${krIdx}" style="margin-top:8px;padding:8px;font-size:11px">＋ サブ目標を追加</button>` : ''}
+      ${kr.subs.length < 3 ? `<button class="btn-add" data-act="add-sub" data-kr="${krIdx}" style="margin-top:4px;padding:8px 12px;font-size:11px;border:1px dashed var(--leaf);color:var(--leaf-deep);background:transparent;border-radius:6px;cursor:pointer;font-family:inherit">＋ 数値目標をもう1つ追加（最大3つ）</button>` : ''}
     `;
     list.appendChild(block);
   });
@@ -1900,7 +1916,7 @@ if(nameParam && !state.userName){
   if(name) q.set('name', name);
   if(params.get('demo')) q.set('demo', '1');
   const qs = q.toString();
-  link.href = 'quest.html' + (qs ? '?' + qs : '');
+  link.href = 'quest_v2.html' + (qs ? '?' + qs : '');
 })();
 
 function demoSimulate(weekCount, achieveRatio){
