@@ -300,9 +300,9 @@ svg{image-rendering:pixelated}
 <!-- Supabase 設定（くみこが書き換え） -->
 <script src="supabase_config.js"></script>
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624j"></script>
-<script src="town3_data.js?v=20260624j"></script>
-<script src="town4_data.js?v=20260624j"></script>
+<script src="town2_data.js?v=20260624k"></script>
+<script src="town3_data.js?v=20260624k"></script>
+<script src="town4_data.js?v=20260624k"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -618,7 +618,92 @@ function loadState(){
     return merged;
   } catch(e){ return def; }
 }
-function saveState(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
+function saveState(){
+  localStorage.setItem(storageKey, JSON.stringify(state));
+  // クラウド自動同期（デバウンス付き）
+  scheduleCloudSync();
+}
+
+// ===== 自動クラウド同期＋復元 =====
+let _syncTimer = null;
+let _isSyncing = false;
+function scheduleCloudSync(){
+  if(typeof getSupabaseClient !== 'function') return;
+  if(!getSupabaseClient || !getSupabaseClient()) return;
+  if(_syncTimer) clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(async () => {
+    if(_isSyncing) return;
+    _isSyncing = true;
+    showSyncIndicator('syncing');
+    try {
+      const result = await uploadMyProfile();
+      showSyncIndicator(result.ok ? 'synced' : 'error');
+    } catch(e){ showSyncIndicator('error'); }
+    _isSyncing = false;
+  }, 2500); // 2.5秒のデバウンス
+}
+function showSyncIndicator(status){
+  let el = document.getElementById('syncIndicator');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'syncIndicator';
+    el.style.cssText = 'position:fixed;bottom:6px;left:6px;padding:5px 10px;border-radius:4px;font-size:10px;letter-spacing:0.1em;background:rgba(0,0,0,0.75);color:#fff;z-index:9998;font-family:DotGothic16,sans-serif;transition:opacity 0.4s;pointer-events:none';
+    document.body.appendChild(el);
+  }
+  const labels = { syncing:'☁ 同期中…', synced:'☁ 保存済', error:'⚠ 接続失敗' };
+  el.textContent = labels[status] || '';
+  el.style.color = status === 'error' ? '#ffaa44' : '#7ac8ff';
+  el.style.opacity = '1';
+  if(status === 'synced' || status === 'error'){
+    setTimeout(()=>{ if(el) el.style.opacity = '0'; }, 2200);
+  }
+}
+
+// クラウドから進捗を復元
+async function loadFromCloud(){
+  const client = (typeof getSupabaseClient === 'function') ? getSupabaseClient() : null;
+  if(!client) return false;
+  try {
+    const { data, error } = await client.from('realize_members').select('*').eq('id', userKey).maybeSingle();
+    if(error || !data) return false;
+    const cloudUpdated = data.updated_at ? new Date(data.updated_at).getTime() : 0;
+    const localUpdated = state.lastVisit ? new Date(state.lastVisit).getTime() : 0;
+    // クラウドの方が新しい OR ローカルが空のときに復元
+    const isLocalEmpty = !state.mbti && (state.progress.strengthsFromOthers || []).filter(s=>s).length === 0;
+    if(cloudUpdated > localUpdated || isLocalEmpty){
+      console.log('☁ クラウドから進捗を復元', data);
+      if(data.name && !state.name) state.name = data.name;
+      if(data.mbti) state.mbti = data.mbti;
+      if(data.role) state.role = data.role;
+      if(data.animal_key) state.animal = data.animal_key;
+      if(!state.progress) state.progress = {};
+      if(data.strengths_others && data.strengths_others.length) state.progress.strengthsFromOthers = data.strengths_others.concat(['','','','','']).slice(0,5);
+      if(data.strengths_town2 && data.strengths_town2.length){
+        state.progress.town2NpcStrengths = [
+          data.strengths_town2.slice(0,2),
+          data.strengths_town2.slice(2,4),
+          data.strengths_town2.slice(4,6)
+        ];
+      }
+      if(data.strengths_additional && data.strengths_additional.length){
+        state.progress.additionalStrengths = data.strengths_additional.map(s => typeof s === 'string' ? {text:s} : s);
+      }
+      if(data.ijouchi) state.progress.town3IjouchiStatement = data.ijouchi;
+      if(data.my_strength_answer) state.progress.myStrengthAnswer = data.my_strength_answer;
+      // フラグ自動推定
+      if(data.mbti){ state.progress.mbtiCompleted = true; state.progress.hatched = true; state.progress.eggReceived = true; state.progress.professorMet = true; }
+      if(data.strengths_others && data.strengths_others.length >= 5){ state.progress.town1Cleared = true; }
+      if((data.strengths_town2 || []).length >= 6){ state.progress.town2GymOpen = true; }
+      if(data.my_strength_answer){ state.progress.town2GymCleared = true; state.progress.town2GymLeaderOpen = true; state.progress.town2GymOpen = true; state.progress.town2WelcomeShown = true; }
+      if(data.ijouchi){ state.progress.town3Cleared = true; }
+      state.lastVisit = data.updated_at;
+      localStorage.setItem(storageKey, JSON.stringify(state));
+      renderStatus();
+      return true;
+    }
+  } catch(e){ console.warn('Cloud load error:', e); }
+  return false;
+}
 
 // SVG
 function heroSVG(){return `<svg class="hero-body" viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="5" y="1" width="6" height="1" fill="#f78ac0"/><rect x="4" y="2" width="8" height="2" fill="#f78ac0"/><rect x="4" y="4" width="2" height="1" fill="#c45a8e"/><rect x="10" y="4" width="2" height="1" fill="#c45a8e"/><rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/><rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="6" width="2" height="1" fill="#e63d6a"/><rect x="4" y="5" width="1" height="3" fill="#f78ac0"/><rect x="10" y="5" width="1" height="3" fill="#f78ac0"/><rect x="5" y="7" width="5" height="5" fill="#e63d6a"/><rect x="4" y="8" width="1" height="3" fill="#e63d6a"/><rect x="10" y="8" width="1" height="3" fill="#e63d6a"/><rect x="5" y="9" width="5" height="1" fill="#ffd644"/><rect x="5" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="8" y="12" width="2" height="2" fill="#fcd1a3"/><rect x="5" y="14" width="2" height="1" fill="#0e0e1a"/><rect x="8" y="14" width="2" height="1" fill="#0e0e1a"/></svg>`;}
@@ -1886,7 +1971,7 @@ function showHowTo(){
   document.getElementById('titleScreen').style.display = 'none';
   document.getElementById('howtoScreen').classList.add('show');
 }
-function startGame(){
+async function startGame(){
   document.getElementById('titleScreen').style.display = 'none';
   document.getElementById('howtoScreen').classList.remove('show');
   document.getElementById('frame').style.display = 'flex';
@@ -1894,6 +1979,12 @@ function startGame(){
     renderStage();
     renderHero();
     renderStatus();
+    // クラウドから進捗復元（バックグラウンド・サイレント）
+    const restored = await loadFromCloud();
+    if(restored){
+      renderStage(); renderHero(); renderStatus();
+      setMsg('▼ ☁ <span class="mind">クラウドから前回の続きを 復元しました！</span>\n  メニュー(B) で 進捗を確認できます。');
+    }
   } catch(e){
     console.error('Game init error:', e);
     setMsg('▼ <span class="red">起動エラー：' + e.message + '</span>\n  メニュー(B) → 全リセット を試してください。');
