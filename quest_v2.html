@@ -262,7 +262,7 @@ svg{image-rendering:pixelated}
     </div>
     <div class="status-right">
       <div class="kakera">★ 進行度 <span id="progressNum">0</span> / 10</div>
-      <div class="warp-btn" onclick="openWarp()">🚀 ワープ</div>
+      <div class="warp-btn" onclick="openMenu()" style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:4px;font-weight:bold;font-size:10px">📜 B=メニュー</div>
     </div>
   </div>
 
@@ -288,7 +288,7 @@ svg{image-rendering:pixelated}
       <button class="ab-btn b" onclick="openMenu()">B</button>
     </div>
   </div>
-  <div class="hint">矢印で移動 ／ A=しらべる ／ B=メニュー</div>
+  <div class="hint">▲▼◀▶ 長押しで連続移動 ／ A=しらべる ／ <span style="color:var(--accent);font-weight:bold">B=メニュー（相棒・強み・レポート）</span></div>
 </div>
 
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
@@ -296,9 +296,9 @@ svg{image-rendering:pixelated}
 </div>
 
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624f"></script>
-<script src="town3_data.js?v=20260624f"></script>
-<script src="town4_data.js?v=20260624f"></script>
+<script src="town2_data.js?v=20260624g"></script>
+<script src="town3_data.js?v=20260624g"></script>
+<script src="town4_data.js?v=20260624g"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -912,8 +912,17 @@ function enterIndoor(id){
   // 自動で博士イベント発火（卵未受領の時のみ）
   if(id === 'professor_lab' && !state.progress.eggReceived){
     setTimeout(()=>{
-      setMsg('▼ 奥に <span class="em">博士</span> がいる。\n  Aボタンで話しかけよう。');
+      setMsg('▼ 奥に <span class="em">しみず博士</span> がいる。\n  Aボタンで話しかけよう。');
     }, 400);
+  }
+  // 街2の家：強み追加 TIP
+  if(/^npc[123]_house$/.test(id)){
+    const npcCnt = state.progress.town2NpcStrengths[Number(id[3])-1] || [];
+    if(npcCnt.length >= 2){
+      setTimeout(()=>{
+        setMsg(`▼ <span class="pink">★ 思い出した強み、ここで都度伝えられる！</span>\n  Aで話す→「✨ 強みを伝える」\n  伝えるほど <span class="em">相棒がレベルアップ！</span>`);
+      }, 400);
+    }
   }
 }
 function exitIndoor(){
@@ -1166,6 +1175,26 @@ function warpTo(tk){
   state.visitedTowns[tk] = true;
   saveState(); closeModal(); renderStage(); renderHero(); renderStatus();
   setMsg(`▼ <span class="em">${t.name}</span> に到着！\n  ${t.description}`);
+  // 街2初回到着時の案内
+  if(tk === 'town2' && !state.progress.town2WelcomeShown){
+    state.progress.town2WelcomeShown = true;
+    saveState();
+    setTimeout(showTown2Welcome, 600);
+  }
+}
+function showTown2Welcome(){
+  showModal(`
+    <h2>📖 強み発掘の街 へようこそ！</h2>
+    <div class="sub">— TUTORIAL —</div>
+    <p>この街でやることは <span class="em">3つ</span>。</p>
+    <div style="background:rgba(122,200,255,0.1);border-left:3px solid var(--mind);padding:12px 14px;margin:12px 0;line-height:1.95">
+      <p><span class="em">① 3人の住人</span>に家で会う<br>　<span class="pink">かなみ・ひかる・えり</span> から強みをもらう</p>
+      <p><span class="em">② 何度でも 強みを追加</span><br>　現実で 他の人から褒められたら、<br>　また3人の誰かの家を訪れて 伝えよう。<br>　<span class="pink">伝えるたびに 相棒のレベルが上がる！</span></p>
+      <p><span class="em">③ ジムリーダーに 挑戦</span><br>　集めた強みを使って 「あなたの強みは？」<br>　に時間内に答える</p>
+    </div>
+    <p style="color:var(--gold);font-size:11px;line-height:1.85">★ TIP：いつでも <span class="em">B ボタン</span> で<br>　・自分の相棒 ＆ レベル<br>　・集めた強み一覧<br>　を確認できます。</p>
+    <div class="modal-actions"><button class="btn primary" onclick="closeModal()">はじめる！</button></div>
+  `);
 }
 
 // ===== 街2 機能 =====
@@ -1406,7 +1435,60 @@ function performSynthesis(){
   state.progress.town3IjouchiStatement = statement;
   state.progress.town3Cleared = true;
   saveState(); renderStatus();
-  showModal(`<h2>🌟 異常値を発見！</h2><p>「${escapeHtml(TOWN3.synthesizer.revealMessage || 'これがキミの異常値だ')}」</p><div class="synth-result"><div class="label">— あなたの異常値 —</div><div class="statement">${escapeHtml(statement)}</div></div><p>${escapeHtml(TOWN3.synthesizer.blessingMessage || '誇りなさい、これがキミの旗じゃ。')}</p><div class="modal-actions"><button class="btn primary" onclick="closeModal()">受け取る</button><button class="btn" onclick="editIjouchi()">少し直す</button></div>`);
+  showModal(`<h2>🌟 異常値を発見！</h2><p>「${escapeHtml(TOWN3.synthesizer.revealMessage || 'これがキミの異常値だ')}」</p><div class="synth-result"><div class="label">— あなたの異常値 —</div><div class="statement">${escapeHtml(statement)}</div></div><p>${escapeHtml(TOWN3.synthesizer.blessingMessage || '誇りなさい、これがキミの旗じゃ。')}</p><div class="modal-actions"><button class="btn" onclick="editIjouchi()">少し直す</button><button class="btn primary" onclick="closeModal();setTimeout(showTown4Unlock,500)">受け取る</button></div>`);
+}
+
+// ===== 街4開放演出 =====
+let _seAudioCtx = null;
+function playUnlockSE(){
+  try {
+    if(!_seAudioCtx) _seAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(_seAudioCtx.state === 'suspended') _seAudioCtx.resume();
+    const now = _seAudioCtx.currentTime;
+    // 上昇ファンファーレ
+    const notes = [
+      [440, 0.15], [554, 0.15], [659, 0.15], [880, 0.3],
+      [0, 0.05], [880, 0.15], [1108, 0.4]
+    ];
+    let t = now;
+    notes.forEach(([f, d]) => {
+      if(f > 0){
+        const osc = _seAudioCtx.createOscillator();
+        const gain = _seAudioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = f;
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.12, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + d);
+        osc.connect(gain).connect(_seAudioCtx.destination);
+        osc.start(t);
+        osc.stop(t + d);
+      }
+      t += d;
+    });
+  } catch(e){}
+}
+function showTown4Unlock(){
+  playUnlockSE();
+  const flash = document.createElement('div');
+  flash.className = 'screen-flash';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(), 800);
+  setTimeout(()=>{
+    showModal(`
+      <h2 class="fanfare-text" style="font-size:24px">⚔ NEW AREA UNLOCKED ⚔</h2>
+      <div class="sub">— 新エリア解放 —</div>
+      <div style="text-align:center;padding:20px;background:linear-gradient(135deg,#3a2a5a 0%,#1a1a3a 100%);border:3px solid var(--gold);margin:14px 0">
+        <p style="font-size:20px;color:var(--gold);letter-spacing:0.2em;margin-bottom:10px;text-shadow:2px 2px 0 var(--dress-d)">★ 街4：交流の都 ★</p>
+        <p style="color:var(--sakura);font-size:12.5px;line-height:1.95">他のRealize仲間と<br>強みをぶつけ合って 高め合おう</p>
+      </div>
+      <p style="color:var(--gold);font-size:12px;text-align:center">▼ 街4 がワープリストに 追加されました ▼</p>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal()">あとで</button>
+        <button class="btn primary" onclick="closeModal();setTimeout(function(){warpTo('town4')},400)">▶ 街4 へ行く！</button>
+      </div>
+    `);
+  }, 700);
 }
 function editIjouchi(){
   showModal(`<h2>✏ 異常値を微調整</h2><p>提示された異常値を自分の言葉で書き直してOK。</p><textarea class="modal-input modal-textarea" id="ijouchiEdit" style="min-height:100px">${escapeHtml(state.progress.town3IjouchiStatement)}</textarea><div class="modal-actions"><button class="btn" onclick="closeModal()">キャンセル</button><button class="btn primary" onclick="saveIjouchiEdit()">確定</button></div>`);
