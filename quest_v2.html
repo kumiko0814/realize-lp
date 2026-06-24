@@ -300,9 +300,9 @@ svg{image-rendering:pixelated}
 <!-- Supabase 設定（くみこが書き換え） -->
 <script src="supabase_config.js"></script>
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260624i"></script>
-<script src="town3_data.js?v=20260624i"></script>
-<script src="town4_data.js?v=20260624i"></script>
+<script src="town2_data.js?v=20260624j"></script>
+<script src="town3_data.js?v=20260624j"></script>
+<script src="town4_data.js?v=20260624j"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -1581,10 +1581,22 @@ function cloudMemberToRival(m){
     mbti: m.mbti || '?',
     animalKey: m.animal_key || 'tamago',
     ijouchi: m.ijouchi || '異常値発見中…',
-    strengths: [...(m.strengths_others || []).slice(0,2), ...(m.strengths_additional || []).slice(0,1)].filter(Boolean),
+    strengths: [
+      ...(m.strengths_others || []).slice(0,2),
+      ...(m.strengths_town2 || []).slice(0,2),
+      ...(m.strengths_additional || []).slice(0,2)
+    ].filter(Boolean),
+    allStrengths: [
+      ...(m.strengths_others || []),
+      ...(m.strengths_town2 || []),
+      ...(m.strengths_additional || [])
+    ].filter(Boolean),
     backstory: '同じ Realize の仲間。実在の参加者。',
     currentGoal: m.current_goal,
-    companionLevel: m.companion_level
+    companionLevel: m.companion_level || 1,
+    currentWeek: m.current_week || 0,
+    achievementRate: m.achievement_rate || 0,
+    submissionRate: m.submission_rate || 0
   };
 }
 
@@ -1622,7 +1634,11 @@ async function showMembersBoard(){
       <div style="width:48px;height:48px;margin:0 auto 6px">${ANIMAL_SVG[r.animalKey] || ANIMAL_SVG.tamago}</div>
       <div style="font-size:11.5px;font-weight:bold">${escapeHtml(r.name)}</div>
       <div style="font-size:9px;color:var(--mind);margin-top:2px">${r.mbti} ／ ${escapeHtml(ANIMAL_NAME[r.animalKey] || '')}</div>
-      ${r.isCloud ? '<div style="font-size:8px;color:var(--mind);margin-top:3px">☁ 実在の仲間</div>' : ''}
+      ${r.isCloud ? `
+        <div style="font-size:8px;color:var(--mind);margin-top:3px">☁ Lv.${r.companionLevel || 1} ／ Week ${r.currentWeek || 0}</div>
+        <div style="height:4px;background:#1a1a2a;border:1px solid #3a3a4a;margin:4px 6px 2px;overflow:hidden;border-radius:2px"><div style="height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--accent) 100%);width:${r.achievementRate || 0}%"></div></div>
+        <div style="font-size:8px;color:var(--gold)">達成率 ${r.achievementRate || 0}%</div>
+      ` : ''}
     </div>
   `).join('');
   showModal(`
@@ -1672,6 +1688,16 @@ function showMemberProfile(id){
         ${(r.strengths || []).map(s => `<li class="pink">${escapeHtml(s)}</li>`).join('')}
       </ul>
       ${r.currentGoal ? `<div style="background:rgba(122,200,255,0.12);border-left:3px solid var(--mind);padding:10px 12px;margin-bottom:14px"><div style="font-size:10px;color:var(--mind);letter-spacing:0.2em;margin-bottom:4px">🎯 今の目標</div><div style="font-size:12px;line-height:1.85">${escapeHtml(r.currentGoal)}</div></div>` : ''}
+      ${r.isCloud ? `
+        <div style="background:rgba(255,214,68,0.12);border:1px solid var(--gold);padding:12px;margin-bottom:14px;border-radius:4px">
+          <div style="font-size:10px;color:var(--gold);letter-spacing:0.2em;margin-bottom:8px">📊 進捗状況</div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-bottom:1px dashed #3a3a4a"><span>🐾 相棒レベル</span><span class="em">Lv.${r.companionLevel}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-bottom:1px dashed #3a3a4a"><span>📅 現在の週</span><span class="em">Week ${r.currentWeek} / 26</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-bottom:1px dashed #3a3a4a"><span>📊 達成率</span><span class="em">${r.achievementRate}%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0"><span>📝 提出率</span><span class="em">${r.submissionRate}%</span></div>
+        </div>
+        ${r.allStrengths && r.allStrengths.length > 3 ? `<p class="em" style="margin-bottom:4px">💎 全強み (${r.allStrengths.length}個)</p><ul style="padding-left:20px;margin-bottom:14px;line-height:1.85;font-size:11.5px">${r.allStrengths.slice(0,10).map(s=>`<li class="pink">${escapeHtml(s)}</li>`).join('')}${r.allStrengths.length>10?`<li style="color:var(--mute)">…他 ${r.allStrengths.length-10}個</li>`:''}</ul>`:''}
+      ` : ''}
       <p class="pink" style="font-size:11.5px;line-height:1.85">「${escapeHtml(r.backstory || '')}」</p>
       ${battled ? `<p style="color:var(--gold);font-size:11px;text-align:center;margin-top:10px">★ 称号「${escapeHtml(r.reward || '')}」獲得済</p>` : ''}
       <div class="modal-actions">

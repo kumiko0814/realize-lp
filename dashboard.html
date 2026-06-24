@@ -456,7 +456,72 @@ body{
   cursor:pointer;letter-spacing:0.1em;margin-top:6px;
 }
 .onboard .ob-close:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ===== みんなの進捗（Supabase連携）===== */
+.peers-section{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:24px 22px;margin-bottom:24px;
+}
+.peers-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;flex-wrap:wrap;gap:8px;
+}
+.peers-head h2{
+  font-family:"Yu Mincho",serif;font-size:17px;font-weight:600;
+  letter-spacing:0.06em;color:var(--leaf-deep);
+}
+.peers-head .count{font-size:11px;color:var(--mute);letter-spacing:0.12em}
+.peers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.peer-card{
+  background:#fdfbf6;border:1px solid var(--line);border-radius:10px;
+  padding:14px 12px;cursor:pointer;transition:all 0.15s;text-align:center;
+}
+.peer-card:hover{border-color:var(--leaf);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.06)}
+.peer-card .avatar{width:56px;height:56px;margin:0 auto 8px;background:#fff7ec;border:1px solid var(--line-soft);border-radius:8px;padding:4px}
+.peer-card .nm{font-size:12.5px;font-weight:700;margin-bottom:2px}
+.peer-card .role{font-size:9.5px;color:var(--leaf-deep);letter-spacing:0.1em;margin-bottom:6px}
+.peer-card .lv{font-size:10.5px;color:var(--accent);font-weight:600;letter-spacing:0.08em}
+.peer-card .bar{height:5px;background:#ece5d8;border-radius:3px;margin:8px 0 4px;overflow:hidden}
+.peer-card .bar-fill{height:100%;background:linear-gradient(90deg,var(--leaf) 0%,var(--gold) 100%);transition:width 0.4s}
+.peer-card .rate{font-size:9.5px;color:var(--sub);letter-spacing:0.06em}
+.peer-card.me{background:linear-gradient(135deg,#fff7ec 0%,#fff 100%);border:2px solid var(--gold)}
+.peer-card.me .nm::after{content:" (自分)";color:var(--accent);font-size:10px}
+.peers-loading{text-align:center;padding:20px;color:var(--mute);font-size:11px;letter-spacing:0.1em}
+.peers-empty{text-align:center;padding:20px;color:var(--mute);font-size:11.5px;line-height:1.85}
+.peers-toggle{
+  background:transparent;border:1px solid var(--line);color:var(--sub);
+  padding:5px 12px;border-radius:999px;font-size:10.5px;cursor:pointer;font-family:inherit;letter-spacing:0.1em;
+}
+.peers-toggle:hover{border-color:var(--leaf-deep);color:var(--leaf-deep)}
+
+/* メンバー詳細モーダル */
+.peer-modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:600;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.peer-modal-bg.show{display:flex}
+.peer-modal{
+  background:#fff;border-radius:14px;padding:28px;max-width:480px;width:100%;
+  max-height:88vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.2);
+}
+.peer-modal h3{font-family:"Yu Mincho",serif;font-size:20px;margin-bottom:6px;color:var(--ink)}
+.peer-modal .role-line{font-size:11px;color:var(--leaf-deep);letter-spacing:0.18em;margin-bottom:18px}
+.peer-modal .big-avatar{width:80px;height:80px;margin:0 auto 16px;display:block;background:#fff7ec;border:2px solid var(--gold);border-radius:10px;padding:6px}
+.peer-modal .ijouchi-box{background:linear-gradient(135deg,#fff7ec 0%,#fef3e0 100%);border:2px solid var(--gold);padding:14px;border-radius:8px;margin-bottom:14px}
+.peer-modal .ijouchi-box .lbl{font-size:9.5px;color:var(--gold-deep);letter-spacing:0.25em;margin-bottom:6px}
+.peer-modal .ijouchi-box .stmt{font-size:13.5px;line-height:1.85;color:var(--ink)}
+.peer-modal .progress-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line-soft)}
+.peer-modal .progress-row .k{font-size:11.5px;color:var(--sub)}
+.peer-modal .progress-row .v{font-size:12.5px;color:var(--accent);font-weight:700}
+.peer-modal h4{font-size:13px;color:var(--leaf-deep);margin:14px 0 6px;font-weight:700}
+.peer-modal ul{padding-left:20px;font-size:12px;line-height:1.85}
+.peer-modal .close{display:block;margin:20px auto 0;background:var(--ink);color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-family:inherit;letter-spacing:0.1em;font-size:12px}
 </style>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase_config.js"></script>
+
 </head>
 <body>
 
@@ -626,6 +691,25 @@ body{
       <a href="quest.html" id="ijouchiLink" style="font-family:'DotGothic16',sans-serif;background:#e63d6a;color:#fff;border:3px solid #fcd5e6;padding:14px 24px;text-decoration:none;letter-spacing:0.15em;font-size:13px;white-space:nowrap;transition:all 0.2s">▶ PLAY</a>
     </div>
   </section>
+
+  <!-- みんなの進捗（Supabase連携） -->
+  <section class="peers-section" id="peersSection">
+    <div class="peers-head">
+      <h2>🌸 みんなの進捗</h2>
+      <div>
+        <span class="count" id="peersCount">読み込み中…</span>
+        <button class="peers-toggle" onclick="refreshPeers()">↻ 更新</button>
+      </div>
+    </div>
+    <div id="peersBody">
+      <div class="peers-loading">クラウドから 仲間を呼び寄せ中…</div>
+    </div>
+  </section>
+
+  <!-- メンバー詳細モーダル -->
+  <div class="peer-modal-bg" id="peerModalBg" onclick="if(event.target===this)closePeerModal()">
+    <div class="peer-modal" id="peerModal"></div>
+  </div>
 
   <!-- MONTHLY BADGES -->
   <section class="card">
@@ -1782,6 +1866,157 @@ function demoReset(){
   saveState(state);
   render();
 }
+
+/* =====================================
+   Supabase 連携：みんなの進捗
+   ===================================== */
+let _supaClient = null;
+function getSupa(){
+  if(_supaClient) return _supaClient;
+  if(typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.enabled) return null;
+  if(typeof supabase === 'undefined') return null;
+  try { _supaClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey); return _supaClient; }
+  catch(e){ return null; }
+}
+
+// quest_v2 連動の動物SVG（10種類）
+const ANIMAL_SVG_DASH = {
+  neko: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="1" height="1" fill="#c45a8e"/><rect x="2" y="2" width="2" height="1" fill="#c45a8e"/><rect x="2" y="3" width="3" height="1" fill="#f78ac0"/><rect x="13" y="1" width="1" height="1" fill="#c45a8e"/><rect x="12" y="2" width="2" height="1" fill="#c45a8e"/><rect x="11" y="3" width="3" height="1" fill="#f78ac0"/><rect x="2" y="4" width="12" height="6" fill="#f78ac0"/><rect x="3" y="3" width="10" height="1" fill="#f78ac0"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="1" fill="#e63d6a"/><rect x="3" y="10" width="10" height="3" fill="#f78ac0"/><rect x="3" y="13" width="2" height="2" fill="#f78ac0"/><rect x="6" y="13" width="2" height="2" fill="#f78ac0"/><rect x="11" y="13" width="2" height="2" fill="#f78ac0"/></svg>',
+  usagi: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="4" y="0" width="2" height="5" fill="#fff"/><rect x="10" y="0" width="2" height="5" fill="#fff"/><rect x="5" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="10" y="1" width="1" height="3" fill="#f6a0c4"/><rect x="2" y="5" width="12" height="7" fill="#fff"/><rect x="5" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="7" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#f6a0c4"/><rect x="3" y="12" width="3" height="2" fill="#fff"/><rect x="10" y="12" width="3" height="2" fill="#fff"/></svg>',
+  panda: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="8" fill="#fff"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/><rect x="3" y="12" width="3" height="2" fill="#0e0e1a"/><rect x="10" y="12" width="3" height="2" fill="#0e0e1a"/></svg>',
+  fukurou: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="2" y="3" width="12" height="9" fill="#a87132"/><rect x="4" y="5" width="3" height="3" fill="#fff"/><rect x="9" y="5" width="3" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#ffd644"/><rect x="5" y="12" width="2" height="2" fill="#ffd644"/><rect x="9" y="12" width="2" height="2" fill="#ffd644"/></svg>',
+  kitsune: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="3" height="3" fill="#e6814a"/><rect x="11" y="1" width="3" height="3" fill="#e6814a"/><rect x="2" y="4" width="12" height="6" fill="#e6814a"/><rect x="4" y="8" width="8" height="2" fill="#fff"/><rect x="4" y="6" width="2" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/><rect x="3" y="10" width="6" height="4" fill="#e6814a"/><rect x="9" y="10" width="5" height="3" fill="#e6814a"/></svg>',
+  shibainu: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="2" width="2" height="3" fill="#c89455"/><rect x="11" y="2" width="2" height="3" fill="#c89455"/><rect x="2" y="4" width="12" height="7" fill="#c89455"/><rect x="4" y="8" width="8" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="9" width="2" height="1" fill="#0e0e1a"/><rect x="3" y="11" width="2" height="3" fill="#c89455"/><rect x="11" y="11" width="2" height="3" fill="#c89455"/></svg>',
+  risu: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="2" y="1" width="2" height="2" fill="#a87132"/><rect x="8" y="1" width="2" height="2" fill="#a87132"/><rect x="2" y="3" width="8" height="5" fill="#a87132"/><rect x="3" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="5" y="7" width="2" height="1" fill="#e63d6a"/><rect x="3" y="9" width="6" height="4" fill="#a87132"/><rect x="4" y="10" width="4" height="3" fill="#fcd5a3"/><rect x="11" y="1" width="4" height="2" fill="#a87132"/><rect x="13" y="2" width="3" height="6" fill="#a87132"/><rect x="12" y="8" width="3" height="3" fill="#a87132"/></svg>',
+  hamster: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="1" width="2" height="2" fill="#c89a55"/><rect x="11" y="1" width="2" height="2" fill="#c89a55"/><rect x="3" y="3" width="10" height="6" fill="#ffd644"/><rect x="2" y="4" width="12" height="5" fill="#ffd644"/><rect x="0" y="6" width="3" height="3" fill="#fff5b8"/><rect x="13" y="6" width="3" height="3" fill="#fff5b8"/><rect x="4" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="5" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="7" width="2" height="1" fill="#f6a0c4"/><rect x="2" y="9" width="12" height="5" fill="#ffd644"/></svg>',
+  penguin: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="3" y="2" width="10" height="11" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="9" fill="#0e0e1a"/><rect x="4" y="6" width="8" height="6" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#e6814a"/><rect x="4" y="13" width="3" height="2" fill="#e6814a"/><rect x="9" y="13" width="3" height="2" fill="#e6814a"/></svg>',
+  tamago: '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:100%;height:100%"><rect x="6" y="2" width="4" height="1" fill="#fff"/><rect x="5" y="3" width="6" height="1" fill="#fff"/><rect x="4" y="4" width="8" height="2" fill="#fff"/><rect x="3" y="6" width="10" height="5" fill="#fff"/><rect x="4" y="11" width="8" height="2" fill="#fff"/><rect x="5" y="13" width="6" height="1" fill="#fff"/><rect x="7" y="7" width="2" height="1" fill="#c25b3f"/><rect x="8" y="8" width="1" height="1" fill="#c25b3f"/></svg>'
+};
+const ANIMAL_NAME_DASH = {neko:'ねこ',usagi:'うさぎ',panda:'パンダ',fukurou:'フクロウ',kitsune:'キツネ',shibainu:'シバイヌ',risu:'リス',hamster:'ハムスター',penguin:'ペンギン',tamago:'たまご'};
+const ROLE_DESC_DASH = {neko:'遊び人/商人',usagi:'吟遊詩人/踊り子',panda:'預言者/僧侶',fukurou:'大賢者/魔法使い',kitsune:'軍師/占い師',shibainu:'戦士/聖女',risu:'武闘家',hamster:'薬師',penguin:'忍者/勇者'};
+
+// 自分のダッシュボード進捗をクラウドへ同期
+async function syncMyProgressToCloud(){
+  const client = getSupa();
+  if(!client) return;
+  // quest_v2 のデータも取り込む
+  const qv2 = (function(){
+    const raw = localStorage.getItem('re_alize_quest_v2_' + userKey);
+    if(!raw) return {};
+    try { return JSON.parse(raw); } catch(e){ return {}; }
+  })();
+  // 進捗計算
+  const route = judgeRoute();
+  const stage = judgeStage();
+  const chaR = getCharRatesByWeek(state.currentWeek);
+  const comR = getComRatesByWeek(state.currentWeek);
+  const avgRate = (chaR + comR) / 2;
+  const submission = getSubmissionRate();
+  const payload = {
+    id: userKey,
+    name: state.userName || qv2.name || nameParam || 'なまえ未設定',
+    mbti: qv2.mbti || null,
+    role: qv2.role || null,
+    animal_key: qv2.animal || null,
+    ijouchi: (qv2.progress && qv2.progress.town3IjouchiStatement) || null,
+    current_week: state.currentWeek,
+    submission_rate: Math.round(submission * 100),
+    achievement_rate: Math.round(avgRate * 100),
+    dashboard_route: route,
+    dashboard_stage: stage,
+    okr_data: { krs: state.krs || null, dream: state.dream || null },
+    updated_at: new Date().toISOString()
+  };
+  try {
+    const { error } = await client.from('realize_members').upsert(payload, { onConflict:'id' });
+    if(error) console.warn('Dashboard sync error:', error);
+  } catch(e){ console.warn('Dashboard sync exception:', e); }
+}
+
+// 他メンバーを取得して表示
+async function refreshPeers(){
+  const body = document.getElementById('peersBody');
+  const count = document.getElementById('peersCount');
+  const client = getSupa();
+  if(!client){
+    body.innerHTML = '<div class="peers-empty">Supabase が未設定です。<br>設定後にここにメンバーが表示されます。</div>';
+    count.textContent = '未接続';
+    return;
+  }
+  body.innerHTML = '<div class="peers-loading">クラウドから 仲間を呼び寄せ中…</div>';
+  // 先に自分を同期
+  await syncMyProgressToCloud();
+  // 全員取得（自分含む）
+  try {
+    const { data, error } = await client.from('realize_members').select('*').order('updated_at', { ascending:false }).limit(50);
+    if(error){ body.innerHTML = '<div class="peers-empty">取得エラー：' + error.message + '</div>'; count.textContent = '0人'; return; }
+    if(!data || data.length === 0){
+      body.innerHTML = '<div class="peers-empty">まだ仲間がいません。<br>このページを更新するたびに、あなたのデータも反映されます。</div>';
+      count.textContent = '0人';
+      return;
+    }
+    count.textContent = data.length + '人 参加中';
+    renderPeers(data);
+  } catch(e){
+    body.innerHTML = '<div class="peers-empty">通信エラー：' + e.message + '</div>';
+    count.textContent = 'エラー';
+  }
+}
+function renderPeers(members){
+  const body = document.getElementById('peersBody');
+  // 自分を最初に
+  members.sort((a,b) => {
+    if(a.id === userKey) return -1;
+    if(b.id === userKey) return 1;
+    return 0;
+  });
+  body.innerHTML = '<div class="peers-grid">' + members.map(m => {
+    const animal = m.animal_key && ANIMAL_SVG_DASH[m.animal_key] ? m.animal_key : 'tamago';
+    const role = ROLE_DESC_DASH[animal] || '旅人';
+    const rate = m.achievement_rate || 0;
+    const isMe = m.id === userKey;
+    return `
+      <div class="peer-card ${isMe?'me':''}" onclick='showPeerModal(${JSON.stringify(m.id)})'>
+        <div class="avatar">${ANIMAL_SVG_DASH[animal]}</div>
+        <div class="nm">${escapeHtmlD(m.name)}</div>
+        <div class="role">${m.mbti || '?'} ／ ${role}</div>
+        <div class="bar"><div class="bar-fill" style="width:${rate}%"></div></div>
+        <div class="rate">達成率 ${rate}% ／ Week ${m.current_week || 0}</div>
+      </div>`;
+  }).join('') + '</div>';
+  window._peersData = members;
+}
+function showPeerModal(id){
+  const m = (window._peersData || []).find(x => x.id === id);
+  if(!m) return;
+  const animal = m.animal_key && ANIMAL_SVG_DASH[m.animal_key] ? m.animal_key : 'tamago';
+  const allStrengths = [
+    ...(m.strengths_others || []),
+    ...(m.strengths_town2 || []),
+    ...(m.strengths_additional || [])
+  ].filter(Boolean);
+  document.getElementById('peerModal').innerHTML = `
+    <h3>${escapeHtmlD(m.name)}${m.id === userKey?' <span style="font-size:12px;color:#c25b3f">(自分)</span>':''}</h3>
+    <div class="role-line">${m.mbti || '未診断'} ・ ${ROLE_DESC_DASH[animal] || '旅人'}</div>
+    <div class="big-avatar">${ANIMAL_SVG_DASH[animal]}</div>
+    ${m.ijouchi ? `<div class="ijouchi-box"><div class="lbl">— 異常値 —</div><div class="stmt">${escapeHtmlD(m.ijouchi)}</div></div>` : ''}
+    <div class="progress-row"><span class="k">📅 現在の週</span><span class="v">Week ${m.current_week || 0} / 26</span></div>
+    <div class="progress-row"><span class="k">📊 達成率</span><span class="v">${m.achievement_rate || 0}%</span></div>
+    <div class="progress-row"><span class="k">📝 提出率</span><span class="v">${m.submission_rate || 0}%</span></div>
+    ${m.companion_level ? `<div class="progress-row"><span class="k">🐾 相棒レベル</span><span class="v">Lv.${m.companion_level}</span></div>`:''}
+    ${allStrengths.length ? `<h4>💎 強み (${allStrengths.length}個)</h4><ul>${allStrengths.slice(0,12).map(s=>`<li>${escapeHtmlD(s)}</li>`).join('')}${allStrengths.length>12?`<li style="color:#8b8278">…他 ${allStrengths.length-12}個</li>`:''}</ul>`:''}
+    ${m.current_goal ? `<h4>🎯 今の目標</h4><p style="font-size:12px;line-height:1.85">${escapeHtmlD(m.current_goal)}</p>`:''}
+    <button class="close" onclick="closePeerModal()">閉じる</button>
+  `;
+  document.getElementById('peerModalBg').classList.add('show');
+}
+function closePeerModal(){ document.getElementById('peerModalBg').classList.remove('show'); }
+function escapeHtmlD(s){return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+// ページロード時に取得
+setTimeout(refreshPeers, 1000);
+// 5分ごと自動更新
+setInterval(refreshPeers, 300000);
 </script>
 
 </body>
