@@ -261,6 +261,7 @@ const params = new URLSearchParams(location.search);
 const userKey = params.get('u') || 'guest';
 const userName = (params.get('name') || '').trim();
 const storageKey = 're_alize_quest_v2_' + userKey;
+if(params.get('reset') === '1'){ localStorage.removeItem(storageKey); }
 const COLS = 20, ROWS = 12;
 
 const MBTI_TO_ANIMAL = {'ENFP':'neko','ESFP':'neko','INFP':'usagi','ISFP':'usagi','INFJ':'panda','ENFJ':'panda','INTJ':'fukurou','INTP':'fukurou','ENTJ':'kitsune','ENTP':'kitsune','ESTJ':'shibainu','ESFJ':'shibainu','ISTJ':'risu','ISFJ':'hamster','ISTP':'penguin','ESTP':'penguin'};
@@ -392,12 +393,28 @@ if(!state.lastVisit){ state.lastVisit = new Date().toISOString(); }
 saveState();
 
 function loadState(){
+  const def = defaultState();
   const raw = localStorage.getItem(storageKey);
-  if(raw){ try{
+  if(!raw) return def;
+  try {
     const d = JSON.parse(raw);
-    return Object.assign(defaultState(), d, { progress: Object.assign(defaultState().progress, d.progress || {}) });
-  }catch(e){} }
-  return defaultState();
+    const merged = Object.assign({}, def, d);
+    // pos が壊れてたら強制リセット
+    if(!merged.pos || typeof merged.pos.x !== 'number' || typeof merged.pos.y !== 'number'){
+      merged.pos = Object.assign({}, def.pos);
+    }
+    // currentTown 不正値チェック
+    if(!['town1','town2','town3','town4'].includes(merged.currentTown)){
+      merged.currentTown = 'town1';
+      merged.pos = Object.assign({}, def.pos);
+    }
+    // progress マージ
+    merged.progress = Object.assign({}, def.progress, d.progress || {});
+    // strengthsFromOthers は配列で初期化
+    if(!Array.isArray(merged.progress.strengthsFromOthers)) merged.progress.strengthsFromOthers = ['','','','',''];
+    if(!Array.isArray(merged.progress.town2NpcStrengths)) merged.progress.town2NpcStrengths = [[],[],[]];
+    return merged;
+  } catch(e){ return def; }
 }
 function saveState(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
 
@@ -1104,7 +1121,14 @@ function startGame(){
   document.getElementById('titleScreen').style.display = 'none';
   document.getElementById('howtoScreen').classList.remove('show');
   document.getElementById('frame').style.display = 'flex';
-  renderStage(); renderHero(); renderStatus();
+  try {
+    renderStage();
+    renderHero();
+    renderStatus();
+  } catch(e){
+    console.error('Game init error:', e);
+    setMsg('▼ <span class="red">起動エラー：' + e.message + '</span>\n  メニュー(B) → 全リセット を試してください。');
+  }
 }
 </script>
 
