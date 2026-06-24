@@ -4,9 +4,8 @@
 // ============================================================
 
 const SUPABASE_CONFIG = {
-  // ↓ Supabase Dashboard → Settings → API からコピー
-  url: '',           // 例: 'https://abcdefg.supabase.co'
-  anonKey: '',       // 例: 'eyJhbGciOiJI...' (anon public key)
+  url: 'https://inrvprlyobghviklulcv.supabase.co',
+  anonKey: 'sb_publishable_ZrCNcsRHMci-l7Fns8QtIA_X22XZGJp',
 
   // 接続が有効か（url/key 両方あれば true）
   get enabled(){ return !!(this.url && this.anonKey); }
