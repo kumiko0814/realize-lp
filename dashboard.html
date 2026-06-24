@@ -251,14 +251,33 @@ body{
 .history-grid{display:grid;grid-template-columns:repeat(26,1fr);gap:3px;padding:8px 0 14px}
 @media(max-width:720px){.history-grid{grid-template-columns:repeat(13,1fr);gap:4px}}
 .history-cell{
-  aspect-ratio:1/1;background:var(--line-soft);border-radius:3px;
-  position:relative;transition:background 0.3s;
+  aspect-ratio:1/1;background:#fef9f0;
+  border:1px solid #ece5d8;border-radius:4px;
+  position:relative;transition:all 0.3s;
+  font-family:'Cormorant Garamond',serif;
+  font-size:11px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  color:#bfb6a0;
 }
-.history-cell[data-rate="1"]{background:#f5d4c2}
-.history-cell[data-rate="2"]{background:#eab295}
-.history-cell[data-rate="3"]{background:#e89378}
-.history-cell[data-rate="4"]{background:#c25b3f}
-.history-cell.current{box-shadow:0 0 0 2px var(--leaf)}
+.history-cell[data-rate="1"]{background:#f5d4c2;color:#7a3a20;border-color:#e8a890}
+.history-cell[data-rate="2"]{background:#eab295;color:#fff;border-color:#d49070}
+.history-cell[data-rate="3"]{background:#e89378;color:#fff;border-color:#c25b3f}
+.history-cell[data-rate="4"]{background:#c25b3f;color:#fff;border-color:#7a3520}
+.history-cell.current{
+  box-shadow:0 0 0 3px var(--leaf-deep);
+  background:#fff7ec;color:var(--accent);
+  font-weight:700;font-size:13px;z-index:2;
+}
+.history-cell.future{background:#fafafa;color:#d8d2c0;border-style:dashed;font-size:9px;opacity:0.6}
+
+/* 凡例 */
+.history-legend{
+  display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--sub);
+  margin-top:14px;padding-top:12px;border-top:1px dashed var(--line-soft);
+  flex-wrap:wrap;letter-spacing:0.06em;
+}
+.history-legend .lg-item{display:flex;align-items:center;gap:4px}
+.history-legend .lg-box{width:14px;height:14px;border-radius:3px;border:1px solid var(--line)}
 
 /* ============= FOOTER ============= */
 .footer-msg{
@@ -1475,11 +1494,16 @@ function renderKRProgress(){
 
 function renderHistory(){
   const grid = document.getElementById('historyGrid');
+  if(!grid) return;
   grid.innerHTML = '';
   for(let w = 0; w < TOTAL_WEEKS; w++){
     const cell = document.createElement('div');
-    cell.className = 'history-cell' + ((w + 1) === state.currentWeek ? ' current' : '');
-    // 週ごとに「その週の全サブ目標の今週入力値の合計 / その週の目安合計」を rate に
+    const isCurrent = (w + 1) === state.currentWeek;
+    const isFuture = (w + 1) > state.currentWeek;
+    let cls = 'history-cell';
+    if(isCurrent) cls += ' current';
+    if(isFuture) cls += ' future';
+    cell.className = cls;
     let achieved = 0, expected = 0;
     state.krs.forEach(kr => kr.subs.forEach(sub => {
       if(!sub.cha) return;
@@ -1497,8 +1521,23 @@ function renderHistory(){
       else r = 4;
     }
     cell.dataset.rate = r;
-    cell.title = `Week ${w+1}`;
+    cell.textContent = (w + 1);
+    cell.title = 'Week ' + (w+1) + (isCurrent ? '（今週）' : (isFuture ? '（未来）' : '（達成度：' + ['未入力','低','中','高','超達成'][r] + '）'));
     grid.appendChild(cell);
+  }
+  // 凡例も挿入（初回のみ）
+  const parent = grid.parentElement;
+  if(parent && !parent.querySelector('.history-legend')){
+    const legend = document.createElement('div');
+    legend.className = 'history-legend';
+    legend.innerHTML =
+      '<div class="lg-item"><div class="lg-box" style="background:#fef9f0"></div>未入力</div>' +
+      '<div class="lg-item"><div class="lg-box" style="background:#f5d4c2"></div>低</div>' +
+      '<div class="lg-item"><div class="lg-box" style="background:#eab295"></div>中</div>' +
+      '<div class="lg-item"><div class="lg-box" style="background:#e89378"></div>高</div>' +
+      '<div class="lg-item"><div class="lg-box" style="background:#c25b3f"></div>超達成</div>' +
+      '<div class="lg-item" style="margin-left:auto"><div class="lg-box" style="background:#fff7ec;box-shadow:0 0 0 2px #5a7050"></div>今週</div>';
+    parent.appendChild(legend);
   }
 }
 
