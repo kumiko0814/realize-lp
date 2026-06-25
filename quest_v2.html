@@ -977,8 +977,8 @@ function action(){
   const adj = nearbyFacility();
   if(!adj){ setMsg('▼ ここには何もない…'); return; }
   const f = adj.f;
-  // 体験版：卵受領後は博士の家・卵スタンド・玄関出入りのみ許可
-  if(IS_DEMO && state.progress.eggReceived){
+  // 体験版：博士の家・卵スタンド・玄関出入りのみ許可（受領前後関わらず）
+  if(IS_DEMO){
     const allowedInDemo = ['professor_door','professor_indoor','egg_pedestal','indoor_exit'];
     if(!allowedInDemo.includes(f.type)){
       showDemoLimit();
