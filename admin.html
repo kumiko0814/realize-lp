@@ -202,6 +202,7 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
         <option value="sensei2">講師B</option>
       </select>
       <button onclick="exportCSV()" style="padding:6px 12px;border:1px solid var(--line);background:transparent;border-radius:6px;font-family:inherit;font-size:12px;cursor:pointer;margin-left:auto">📥 CSVエクスポート</button>
+      <button onclick="bulkDeleteTest()" style="padding:6px 12px;border:1px dashed #c25b3f;background:transparent;color:#c25b3f;border-radius:6px;font-family:inherit;font-size:12px;cursor:pointer">☠ テストデータ一括削除</button>
     </div>
     <div id="memberDash">
       <p style="text-align:center;padding:30px;color:var(--mute);font-size:12px">クラウドからデータ取得中…</p>
@@ -733,6 +734,30 @@ function closeMemberModal(){ document.getElementById('memberModalBg').style.disp
 // ヘルプモーダル
 function showHelp(){ document.getElementById('helpModalBg').style.display = 'flex'; }
 function closeHelp(){ document.getElementById('helpModalBg').style.display = 'none'; }
+
+// 一括削除（テストID・くみこ系）
+async function bulkDeleteTest(){
+  const client = getSupaAdmin();
+  if(!client){ alert('Supabase未接続'); return; }
+  const candidates = _allMembers.filter(m =>
+    m.id.startsWith('test_') ||
+    m.id.startsWith('kumiko') ||
+    m.id.startsWith('demo') ||
+    m.id === 'guest'
+  );
+  if(!candidates.length){ alert('削除対象なし'); return; }
+  if(!confirm(`以下の ${candidates.length}件 を完全削除します：\n\n${candidates.map(m=>`・${m.id}（${m.name||''}）`).join('\n')}\n\nよろしいですか？`)) return;
+  let okCount = 0;
+  for(const m of candidates){
+    try {
+      await client.from('realize_members').delete().eq('id', m.id);
+      await client.from('realize_comments').delete().eq('target_id', m.id);
+      okCount++;
+    } catch(e){}
+  }
+  showToast(`☑ ${okCount}件 削除完了`);
+  loadMembers();
+}
 
 // メンバーをクラウドから削除
 async function deleteMember(id, name){

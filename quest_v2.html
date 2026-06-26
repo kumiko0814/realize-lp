@@ -300,9 +300,9 @@ svg{image-rendering:pixelated}
 <!-- Supabase 設定（くみこが書き換え） -->
 <script src="supabase_config.js"></script>
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260626b"></script>
-<script src="town3_data.js?v=20260626b"></script>
-<script src="town4_data.js?v=20260626b"></script>
+<script src="town2_data.js?v=20260626c"></script>
+<script src="town3_data.js?v=20260626c"></script>
+<script src="town4_data.js?v=20260626c"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -830,6 +830,25 @@ function renderStage(){
     lb.textContent = l.text;
     stage.appendChild(lb);
   });
+  // 街4：動的クラウドメンバー アバター描画
+  if(state.currentTown === 'town4' && !state.indoors && Array.isArray(space.dynamicNpcs)){
+    space.dynamicNpcs.forEach(npc => {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.style.left = (npc.x * 5) + '%';
+      tile.style.top = (npc.y * (100/ROWS)) + '%';
+      tile.style.zIndex = 4;
+      tile.style.position = 'absolute';
+      let inner = ANIMAL_SVG[npc.animalKey] || ANIMAL_SVG.tamago;
+      if(npc.isOnline){
+        inner += '<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#5fbb5f;color:#fff;font-size:7px;padding:1px 4px;border-radius:3px;white-space:nowrap;font-family:DotGothic16,sans-serif;letter-spacing:0.05em;box-shadow:0 0 4px #5fbb5f">🟢LIVE</div>';
+      }
+      // 名前ラベル（小さく）
+      inner += '<div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;font-size:6px;padding:1px 3px;border-radius:2px;white-space:nowrap;font-family:DotGothic16,sans-serif;letter-spacing:0">'+(npc.name || '').slice(0,4)+'</div>';
+      tile.innerHTML = inner;
+      stage.appendChild(tile);
+    });
+  }
   // 屋内 NPC/博士/トレーナー アバターを描画
   const drawn = new Set();
   Object.entries(space.facilities || {}).forEach(([key, f]) => {
@@ -968,6 +987,11 @@ function nearbyFacility(){
       const r = town.rivals.find(n => n.x === x && n.y === y);
       if(r) return { x, y, f:Object.assign({type:'rival'}, r) };
     }
+    // 街4の動的クラウドメンバー
+    if(town.dynamicNpcs){
+      const dn = town.dynamicNpcs.find(n => n.x === x && n.y === y);
+      if(dn) return { x, y, f:Object.assign({type:'cloud_member'}, dn) };
+    }
   }
   return null;
 }
@@ -1008,6 +1032,16 @@ function action(){
     gym_trainer_indoor: () => openGymDoor(TOWN2.gym),
     gym_leader_indoor: () => openGymLeader(TOWN2.gym),
     gym_leader: () => openGymLeader(f.gym),
+    cloud_member: () => {
+      // クラウドメンバープロフィール表示
+      window._allCurrentRivals = TOWN4.dynamicNpcs.map(n => ({
+        id: n.id, isCloud: true, name: n.name, mbti: n.mbti, animalKey: n.animalKey,
+        ijouchi: '', strengths: [], allStrengths: [], backstory: '同じ Realize の仲間。',
+        currentGoal: '', companionLevel: n.companionLevel, currentWeek: n.currentWeek,
+        achievementRate: n.achievementRate, submissionRate: 0
+      }));
+      showMemberProfile(f.id);
+    },
     sage: () => openSage(f),
     synthesizer: () => openSynthesizer(f),
     rival: () => openRival(f),
@@ -1312,15 +1346,69 @@ function warpTo(tk){
     saveState();
     setTimeout(showTown2Welcome, 600);
   }
-  // 街4到着時：メンバーボード自動表示＋オンライン状態登録＋Realtime subscribe
+  // 街4到着時：メンバーボード自動表示＋オンライン状態登録＋Realtime subscribe＋動的NPC配置
   if(tk === 'town4'){
     startPresence();
     subscribeBattleChannel();
+    setupTown4DynamicNpcs();
     setTimeout(showMembersBoard, 600);
   } else {
     stopPresence();
     unsubscribeBattleChannel();
+    if(typeof TOWN4 !== 'undefined') TOWN4.dynamicNpcs = [];
   }
+}
+
+// 街4に クラウドメンバーを動的配置
+async function setupTown4DynamicNpcs(){
+  if(typeof TOWN4 === 'undefined') return;
+  const client = getSupabaseClient();
+  if(!client){ TOWN4.dynamicNpcs = []; return; }
+  try {
+    // 全メンバー取得（自分以外）
+    const { data: members } = await client.from('realize_members')
+      .select('id,name,mbti,animal_key,achievement_rate,current_week,companion_level')
+      .neq('id', userKey)
+      .limit(20);
+    // オンライン状態取得
+    const fiveMinAgo = new Date(Date.now() - 5*60*1000).toISOString();
+    const { data: presence } = await client.from('realize_presence')
+      .select('user_id').gte('last_seen', fiveMinAgo);
+    const onlineIds = new Set((presence||[]).map(p => p.user_id));
+    window._onlineIds = onlineIds;
+    // 草マスを探す
+    const map = TOWN4.map;
+    const positions = [];
+    for(let y = 1; y < ROWS - 1; y++){
+      for(let x = 1; x < COLS - 1; x++){
+        if(map[y][x] === 0){
+          const dx = Math.abs(x - TOWN4.spawnPos.x);
+          const dy = Math.abs(y - TOWN4.spawnPos.y);
+          if(dx + dy < 2) continue; // スポーン周辺は避ける
+          positions.push({ x, y });
+        }
+      }
+    }
+    // 安定したランダム配置（idベース・hash sortで毎回同じ）
+    positions.sort((a,b) => (a.x*31+a.y) - (b.x*31+b.y));
+    const list = (members || []).filter(m => m.mbti); // 診断済みのみ
+    TOWN4.dynamicNpcs = list.map((m, i) => {
+      const pos = positions[i % positions.length] || { x:5+i, y:8 };
+      return {
+        id: 'cloud_' + m.id,
+        realId: m.id,
+        x: pos.x, y: pos.y,
+        name: m.name || '匿名',
+        mbti: m.mbti,
+        animalKey: m.animal_key || 'tamago',
+        achievementRate: m.achievement_rate || 0,
+        currentWeek: m.current_week || 0,
+        companionLevel: m.companion_level || 1,
+        isOnline: onlineIds.has(m.id)
+      };
+    });
+    renderStage();
+  } catch(e){ console.warn('dynamicNpcs error', e); TOWN4.dynamicNpcs = []; }
 }
 function showTown2Welcome(){
   showModal(`
