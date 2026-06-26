@@ -300,9 +300,9 @@ svg{image-rendering:pixelated}
 <!-- Supabase 設定（くみこが書き換え） -->
 <script src="supabase_config.js"></script>
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260626a"></script>
-<script src="town3_data.js?v=20260626a"></script>
-<script src="town4_data.js?v=20260626a"></script>
+<script src="town2_data.js?v=20260626b"></script>
+<script src="town3_data.js?v=20260626b"></script>
+<script src="town4_data.js?v=20260626b"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -2095,11 +2095,13 @@ async function showMembersBoard(){
     : (isCloudEnabled ? '★ クラウドに まだ誰もいない (モック表示)' : '★ ローカルモード (Supabase未設定)');
   // 自分のカード
   const myCard = (state.mbti && state.animal) ? `
-    <div onclick="showMemberProfile('me')" style="background:linear-gradient(135deg,#3a2a5a 0%,#1a1a3a 100%);border:3px solid var(--gold);padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px">
+    <div onclick="showMemberProfile('me')" style="position:relative;background:linear-gradient(135deg,#3a2a5a 0%,#1a1a3a 100%);border:3px solid var(--gold);padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px">
+      <div style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:#5fbb5f;border-radius:50%;border:1px solid #fff;box-shadow:0 0 6px #5fbb5f;animation:blink 1.4s ease-in-out infinite"></div>
       <div style="font-size:9px;color:var(--gold);letter-spacing:0.2em;margin-bottom:4px">★ YOU ★</div>
       <div style="width:48px;height:48px;margin:0 auto 6px">${ANIMAL_SVG[state.animal]}</div>
       <div style="font-size:11.5px;font-weight:bold;color:var(--sakura)">${escapeHtml(state.name)}</div>
       <div style="font-size:9px;color:var(--gold);margin-top:2px">${state.mbti} ／ ${escapeHtml(state.role)}</div>
+      <div style="font-size:8px;color:#5fbb5f;margin-top:3px;font-weight:bold">🟢 オンライン中</div>
     </div>` : '';
   // クラウドキャッシュに保存（プロフィール表示用）
   window._allCurrentRivals = rivals;
@@ -2125,6 +2127,11 @@ async function showMembersBoard(){
     <div class="sub">— MEMBERS —</div>
     <p style="font-size:10px;color:var(--mind);margin-bottom:8px">${sourceLabel}</p>
     <p style="font-size:11.5px;line-height:1.85">仲間のカードをタップすると、<br><span class="em">強み・異常値・今の目標</span> が見られる。</p>
+    <div style="background:rgba(95,187,95,0.15);border:1px solid #5fbb5f;border-radius:6px;padding:8px 10px;margin-top:8px;font-size:10.5px;line-height:1.7">
+      <span style="display:inline-block;width:8px;height:8px;background:#5fbb5f;border-radius:50%;border:1px solid #fff;vertical-align:middle;margin-right:4px;animation:blink 1.4s ease-in-out infinite"></span>
+      <strong style="color:#5fbb5f">緑のドット</strong>が付いてる仲間は <strong>今オンライン中</strong>。<br>
+      　タップして「⚔ リアルタイム対戦！」が選べます！
+    </div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px">
       ${myCard}
       ${cards}

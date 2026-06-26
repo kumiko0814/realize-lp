@@ -21,7 +21,9 @@ const TOWN4 = {
   spawnPos: { x: 10, y: 6 },
 
   // 街にいる5人の他Realizeメンバー（架空・多様な個性）
-  rivals: [
+  // 架空ライバル削除済み（クラウドメンバーのみ表示）
+  rivals: [],
+  _legacy_rivals_disabled: [
     {
       id: "rival_hana",
       x: 8,
