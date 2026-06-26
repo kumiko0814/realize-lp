@@ -300,9 +300,9 @@ svg{image-rendering:pixelated}
 <!-- Supabase 設定（くみこが書き換え） -->
 <script src="supabase_config.js"></script>
 <!-- Town2/3/4 のデータ（キャッシュバスター付き）-->
-<script src="town2_data.js?v=20260625a"></script>
-<script src="town3_data.js?v=20260625a"></script>
-<script src="town4_data.js?v=20260625a"></script>
+<script src="town2_data.js?v=20260626a"></script>
+<script src="town3_data.js?v=20260626a"></script>
+<script src="town4_data.js?v=20260626a"></script>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -1312,9 +1312,14 @@ function warpTo(tk){
     saveState();
     setTimeout(showTown2Welcome, 600);
   }
-  // 街4到着時：メンバーボード自動表示
+  // 街4到着時：メンバーボード自動表示＋オンライン状態登録＋Realtime subscribe
   if(tk === 'town4'){
+    startPresence();
+    subscribeBattleChannel();
     setTimeout(showMembersBoard, 600);
+  } else {
+    stopPresence();
+    unsubscribeBattleChannel();
   }
 }
 function showTown2Welcome(){
@@ -1727,11 +1732,335 @@ function cloudMemberToRival(m){
   };
 }
 
+// ===== Realtime バトル基盤 =====
+let _battleChannel = null;
+let _myPresenceTimer = null;
+let _activeBattle = null;
+let _battleTimer = null;
+let _battleTimerInterval = null;
+
+const BATTLE_QUESTIONS = [
+  { scene:'仕事で疲れた仲間が「もう辞めたい」と零した時', q:'あなたの強みで どう声をかける？' },
+  { scene:'家族と意見が衝突して 雰囲気が悪くなった瞬間', q:'まず何をする？' },
+  { scene:'やったことのない大きな仕事を任された時', q:'最初の一歩は？' },
+  { scene:'褒められても素直に喜べない自分に気づいた時', q:'自分にどう声をかける？' },
+  { scene:'新しい環境で 知らない人ばかりの集まりに出る時', q:'どんな姿勢で臨む？' },
+  { scene:'子どもや部下が失敗を繰り返している時', q:'どんな言葉をかける？' },
+  { scene:'本当はやりたくないのに 頼まれて引き受けてしまった時', q:'どう向き合う？' },
+  { scene:'夢中になっていたことを 周りに「無理だよ」と言われた時', q:'どう反応する？' }
+];
+
+// 自分のオンライン状態を Supabase に登録
+async function registerPresence(){
+  const client = getSupabaseClient();
+  if(!client || !state.mbti) return;
+  try {
+    await client.from('realize_presence').upsert({
+      user_id: userKey,
+      name: state.name,
+      animal_key: state.animal,
+      mbti: state.mbti,
+      status: _activeBattle ? 'in_battle' : 'online',
+      last_seen: new Date().toISOString()
+    }, { onConflict:'user_id' });
+  } catch(e){}
+}
+function startPresence(){
+  if(_myPresenceTimer) clearInterval(_myPresenceTimer);
+  registerPresence();
+  _myPresenceTimer = setInterval(registerPresence, 30000);
+}
+function stopPresence(){
+  if(_myPresenceTimer) clearInterval(_myPresenceTimer);
+  _myPresenceTimer = null;
+  const client = getSupabaseClient();
+  if(client) client.from('realize_presence').delete().eq('user_id', userKey).then(()=>{});
+}
+window.addEventListener('beforeunload', stopPresence);
+
+// Realtime チャンネル：バトル招待を監視
+function subscribeBattleChannel(){
+  const client = getSupabaseClient();
+  if(!client || _battleChannel) return;
+  _battleChannel = client.channel('realize_battles_' + userKey)
+    .on('postgres_changes',
+      { event:'*', schema:'public', table:'realize_battles', filter:'opponent_id=eq.' + userKey },
+      payload => handleBattleEvent(payload)
+    )
+    .on('postgres_changes',
+      { event:'*', schema:'public', table:'realize_battles', filter:'challenger_id=eq.' + userKey },
+      payload => handleBattleEvent(payload)
+    )
+    .subscribe();
+}
+function unsubscribeBattleChannel(){
+  if(_battleChannel){ _battleChannel.unsubscribe(); _battleChannel = null; }
+}
+
+function handleBattleEvent(payload){
+  const b = payload.new || payload.old;
+  if(!b) return;
+  // 既存のバトルでない、招待を受けた
+  if(b.status === 'pending' && b.opponent_id === userKey && !_activeBattle){
+    showBattleInvitation(b);
+  }
+  // 自分が関与してるバトルの状態変化
+  if(_activeBattle && _activeBattle.id === b.id){
+    _activeBattle = b;
+    renderBattleScreen();
+  }
+}
+
+// 招待を受信したUI
+function showBattleInvitation(battle){
+  const challengerAnimal = ANIMAL_SVG[battle.challenger_animal_key] || ANIMAL_SVG.tamago;
+  showModal(`
+    <h2 class="fanfare-text" style="font-size:18px">⚔ バトル招待が届いた！</h2>
+    <div class="sub">— REALTIME BATTLE CHALLENGE —</div>
+    <div style="text-align:center;margin:14px 0">
+      <div style="display:inline-block;width:80px;height:80px;background:#1a1a2a;border:2px solid var(--gold);padding:4px">${challengerAnimal}</div>
+    </div>
+    <p style="text-align:center;font-size:14px"><span class="pink">${escapeHtml(battle.challenger_name)}</span> さんが あなたに対戦を申し込んでいます！</p>
+    <p style="font-size:12px;color:var(--mind);text-align:center">5問のシナリオに 交互に答える 5分のバトル。<br>勝敗より、お互いの考えが見える対戦です。</p>
+    <div class="modal-actions">
+      <button class="btn danger" onclick='declineBattle(${JSON.stringify(battle.id)})'>逃げる</button>
+      <button class="btn primary" onclick='acceptBattle(${JSON.stringify(battle.id)})'>⚔ 受けて立つ！</button>
+    </div>
+  `);
+}
+
+async function sendBattleInvitation(opponentId, opponentName, opponentAnimal){
+  const client = getSupabaseClient();
+  if(!client){ alert('クラウド未接続'); return; }
+  if(!state.mbti){ alert('まず街3まで進めてから挑戦できます'); return; }
+  // ランダム3問選ぶ
+  const shuffled = BATTLE_QUESTIONS.slice().sort(()=>Math.random()-0.5);
+  const questions = shuffled.slice(0,3);
+  try {
+    const { data, error } = await client.from('realize_battles').insert({
+      challenger_id: userKey,
+      challenger_name: state.name,
+      challenger_animal_key: state.animal,
+      challenger_mbti: state.mbti,
+      opponent_id: opponentId,
+      opponent_name: opponentName,
+      opponent_animal_key: opponentAnimal,
+      status: 'pending',
+      questions: questions
+    }).select().single();
+    if(error){ alert('招待エラー：' + error.message); return; }
+    _activeBattle = data;
+    showWaitingForOpponent(data);
+  } catch(e){ alert('通信エラー：' + e.message); }
+}
+
+function showWaitingForOpponent(battle){
+  showModal(`
+    <h2>⚔ 招待中…</h2>
+    <p style="text-align:center;font-size:13px;margin:20px 0"><span class="pink">${escapeHtml(battle.opponent_name)}</span> さんの応答を待っています</p>
+    <div style="text-align:center;padding:20px;font-size:30px;color:var(--gold);animation:blink 1s steps(2) infinite">⚔ … ⚔</div>
+    <p style="text-align:center;font-size:11px;color:var(--mind)">90秒以内に応答がなければ自動キャンセルされます</p>
+    <div class="modal-actions">
+      <button class="btn danger" onclick='cancelBattle(${JSON.stringify(battle.id)})'>キャンセル</button>
+    </div>
+  `);
+  // 90秒タイムアウト
+  setTimeout(async () => {
+    if(_activeBattle && _activeBattle.id === battle.id && _activeBattle.status === 'pending'){
+      await cancelBattle(battle.id);
+    }
+  }, 90000);
+}
+
+async function acceptBattle(battleId){
+  const client = getSupabaseClient();
+  if(!client) return;
+  try {
+    const { data, error } = await client.from('realize_battles').update({
+      status: 'in_progress',
+      current_question: 0
+    }).eq('id', battleId).select().single();
+    if(error){ alert('受諾エラー：' + error.message); return; }
+    _activeBattle = data;
+    renderBattleScreen();
+  } catch(e){ alert('通信エラー：' + e.message); }
+}
+
+async function declineBattle(battleId){
+  const client = getSupabaseClient();
+  if(client) await client.from('realize_battles').update({ status:'cancelled' }).eq('id', battleId);
+  closeModal();
+  _activeBattle = null;
+}
+
+async function cancelBattle(battleId){
+  const client = getSupabaseClient();
+  if(client) await client.from('realize_battles').update({ status:'cancelled' }).eq('id', battleId);
+  closeModal();
+  _activeBattle = null;
+  setMsg('▼ バトルをキャンセルしました');
+}
+
+// バトル画面を表示・更新
+function renderBattleScreen(){
+  const b = _activeBattle;
+  if(!b) return;
+  if(b.status === 'cancelled'){
+    showModal(`<h2 class="red">⚔ バトル中止</h2><p>相手が応答しなかった or キャンセルされました</p><div class="modal-actions"><button class="btn" onclick="closeModal()">わかった</button></div>`);
+    _activeBattle = null;
+    return;
+  }
+  if(b.status === 'completed'){
+    showBattleResult(b);
+    return;
+  }
+  const isChallenger = b.challenger_id === userKey;
+  const myAnswers = isChallenger ? (b.challenger_answers||[]) : (b.opponent_answers||[]);
+  const oppAnswers = isChallenger ? (b.opponent_answers||[]) : (b.challenger_answers||[]);
+  const oppName = isChallenger ? b.opponent_name : b.challenger_name;
+  const oppAnimal = isChallenger ? b.opponent_animal_key : b.challenger_animal_key;
+  const qIdx = Math.min(myAnswers.length, oppAnswers.length);
+  if(qIdx >= b.questions.length){
+    // 両者全問回答 → 完了処理
+    if(b.status !== 'completed') completeBattle(b);
+    return;
+  }
+  const q = b.questions[qIdx];
+  const myAnswered = myAnswers.length > qIdx;
+  const oppAnswered = oppAnswers.length > qIdx;
+  const cancelBtn = `<button class="btn danger" onclick='forceQuitBattle(${JSON.stringify(b.id)})'>離脱</button>`;
+  showModal(`
+    <h2>⚔ vs ${escapeHtml(oppName)}（${qIdx+1}/${b.questions.length}問目）</h2>
+    <div class="battle-arena" style="padding:14px">
+      <div style="display:flex;justify-content:space-around;margin-bottom:14px;align-items:center">
+        <div style="text-align:center">
+          <div style="width:48px;height:48px;background:#1a1a2a;padding:3px;margin:0 auto;border:1px solid var(--gold)">${ANIMAL_SVG[state.animal] || ANIMAL_SVG.tamago}</div>
+          <div style="font-size:10px;color:var(--gold);margin-top:4px">${escapeHtml(state.name)}</div>
+          <div style="font-size:8px;color:${myAnswered?'#5fbb5f':'#ffd644'}">${myAnswered?'✓ 回答済':'回答中…'}</div>
+        </div>
+        <div style="font-size:20px;color:var(--accent)">⚔</div>
+        <div style="text-align:center">
+          <div style="width:48px;height:48px;background:#1a1a2a;padding:3px;margin:0 auto;border:1px solid var(--mind)">${ANIMAL_SVG[oppAnimal] || ANIMAL_SVG.tamago}</div>
+          <div style="font-size:10px;color:var(--mind);margin-top:4px">${escapeHtml(oppName)}</div>
+          <div style="font-size:8px;color:${oppAnswered?'#5fbb5f':'#ffd644'}">${oppAnswered?'✓ 回答済':'回答中…'}</div>
+        </div>
+      </div>
+      <div class="battle-timer" id="battleTimer">90</div>
+      <p style="font-size:11px;color:var(--sakura);margin-bottom:6px">シーン：</p>
+      <p style="font-size:12.5px;margin-bottom:10px">${escapeHtml(q.scene)}</p>
+      <p style="font-size:11px;color:var(--gold);margin-bottom:6px">${escapeHtml(q.q)}</p>
+      ${myAnswered ? `
+        <div style="background:rgba(95,187,95,0.15);border:1px solid #5fbb5f;padding:10px;border-radius:4px;font-size:11.5px;line-height:1.7;margin-top:8px">
+          <p style="color:#5fbb5f;font-size:10px;margin-bottom:4px">★ あなたの回答（送信済）</p>
+          ${escapeHtml(myAnswers[qIdx])}
+        </div>
+        <p style="font-size:11px;color:var(--mind);text-align:center;margin-top:10px">${oppAnswered ? '次の問題へ…' : '相手の回答待ち…'}</p>
+      ` : `
+        <textarea class="modal-input modal-textarea" id="battleAnswerInput" placeholder="あなたの考えを 自分の言葉で書こう（最低10文字）" style="background:rgba(0,0,0,0.5);min-height:90px;margin-top:6px"></textarea>
+      `}
+    </div>
+    <div class="modal-actions">
+      ${cancelBtn}
+      ${!myAnswered ? `<button class="btn primary" onclick='submitBattleAnswer(${JSON.stringify(b.id)},${qIdx},${isChallenger?'true':'false'})'>送信</button>` : ''}
+    </div>
+  `);
+  if(!myAnswered) startBattleTimer(b.id, qIdx, isChallenger);
+  else if(_battleTimerInterval){ clearInterval(_battleTimerInterval); _battleTimerInterval = null; }
+}
+
+function startBattleTimer(battleId, qIdx, isChallenger){
+  if(_battleTimerInterval) clearInterval(_battleTimerInterval);
+  let remain = 90;
+  _battleTimerInterval = setInterval(()=>{
+    remain--;
+    const tEl = document.getElementById('battleTimer');
+    if(!tEl){ clearInterval(_battleTimerInterval); _battleTimerInterval = null; return; }
+    tEl.textContent = remain;
+    if(remain <= 15) tEl.classList.add('warning');
+    if(remain <= 0){
+      clearInterval(_battleTimerInterval); _battleTimerInterval = null;
+      const inp = document.getElementById('battleAnswerInput');
+      const ans = inp ? inp.value.trim() : '';
+      submitBattleAnswer(battleId, qIdx, isChallenger, ans || '（時間切れ・無回答）');
+    }
+  }, 1000);
+}
+
+async function submitBattleAnswer(battleId, qIdx, isChallenger, forcedAns){
+  const inp = document.getElementById('battleAnswerInput');
+  const ans = forcedAns || (inp ? inp.value.trim() : '');
+  if(!forcedAns && ans.length < 10){ alert('10文字以上 書いてください'); return; }
+  if(_battleTimerInterval){ clearInterval(_battleTimerInterval); _battleTimerInterval = null; }
+  const client = getSupabaseClient();
+  if(!client) return;
+  try {
+    // 現状取得→配列に追加
+    const { data: cur } = await client.from('realize_battles').select('challenger_answers,opponent_answers').eq('id', battleId).single();
+    const arrCol = isChallenger ? 'challenger_answers' : 'opponent_answers';
+    const arr = (cur && cur[arrCol]) ? cur[arrCol].slice() : [];
+    while(arr.length <= qIdx) arr.push('');
+    arr[qIdx] = ans;
+    const update = {}; update[arrCol] = arr; update.updated_at = new Date().toISOString();
+    await client.from('realize_battles').update(update).eq('id', battleId);
+  } catch(e){ alert('送信エラー：' + e.message); }
+}
+
+async function completeBattle(b){
+  const client = getSupabaseClient();
+  if(!client) return;
+  try {
+    await client.from('realize_battles').update({ status:'completed' }).eq('id', b.id);
+  } catch(e){}
+}
+
+function showBattleResult(b){
+  const isChallenger = b.challenger_id === userKey;
+  const myAnswers = isChallenger ? (b.challenger_answers||[]) : (b.opponent_answers||[]);
+  const oppAnswers = isChallenger ? (b.opponent_answers||[]) : (b.challenger_answers||[]);
+  const oppName = isChallenger ? b.opponent_name : b.challenger_name;
+  showModal(`
+    <h2 class="fanfare-text" style="font-size:20px">🏆 バトル終了！</h2>
+    <div class="sub">— RESULT —</div>
+    <p style="text-align:center;font-size:13px;color:var(--gold);margin-bottom:14px">★ お互いの回答を見てみよう ★</p>
+    ${b.questions.map((q,i)=>`
+      <div style="background:rgba(255,255,255,0.04);border:1px solid var(--msg-border);padding:12px;margin-bottom:10px;border-radius:4px">
+        <p style="font-size:11px;color:var(--sakura);margin-bottom:4px">${i+1}. ${escapeHtml(q.scene)}</p>
+        <p style="font-size:10.5px;color:var(--gold);margin-bottom:8px">→ ${escapeHtml(q.q)}</p>
+        <div style="background:rgba(255,214,68,0.08);padding:8px;border-left:2px solid var(--gold);font-size:11.5px;margin-bottom:6px">
+          <p style="font-size:9px;color:var(--gold);margin-bottom:2px">あなた</p>
+          ${escapeHtml(myAnswers[i]||'')}
+        </div>
+        <div style="background:rgba(122,200,255,0.08);padding:8px;border-left:2px solid var(--mind);font-size:11.5px">
+          <p style="font-size:9px;color:var(--mind);margin-bottom:2px">${escapeHtml(oppName)}</p>
+          ${escapeHtml(oppAnswers[i]||'')}
+        </div>
+      </div>
+    `).join('')}
+    <p class="pink" style="font-size:11.5px;text-align:center;margin-top:14px">★ 勝敗より「相手の視点」を 持って帰ろう ★</p>
+    <div class="modal-actions">
+      <button class="btn primary" onclick="closeBattleAndRefresh()">ありがとうございました</button>
+    </div>
+  `);
+  _activeBattle = null;
+  registerPresence();
+}
+function closeBattleAndRefresh(){ closeModal(); _activeBattle = null; }
+async function forceQuitBattle(battleId){
+  if(!confirm('バトルを離脱しますか？')) return;
+  const client = getSupabaseClient();
+  if(client) await client.from('realize_battles').update({ status:'cancelled' }).eq('id', battleId);
+  if(_battleTimerInterval){ clearInterval(_battleTimerInterval); _battleTimerInterval = null; }
+  closeModal();
+  _activeBattle = null;
+  registerPresence();
+}
+
 // ===== 街4：メンバーズボード =====
 async function showMembersBoard(){
   if(typeof TOWN4 === 'undefined') return;
   // クラウドメンバー取得（あれば）
   let cloudRivals = [];
+  let onlineIds = new Set();
   const isCloudEnabled = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.enabled);
   if(isCloudEnabled){
     // ローディング表示
@@ -1740,6 +2069,16 @@ async function showMembersBoard(){
     if(members && members.length > 0){
       cloudRivals = members.map(cloudMemberToRival);
     }
+    // オンライン状態も取得
+    try {
+      const client = getSupabaseClient();
+      if(client){
+        const fiveMinAgo = new Date(Date.now() - 5*60*1000).toISOString();
+        const { data } = await client.from('realize_presence').select('user_id,status').gte('last_seen', fiveMinAgo);
+        if(data) data.forEach(p => onlineIds.add(p.user_id));
+      }
+    } catch(e){}
+    window._onlineIds = onlineIds;
   }
   // 仮想メンバー（クラウドにいなければモック表示、あれば隠す）
   const rivals = cloudRivals.length > 0 ? cloudRivals : (TOWN4.rivals || []);
@@ -1756,18 +2095,23 @@ async function showMembersBoard(){
     </div>` : '';
   // クラウドキャッシュに保存（プロフィール表示用）
   window._allCurrentRivals = rivals;
-  const cards = rivals.map(r => `
-    <div onclick="showMemberProfile('${r.id}')" style="background:#1a1a2a;border:2px solid ${r.isCloud?'var(--mind)':'var(--msg-border)'};padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='${r.isCloud?'var(--mind)':'var(--msg-border)'}'">
+  const cards = rivals.map(r => {
+    const realId = r.isCloud ? r.id.replace(/^cloud_/,'') : null;
+    const isOnline = realId && onlineIds.has(realId);
+    return `
+    <div onclick="showMemberProfile('${r.id}')" style="position:relative;background:#1a1a2a;border:2px solid ${r.isCloud?'var(--mind)':'var(--msg-border)'};padding:12px 10px;cursor:pointer;text-align:center;border-radius:6px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='${r.isCloud?'var(--mind)':'var(--msg-border)'}'">
+      ${isOnline ? '<div style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:#5fbb5f;border-radius:50%;border:1px solid #fff;box-shadow:0 0 4px #5fbb5f;animation:blink 1.4s ease-in-out infinite"></div>' : ''}
       <div style="width:48px;height:48px;margin:0 auto 6px">${ANIMAL_SVG[r.animalKey] || ANIMAL_SVG.tamago}</div>
       <div style="font-size:11.5px;font-weight:bold">${escapeHtml(r.name)}</div>
       <div style="font-size:9px;color:var(--mind);margin-top:2px">${r.mbti} ／ ${escapeHtml(ANIMAL_NAME[r.animalKey] || '')}</div>
       ${r.isCloud ? `
-        <div style="font-size:8px;color:var(--mind);margin-top:3px">☁ Lv.${r.companionLevel || 1} ／ Week ${r.currentWeek || 0}</div>
+        <div style="font-size:8px;color:${isOnline?'#5fbb5f':'var(--mind)'};margin-top:3px">${isOnline?'🟢 オンライン':'☁ Lv.'+(r.companionLevel||1)+' / Week '+(r.currentWeek||0)}</div>
         <div style="height:4px;background:#1a1a2a;border:1px solid #3a3a4a;margin:4px 6px 2px;overflow:hidden;border-radius:2px"><div style="height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--accent) 100%);width:${r.achievementRate || 0}%"></div></div>
         <div style="font-size:8px;color:var(--gold)">達成率 ${r.achievementRate || 0}%</div>
       ` : ''}
     </div>
-  `).join('');
+  `;
+  }).join('');
   showModal(`
     <h2>📋 ルミナリア メンバーズボード</h2>
     <div class="sub">— MEMBERS —</div>
@@ -1827,9 +2171,25 @@ function showMemberProfile(id){
       ` : ''}
       <p class="pink" style="font-size:11.5px;line-height:1.85">「${escapeHtml(r.backstory || '')}」</p>
       ${battled ? `<p style="color:var(--gold);font-size:11px;text-align:center;margin-top:10px">★ 称号「${escapeHtml(r.reward || '')}」獲得済</p>` : ''}
+      ${(function(){
+        const realId = r.isCloud ? r.id.replace(/^cloud_/,'') : null;
+        const isOnline = realId && (window._onlineIds || new Set()).has(realId);
+        if(isOnline){
+          return `<div style="background:rgba(95,187,95,0.18);border:1px solid #5fbb5f;border-radius:6px;padding:10px;margin-top:12px;text-align:center"><span style="color:#5fbb5f;font-size:11px;font-weight:bold">🟢 今オンライン中！</span><br><span style="font-size:10px;color:var(--sakura)">リアルタイム対戦が申し込めます</span></div>`;
+        }
+        return '';
+      })()}
       <div class="modal-actions">
         <button class="btn" onclick="closeModal();setTimeout(showMembersBoard,150)">← ボードへ</button>
-        <button class="btn primary" onclick='startRivalBattle(${JSON.stringify(r.id)})'>${battled ? 'もう一度対戦' : '⚔ 対戦する'}</button>
+        ${(function(){
+          const realId = r.isCloud ? r.id.replace(/^cloud_/,'') : null;
+          const isOnline = realId && (window._onlineIds || new Set()).has(realId);
+          if(isOnline){
+            return `<button class="btn primary" onclick='sendBattleInvitation(${JSON.stringify(realId)},${JSON.stringify(r.name)},${JSON.stringify(r.animalKey)})'>⚔ リアルタイム対戦！</button>`;
+          }
+          if(r.isCloud) return '';
+          return `<button class="btn primary" onclick='startRivalBattle(${JSON.stringify(r.id)})'>${battled ? 'もう一度対戦' : '⚔ 対戦する'}</button>`;
+        })()}
       </div>
     `);
   }, 100);
