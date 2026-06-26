@@ -742,15 +742,15 @@ function closeHelp(){ document.getElementById('helpModalBg').style.display = 'no
 
 // 初回 Supabase SQL を自動コピー＋Supabase SQL Editor を開く
 function setupSupabaseSQL(){
-  const SQL = `-- ============================================================
--- Re:alize Quest 必要な権限とテーブルを全部設定（初回1回だけ）
--- ============================================================
+  const SQL = `-- Re:alize Quest 初回設定（何度実行してもOK）
 
--- 1) DELETE 権限を追加（テストデータ削除用）
-CREATE POLICY IF NOT EXISTS "del_members" ON realize_members FOR DELETE TO anon USING (true);
-CREATE POLICY IF NOT EXISTS "del_comments" ON realize_comments FOR DELETE TO anon USING (true);
+-- 1) DELETE 権限
+DROP POLICY IF EXISTS "del_members" ON realize_members;
+CREATE POLICY "del_members" ON realize_members FOR DELETE TO anon USING (true);
+DROP POLICY IF EXISTS "del_comments" ON realize_comments;
+CREATE POLICY "del_comments" ON realize_comments FOR DELETE TO anon USING (true);
 
--- 2) リアルタイムバトル用テーブル
+-- 2) presence テーブル
 CREATE TABLE IF NOT EXISTS realize_presence (
   user_id TEXT PRIMARY KEY,
   name TEXT,
@@ -760,11 +760,16 @@ CREATE TABLE IF NOT EXISTS realize_presence (
   last_seen TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE realize_presence ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "pres_select" ON realize_presence FOR SELECT TO anon USING (true);
-CREATE POLICY IF NOT EXISTS "pres_insert" ON realize_presence FOR INSERT TO anon WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "pres_update" ON realize_presence FOR UPDATE TO anon USING (true);
-CREATE POLICY IF NOT EXISTS "pres_delete" ON realize_presence FOR DELETE TO anon USING (true);
+DROP POLICY IF EXISTS "pres_select" ON realize_presence;
+CREATE POLICY "pres_select" ON realize_presence FOR SELECT TO anon USING (true);
+DROP POLICY IF EXISTS "pres_insert" ON realize_presence;
+CREATE POLICY "pres_insert" ON realize_presence FOR INSERT TO anon WITH CHECK (true);
+DROP POLICY IF EXISTS "pres_update" ON realize_presence;
+CREATE POLICY "pres_update" ON realize_presence FOR UPDATE TO anon USING (true);
+DROP POLICY IF EXISTS "pres_delete" ON realize_presence;
+CREATE POLICY "pres_delete" ON realize_presence FOR DELETE TO anon USING (true);
 
+-- 3) battles テーブル
 CREATE TABLE IF NOT EXISTS realize_battles (
   id BIGSERIAL PRIMARY KEY,
   challenger_id TEXT NOT NULL,
@@ -785,11 +790,14 @@ CREATE TABLE IF NOT EXISTS realize_battles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE realize_battles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "bat_select" ON realize_battles FOR SELECT TO anon USING (true);
-CREATE POLICY IF NOT EXISTS "bat_insert" ON realize_battles FOR INSERT TO anon WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "bat_update" ON realize_battles FOR UPDATE TO anon USING (true);
+DROP POLICY IF EXISTS "bat_select" ON realize_battles;
+CREATE POLICY "bat_select" ON realize_battles FOR SELECT TO anon USING (true);
+DROP POLICY IF EXISTS "bat_insert" ON realize_battles;
+CREATE POLICY "bat_insert" ON realize_battles FOR INSERT TO anon WITH CHECK (true);
+DROP POLICY IF EXISTS "bat_update" ON realize_battles;
+CREATE POLICY "bat_update" ON realize_battles FOR UPDATE TO anon USING (true);
 
--- 3) Realtime（リアルタイムバトル用）
+-- 4) Realtime 有効化
 ALTER PUBLICATION supabase_realtime ADD TABLE realize_battles;
 `;
 
