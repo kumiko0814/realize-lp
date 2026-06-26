@@ -202,6 +202,7 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
         <option value="sensei2">講師B</option>
       </select>
       <button onclick="exportCSV()" style="padding:6px 12px;border:1px solid var(--line);background:transparent;border-radius:6px;font-family:inherit;font-size:12px;cursor:pointer;margin-left:auto">📥 CSVエクスポート</button>
+      <button onclick="setupSupabaseSQL()" style="padding:6px 12px;border:none;background:#5a7050;color:#fff;border-radius:6px;font-family:inherit;font-size:12px;cursor:pointer;font-weight:700">🛠 Supabase設定（初回のみ）</button>
       <button onclick="bulkDeleteTest()" style="padding:6px 12px;border:1px dashed #c25b3f;background:transparent;color:#c25b3f;border-radius:6px;font-family:inherit;font-size:12px;cursor:pointer">☠ テストデータ一括削除</button>
     </div>
     <div id="memberDash">
@@ -738,6 +739,104 @@ function closeMemberModal(){ document.getElementById('memberModalBg').style.disp
 // ヘルプモーダル
 function showHelp(){ document.getElementById('helpModalBg').style.display = 'flex'; }
 function closeHelp(){ document.getElementById('helpModalBg').style.display = 'none'; }
+
+// 初回 Supabase SQL を自動コピー＋Supabase SQL Editor を開く
+function setupSupabaseSQL(){
+  const SQL = `-- ============================================================
+-- Re:alize Quest 必要な権限とテーブルを全部設定（初回1回だけ）
+-- ============================================================
+
+-- 1) DELETE 権限を追加（テストデータ削除用）
+CREATE POLICY IF NOT EXISTS "del_members" ON realize_members FOR DELETE TO anon USING (true);
+CREATE POLICY IF NOT EXISTS "del_comments" ON realize_comments FOR DELETE TO anon USING (true);
+
+-- 2) リアルタイムバトル用テーブル
+CREATE TABLE IF NOT EXISTS realize_presence (
+  user_id TEXT PRIMARY KEY,
+  name TEXT,
+  animal_key TEXT,
+  mbti TEXT,
+  status TEXT DEFAULT 'online',
+  last_seen TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE realize_presence ENABLE ROW LEVEL SECURITY;
+CREATE POLICY IF NOT EXISTS "pres_select" ON realize_presence FOR SELECT TO anon USING (true);
+CREATE POLICY IF NOT EXISTS "pres_insert" ON realize_presence FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY IF NOT EXISTS "pres_update" ON realize_presence FOR UPDATE TO anon USING (true);
+CREATE POLICY IF NOT EXISTS "pres_delete" ON realize_presence FOR DELETE TO anon USING (true);
+
+CREATE TABLE IF NOT EXISTS realize_battles (
+  id BIGSERIAL PRIMARY KEY,
+  challenger_id TEXT NOT NULL,
+  challenger_name TEXT,
+  challenger_animal_key TEXT,
+  challenger_mbti TEXT,
+  opponent_id TEXT NOT NULL,
+  opponent_name TEXT,
+  opponent_animal_key TEXT,
+  opponent_mbti TEXT,
+  status TEXT DEFAULT 'pending',
+  current_question INTEGER DEFAULT 0,
+  questions JSONB,
+  challenger_answers JSONB DEFAULT '[]'::jsonb,
+  opponent_answers JSONB DEFAULT '[]'::jsonb,
+  winner_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE realize_battles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY IF NOT EXISTS "bat_select" ON realize_battles FOR SELECT TO anon USING (true);
+CREATE POLICY IF NOT EXISTS "bat_insert" ON realize_battles FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY IF NOT EXISTS "bat_update" ON realize_battles FOR UPDATE TO anon USING (true);
+
+-- 3) Realtime（リアルタイムバトル用）
+ALTER PUBLICATION supabase_realtime ADD TABLE realize_battles;
+`;
+
+  // クリップボードにコピー
+  navigator.clipboard.writeText(SQL).then(() => {
+    showToast('☑ SQLをコピー＆Supabaseを開きます');
+  }).catch(()=>{
+    // フォールバック
+    const ta = document.createElement('textarea');
+    ta.value = SQL; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+  });
+
+  // 案内モーダル
+  document.getElementById('memberModal').innerHTML = `
+    <h3 style="font-size:18px;font-weight:700;color:#5a7050;margin-bottom:6px">🛠 Supabase 初回設定（あと2ステップ）</h3>
+    <p style="font-size:11px;color:#8b8278;letter-spacing:0.15em;margin-bottom:18px">— SUPABASE SETUP —</p>
+
+    <div style="background:#f5f9f0;border:2px solid #5a7050;border-radius:10px;padding:14px;margin-bottom:14px">
+      <p style="font-size:14px;color:#5a7050;font-weight:700;margin-bottom:8px">✅ SQL は すでに クリップボードにコピー済み！</p>
+      <p style="font-size:12px;color:#5a5a5a;line-height:1.85">あと2ステップで完了します。</p>
+    </div>
+
+    <h4 style="font-size:13px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">STEP 1：Supabase の SQL Editor を開く</h4>
+    <p style="font-size:11.5px;color:#5a5a5a;margin-bottom:8px">下のボタンを押すと、Supabase が別タブで開きます。</p>
+    <button onclick="window.open('https://supabase.com/dashboard/project/inrvprlyobghviklulcv/sql/new','_blank')" style="background:#3ecf8e;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-family:inherit;font-weight:700;cursor:pointer;font-size:13px;display:block;width:100%">▶ Supabase SQL Editor を開く</button>
+
+    <h4 style="font-size:13px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">STEP 2：Supabase のページで貼り付けて実行</h4>
+    <ol style="padding-left:20px;font-size:12px;line-height:2;color:#5a5a5a">
+      <li>SQL Editor が開いたら、エディタ部分をクリック</li>
+      <li><strong>Cmd+V</strong>（Macなら）or <strong>Ctrl+V</strong>（Windows）で貼り付け</li>
+      <li>右下の <strong style="color:#3ecf8e">「Run」</strong> ボタンを押す（or Cmd+Enter）</li>
+      <li>「Success」と出れば完了！</li>
+    </ol>
+
+    <div style="background:#fff7ec;border:1px solid #c9a574;border-radius:6px;padding:10px;margin-top:14px;font-size:11.5px;line-height:1.85">
+      <strong>★ 完了したら：</strong><br>
+      この管理者ボードに戻って Cmd+Shift+R で再読み込み → 「✕」ボタンで削除できるようになります。
+    </div>
+
+    <div style="margin-top:18px;text-align:right">
+      <button onclick="closeMemberModal()" style="background:#1a1a1a;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">閉じる</button>
+    </div>
+  `;
+  document.getElementById('memberModalBg').style.display = 'flex';
+}
 
 // 一括削除（チェックして選んで削除）
 async function bulkDeleteTest(){
