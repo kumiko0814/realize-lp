@@ -800,15 +800,19 @@ async function executeBulkDelete(){
 
 // メンバーをクラウドから削除
 async function deleteMember(id, name){
-  if(!confirm('「' + name + '」(' + id + ') のクラウドデータを完全削除します。\n\n・進捗データ\n・強み・異常値\n・OKR目標\n・受信したメッセージ\n\nが全て消えます。よろしいですか？')) return;
+  if(!confirm('「' + name + '」(' + id + ') を完全削除します。よろしいですか？')) return;
   const client = getSupaAdmin();
   if(!client){ alert('Supabase未接続'); return; }
   try {
-    // メンバー本体削除
     const { error: e1 } = await client.from('realize_members').delete().eq('id', id);
-    if(e1){ alert('削除エラー：' + e1.message); return; }
-    // 受信コメントも削除
-    await client.from('realize_comments').delete().eq('target_id', id);
+    if(e1){ alert('削除エラー：' + e1.message + '\n\nSupabaseで以下のSQL実行が必要です：\nCREATE POLICY "del_m" ON realize_members FOR DELETE TO anon USING (true);'); return; }
+    await client.from('realize_comments').delete().eq('target_id', id).then(()=>{}).catch(()=>{});
+    // 実際に消えたかを確認
+    const { data: check } = await client.from('realize_members').select('id').eq('id', id).maybeSingle();
+    if(check){
+      alert('⚠ 削除リクエストは送信されましたが、データがまだ残っています。\n\n原因：Supabase に DELETE 権限が設定されていません。\n\n👉 Supabase の SQL Editor で次のSQLを実行してください：\n\nCREATE POLICY "del_members" ON realize_members FOR DELETE TO anon USING (true);\nCREATE POLICY "del_comments" ON realize_comments FOR DELETE TO anon USING (true);\n\n実行後、再度削除ボタンを押してください。');
+      return;
+    }
     showToast('☑ 削除しました：' + name);
     closeMemberModal();
     loadMembers();
