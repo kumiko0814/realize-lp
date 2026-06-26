@@ -147,7 +147,7 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
 
       <h3 style="font-size:14px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">STEP 3：メッセージを送る</h3>
       <ol style="padding-left:20px;font-size:12px;line-height:1.95;color:#5a5a5a">
-        <li>上部の「あなたの管理者ID」で自分を選ぶ（くみこ／清水CTO／講師A/B）</li>
+        <li>上部の「あなたの管理者ID」で自分を選ぶ（くみこ／清水／講師A/B）</li>
         <li>参加者カードをクリック → 詳細モーダル</li>
         <li>下までスクロール → 「💌 ◯◯さんへメッセージ」欄</li>
         <li>応援メッセージを書いて「📨 メッセージを送る」</li>
@@ -197,7 +197,7 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
       <label style="font-size:11px;color:var(--mute);letter-spacing:0.1em;margin-left:10px">あなたの管理者ID：</label>
       <select id="adminId" onchange="localStorage.setItem('realize_admin_id', this.value)" style="padding:6px 10px;border:1px solid var(--accent);border-radius:6px;font-family:inherit;font-size:12px;background:#fdf6f3;color:#c25b3f;font-weight:700">
         <option value="kumiko">くみこ（代表）</option>
-        <option value="shimizu">清水CTO</option>
+        <option value="shimizu">清水</option>
         <option value="sensei1">講師A</option>
         <option value="sensei2">講師B</option>
       </select>
@@ -629,7 +629,7 @@ function renderMembers(){
 // 管理者プロフィール
 const ADMINS = {
   kumiko:  { name:'くみこ', role:'代表', color:'#f78ac0', icon:'kumiko' },
-  shimizu: { name:'清水CTO', role:'CTO・技術', color:'#7ac8ff', icon:'shimizu' },
+  shimizu: { name:'清水', role:'コーチ', color:'#7ac8ff', icon:'shimizu' },
   sensei1: { name:'講師A', role:'コーチ', color:'#5fbb5f', icon:'sensei1' },
   sensei2: { name:'講師B', role:'コーチ', color:'#ffd644', icon:'sensei2' }
 };
