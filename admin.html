@@ -604,12 +604,15 @@ function renderMembers(){
     const strengthsTotal = ((m.strengths_others||[]).length + (m.strengths_town2||[]).length + (m.strengths_additional||[]).length);
     const updated = m.updated_at ? new Date(m.updated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
     return `
-      <div onclick='showMemberDetail(${JSON.stringify(m.id)})' style="background:#fdfbf6;border:1px solid #ece5d8;border-radius:12px;padding:14px 12px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='#c25b3f';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#ece5d8';this.style.transform='translateY(0)'">
+      <div style="position:relative;background:#fdfbf6;border:1px solid #ece5d8;border-radius:12px;padding:14px 12px;transition:all 0.2s">
+        <button onclick='deleteMember(${JSON.stringify(m.id)},${JSON.stringify(m.name||"")})' title="このIDを削除" style="position:absolute;top:6px;right:6px;background:rgba(194,91,63,0.1);color:#c25b3f;border:1px solid #c25b3f;width:24px;height:24px;border-radius:50%;font-family:inherit;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0;z-index:2">✕</button>
+        <div onclick='showMemberDetail(${JSON.stringify(m.id)})' style="cursor:pointer">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           <div style="width:46px;height:46px;background:#fff7ec;border:1px solid #ece5d8;border-radius:8px;padding:4px;flex-shrink:0">${ANIMAL_SVG_ADMIN[animal]}</div>
-          <div style="flex:1;min-width:0">
+          <div style="flex:1;min-width:0;padding-right:24px">
             <div style="font-weight:700;font-size:13px;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeAdmin(m.name||'匿名')}</div>
             <div style="font-size:10px;color:#5a7050;letter-spacing:0.08em">${m.mbti || '未診断'} ／ ${ANIMAL_NAME_ADMIN[animal]}</div>
+            <div style="font-size:9px;color:#8b8278;margin-top:2px"><code style="background:#f5eee2;padding:1px 4px;border-radius:3px">${escapeAdmin(m.id)}</code></div>
           </div>
         </div>
         <div style="height:6px;background:#ece5d8;border-radius:3px;margin-bottom:4px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,#7a9070 0%,#c9a574 100%);width:${rate}%"></div></div>
@@ -621,6 +624,7 @@ function renderMembers(){
           <span>${m.ijouchi ? '⭐済' : '⭐未'}</span>
           <span>Lv.${m.companion_level || 1}</span>
           <span style="margin-left:auto;font-size:8.5px">${updated}</span>
+        </div>
         </div>
       </div>
     `;
