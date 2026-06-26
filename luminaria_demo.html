@@ -311,35 +311,103 @@ footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-al
 
   <!-- 方法③ 街を歩く -->
   <section id="m3">
-    <h3>方法③ 🗺 街を歩いて直接「出会う」</h3>
-    <p class="lead">ルミナリアの街を主人公が歩き回り、<strong>仲間のキャラクターと現地で出会う</strong> こともできる。</p>
+    <h3>方法③ 🗺 街を歩いて直接「出会う」（NEW）</h3>
+    <p class="lead">ルミナリアの街を主人公が歩き回ると、<strong>登録している全メンバーのアバターが街中に立ち並ぶ</strong>。<br>オンライン中の人は頭上に「🟢LIVE」マーカーが点滅。</p>
 
+    <!-- 街マップ風モック -->
     <div class="screen-mock">
-      <div class="screen-inner" style="background:#5fbb5f">
-        <div style="background:#3a8a3a;padding:10px;border:2px solid #fffbf3;border-radius:4px;font-family:DotGothic16,sans-serif;text-align:center;color:#fff">
-          <p style="margin:0;font-size:13px">🗺 街4：交流の都ルミナリア</p>
-          <p style="font-size:10px;color:#ffd644;margin-top:6px">▼ ▲ ◀ ▶ で 主人公が街を歩く</p>
-          <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:14px">
-            <div style="background:#a87132;padding:6px;font-size:9px;border-radius:3px">🦊 茜</div>
-            <div style="opacity:0">·</div>
-            <div style="background:#f78ac0;padding:6px;font-size:9px;border-radius:3px">🐱 かなみ</div>
-            <div style="opacity:0">·</div>
-            <div style="background:#5fbb5f;border:2px solid #ffd644;padding:6px;font-size:9px;border-radius:3px">★ YOU</div>
-            <div style="opacity:0">·</div>
-            <div style="background:#a87132;padding:6px;font-size:9px;border-radius:3px">🦉 玲</div>
-            <div style="opacity:0">·</div>
+      <div style="background:#5fbb5f;padding:10px;border:3px solid #fffbf3;border-radius:6px;font-family:DotGothic16,sans-serif;color:#fff;position:relative">
+        <p style="font-size:11px;color:#fff;margin-bottom:8px;letter-spacing:0.1em">🗺 街4：交流の都ルミナリア</p>
+        <div style="position:relative;background:#5fbb5f;padding:14px 4px;min-height:240px">
+          <!-- 草・木 装飾 -->
+          <div style="position:absolute;inset:0;background-image:radial-gradient(circle at 8% 22%,#3a8a3a 6px,transparent 8px),radial-gradient(circle at 22% 70%,#3a8a3a 4px,transparent 6px),radial-gradient(circle at 85% 35%,#3a8a3a 5px,transparent 7px),radial-gradient(circle at 50% 85%,#3a8a3a 4px,transparent 6px);opacity:0.5"></div>
+
+          <!-- 自分 YOU -->
+          <div style="position:absolute;top:48%;left:48%;text-align:center;z-index:5">
+            <div style="background:#ffd644;color:#0e0e1a;font-size:7px;padding:1px 4px;border-radius:3px;margin-bottom:1px;font-family:DotGothic16">YOU</div>
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:32px;height:32px;image-rendering:pixelated"><rect x="5" y="1" width="6" height="1" fill="#f78ac0"/><rect x="4" y="2" width="8" height="2" fill="#f78ac0"/><rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/><rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="6" width="2" height="1" fill="#e63d6a"/><rect x="5" y="7" width="5" height="5" fill="#e63d6a"/><rect x="5" y="9" width="5" height="1" fill="#ffd644"/></svg>
           </div>
-          <p style="font-size:10px;margin-top:10px;color:#fcd5e6">★ 仲間に近づいて Aボタンで話しかける！</p>
+
+          <!-- オンライン中（左上） -->
+          <div style="position:absolute;top:12%;left:18%;text-align:center;z-index:4">
+            <div style="background:#5fbb5f;color:#fff;font-size:7px;padding:1px 4px;border-radius:3px;margin-bottom:1px;font-family:DotGothic16;animation:pulse 1.4s ease-in-out infinite;box-shadow:0 0 6px #5fbb5f">🟢LIVE</div>
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:32px;height:32px;image-rendering:pixelated"><rect x="2" y="1" width="1" height="1" fill="#c45a8e"/><rect x="2" y="2" width="2" height="1" fill="#c45a8e"/><rect x="13" y="1" width="1" height="1" fill="#c45a8e"/><rect x="12" y="2" width="2" height="1" fill="#c45a8e"/><rect x="2" y="4" width="12" height="6" fill="#f78ac0"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="3" y="10" width="10" height="3" fill="#f78ac0"/></svg>
+            <div style="background:rgba(0,0,0,0.7);color:#fff;font-size:6px;padding:1px 3px;border-radius:2px;margin-top:1px">かなみ</div>
+          </div>
+
+          <!-- オフライン例（右上） -->
+          <div style="position:absolute;top:22%;right:14%;text-align:center;z-index:4">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:32px;height:32px;image-rendering:pixelated;opacity:0.85"><rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="2" y="3" width="12" height="9" fill="#a87132"/><rect x="4" y="5" width="3" height="3" fill="#fff"/><rect x="9" y="5" width="3" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#ffd644"/></svg>
+            <div style="background:rgba(0,0,0,0.7);color:#fff;font-size:6px;padding:1px 3px;border-radius:2px;margin-top:1px">玲</div>
+          </div>
+
+          <!-- オンライン中（下左） -->
+          <div style="position:absolute;bottom:10%;left:22%;text-align:center;z-index:4">
+            <div style="background:#5fbb5f;color:#fff;font-size:7px;padding:1px 4px;border-radius:3px;margin-bottom:1px;font-family:DotGothic16;animation:pulse 1.4s ease-in-out infinite;box-shadow:0 0 6px #5fbb5f">🟢LIVE</div>
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:32px;height:32px;image-rendering:pixelated"><rect x="2" y="1" width="3" height="3" fill="#e6814a"/><rect x="11" y="1" width="3" height="3" fill="#e6814a"/><rect x="2" y="4" width="12" height="6" fill="#e6814a"/><rect x="4" y="8" width="8" height="2" fill="#fff"/></svg>
+            <div style="background:rgba(0,0,0,0.7);color:#fff;font-size:6px;padding:1px 3px;border-radius:2px;margin-top:1px">茜</div>
+          </div>
+
+          <!-- オフライン例（下右） -->
+          <div style="position:absolute;bottom:14%;right:18%;text-align:center;z-index:4">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:32px;height:32px;image-rendering:pixelated;opacity:0.85"><rect x="3" y="2" width="2" height="3" fill="#c89455"/><rect x="11" y="2" width="2" height="3" fill="#c89455"/><rect x="2" y="4" width="12" height="7" fill="#c89455"/><rect x="4" y="8" width="8" height="3" fill="#fff"/></svg>
+            <div style="background:rgba(0,0,0,0.7);color:#fff;font-size:6px;padding:1px 3px;border-radius:2px;margin-top:1px">美世</div>
+          </div>
+
+          <!-- オフライン例（中央上） -->
+          <div style="position:absolute;top:14%;left:55%;text-align:center;z-index:4">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges" style="width:32px;height:32px;image-rendering:pixelated;opacity:0.85"><rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="8" fill="#fff"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/></svg>
+            <div style="background:rgba(0,0,0,0.7);color:#fff;font-size:6px;padding:1px 3px;border-radius:2px;margin-top:1px">空</div>
+          </div>
         </div>
+        <p style="font-size:10px;margin-top:8px;color:#fffcf0;text-align:center">▼ ▲ ◀ ▶ で主人公を動かして、Aで話しかける！</p>
       </div>
     </div>
 
     <div class="note-box">
-      <strong>💡 ゲーム性の演出</strong><br>
-      ・各メンバーが街に立ち並んでいる（位置はランダム配置）<br>
-      ・自分のキャラを矢印キー／Dパッドで動かして近づく<br>
-      ・Aボタンで話しかける → プロフィール画面が開く<br>
-      ・「メンバーズボード」と同じプロフィールが見られるが、<strong>「歩いて出会う」体験</strong>がポケモンらしさを演出
+      <strong>💡 新仕様：街4に全メンバーが登場</strong><br>
+      ✦ 街4に着くと、Realize に登録している <strong>全参加者のアバターが街中に自動配置</strong><br>
+      ✦ オンライン中の人は頭上に <strong>「🟢LIVE」マーカー</strong> がチカチカ点滅<br>
+      ✦ オフラインの人は <strong>少し透けた状態で配置</strong>（プロフィール閲覧はできる）<br>
+      ✦ 矢印キー／Dパッドで近づいて Aボタンで話しかけ → プロフィール画面へ<br>
+      ✦ オンライン中なら <strong>「⚔ リアルタイム対戦！」</strong>、オフラインなら<strong>閲覧のみ</strong>
+    </div>
+
+    <style>@keyframes pulse{50%{opacity:0.4}}</style>
+  </section>
+
+  <!-- 方法③-b オンライン/オフラインの違い -->
+  <section id="m3b">
+    <h3>方法③-b 🟢 オンライン／オフライン の挙動の違い</h3>
+    <p class="lead">同じカードでも、相手の状態によって出来ることが変わる。</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0">
+      <div style="background:rgba(95,187,95,0.1);border:2px solid #5fbb5f;border-radius:10px;padding:16px">
+        <p style="font-size:13px;font-weight:700;color:var(--leaf-deep);margin-bottom:8px">🟢 オンライン中の相手</p>
+        <ul style="padding-left:18px;font-size:11.5px;line-height:1.95;color:var(--sub)">
+          <li>カードに緑ドット点滅</li>
+          <li>アバター頭上に「🟢LIVE」表示</li>
+          <li>プロフィール閲覧 <strong>OK</strong></li>
+          <li><strong>「⚔ リアルタイム対戦！」</strong> ボタン</li>
+          <li>5問の対話バトル（3分程度）</li>
+        </ul>
+      </div>
+      <div style="background:rgba(139,130,120,0.1);border:2px solid var(--mute);border-radius:10px;padding:16px">
+        <p style="font-size:13px;font-weight:700;color:var(--mute);margin-bottom:8px">🌥 オフラインの相手</p>
+        <ul style="padding-left:18px;font-size:11.5px;line-height:1.95;color:var(--sub)">
+          <li>カードはグレー基調</li>
+          <li>アバターは少し透けて表示</li>
+          <li>プロフィール閲覧 <strong>OK</strong></li>
+          <li>対戦ボタン <strong>非表示</strong></li>
+          <li>強み・異常値・目標は <strong>常時見られる</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>★ 一番大事な原則</strong><br>
+      <strong style="color:var(--accent)">プロフィールは常時誰でも見られる。リアルタイム対戦は両者オンライン時のみ。</strong><br>
+      「あの人どんな異常値持ってるんだろう」を いつでも覗ける関係性を作る。
     </div>
   </section>
 
