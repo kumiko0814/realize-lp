@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ルミナリア交流デモ ｜ Re:alize Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a1a;--sub:#5a5a5a;--mute:#8b8278;
+  --bg:#fffaf6;--card:#fff;--line:#ece5d8;--line-soft:#f5eee2;
+  --accent:#c25b3f;--accent-deep:#a64626;
+  --leaf:#7a9070;--leaf-deep:#5a7050;
+  --gold:#c9a574;--gold-deep:#a67a26;
+  --pink:#e8b6bc;--sakura:#fcd5e6;
+  --mind:#7ac8ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Yu Gothic","YuGothic","Hiragino Kaku Gothic ProN",sans-serif;
+  color:var(--ink);background:var(--bg);
+  font-size:14px;line-height:1.95;letter-spacing:0.05em;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"palt";
+}
+.wrap{max-width:920px;margin:0 auto;padding:56px 24px 96px}
+@media(max-width:720px){.wrap{padding:32px 18px 64px}}
+
+/* HEADER */
+.head{text-align:center;margin-bottom:56px;padding-bottom:36px;border-bottom:1px solid var(--line)}
+.head .meta{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:12px;letter-spacing:0.35em;color:var(--mute);margin-bottom:14px}
+.head h1{font-family:"Yu Mincho",serif;font-size:28px;font-weight:500;letter-spacing:0.08em;line-height:1.5;margin-bottom:10px}
+.head h1 .em{color:var(--accent)}
+.head .sub{font-size:13px;color:var(--sub);letter-spacing:0.08em}
+
+section{margin-bottom:56px;scroll-margin-top:20px}
+section h2{
+  font-family:"Yu Mincho",serif;font-size:22px;font-weight:600;letter-spacing:0.06em;
+  line-height:1.6;padding-bottom:14px;border-bottom:2px solid var(--leaf-deep);
+  display:flex;align-items:baseline;gap:14px;margin-bottom:24px;
+}
+section h2 .num{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;color:var(--leaf);letter-spacing:0.2em;font-weight:500}
+.lead{font-size:14px;color:var(--sub);line-height:2;letter-spacing:0.05em;margin-bottom:24px}
+
+h3{font-size:16px;font-weight:700;margin:24px 0 10px;letter-spacing:0.06em;color:var(--leaf-deep);padding-left:14px;border-left:3px solid var(--leaf)}
+
+/* SCREEN MOCK */
+.screen-mock{
+  background:#000;border-radius:14px;padding:14px;margin:20px 0;
+  box-shadow:0 8px 28px rgba(0,0,0,0.15);
+}
+.screen-inner{
+  background:#0e0e1a;color:#fffbf3;padding:18px;border-radius:8px;
+  font-family:"DotGothic16","Yu Gothic",sans-serif;letter-spacing:0.04em;
+  border:3px solid #fffbf3;
+}
+.screen-inner h4{
+  font-size:14px;color:#ffd644;margin-bottom:6px;letter-spacing:0.15em;
+}
+.screen-inner .sub-label{font-size:9px;color:#fcd5e6;letter-spacing:0.3em;margin-bottom:14px}
+
+.member-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+@media(max-width:720px){.member-grid{grid-template-columns:repeat(2,1fr)}}
+.mock-card{
+  background:#1a1a2a;border:2px solid #fffbf3;border-radius:6px;
+  padding:10px 8px;text-align:center;
+}
+.mock-card.cloud{border-color:#7ac8ff}
+.mock-card.you{background:linear-gradient(135deg,#3a2a5a 0%,#1a1a3a 100%);border-color:#ffd644}
+.mock-card svg{width:42px;height:42px;margin:0 auto 6px;display:block;image-rendering:pixelated}
+.mock-card .nm{font-size:11px;font-weight:bold}
+.mock-card .role{font-size:8.5px;color:#7ac8ff;margin-top:2px}
+.mock-card .badge{font-size:8px;color:#fcd5e6;margin-top:3px}
+.mock-card .progress{margin-top:4px}
+.mock-card .progress .bar{height:3px;background:#1a1a2a;border:1px solid #3a3a4a;overflow:hidden;border-radius:2px}
+.mock-card .progress .bar-fill{height:100%;background:linear-gradient(90deg,#ffd644,#c25b3f)}
+.mock-card .progress .label{font-size:7.5px;color:#ffd644;margin-top:2px}
+
+/* PROFILE MOCK */
+.profile-mock{
+  background:#1a1a2a;border:2px solid #fffbf3;border-radius:6px;
+  padding:18px;color:#fffbf3;
+}
+.profile-mock .avatar-large{width:72px;height:72px;margin:0 auto 12px;background:#0e0e1a;border:2px solid #ffd644;display:block;padding:4px}
+.profile-mock h5{text-align:center;font-size:15px;color:#fcd5e6;margin-bottom:4px}
+.profile-mock .meta{text-align:center;font-size:10px;color:#7ac8ff;letter-spacing:0.2em;margin-bottom:14px}
+.profile-mock .ijouchi-box{
+  background:linear-gradient(135deg,rgba(255,214,68,0.18),rgba(122,200,255,0.14));
+  border:2px solid #ffd644;padding:12px;border-radius:4px;margin-bottom:12px;
+}
+.profile-mock .ijouchi-box .label{font-size:9px;color:#ffd644;letter-spacing:0.25em;margin-bottom:5px;text-align:center}
+.profile-mock .ijouchi-box .stmt{font-size:11.5px;line-height:1.85;text-align:center}
+.profile-mock .row{font-size:11px;padding:5px 0;border-bottom:1px dashed #3a3a4a;display:flex;justify-content:space-between}
+.profile-mock .row .em{color:#ffd644}
+.profile-mock .goal-box{background:rgba(122,200,255,0.1);border-left:3px solid #7ac8ff;padding:8px 10px;margin-top:10px;font-size:11px;line-height:1.6}
+.profile-mock .goal-box .label{font-size:9px;color:#7ac8ff;letter-spacing:0.2em;margin-bottom:4px}
+
+/* MESSAGE MOCK */
+.msg-mock{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;display:flex;gap:10px;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.msg-mock .icon{flex-shrink:0}
+.msg-mock .body{flex:1}
+.msg-mock .name-line{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;margin-bottom:3px}
+.msg-mock .role-tag{font-size:9.5px;color:var(--mute);background:var(--line-soft);padding:2px 8px;border-radius:8px;letter-spacing:0.1em;font-weight:400}
+.msg-mock .date{font-size:9.5px;color:var(--mute);margin-bottom:6px}
+.msg-mock .text{font-size:12.5px;line-height:1.85}
+
+/* FLOW BLOCKS */
+.flow-step{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:22px 24px;margin-bottom:14px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;
+}
+@media(max-width:720px){.flow-step{grid-template-columns:1fr;gap:10px}}
+.flow-step .step-num{
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+  background:var(--accent);color:#fff;width:48px;height:48px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;font-size:18px;font-weight:700;flex-shrink:0;
+}
+.flow-step h4{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--ink);letter-spacing:0.05em}
+.flow-step p{font-size:12.5px;color:var(--sub);line-height:1.95}
+
+/* TIP / FEATURE */
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+@media(max-width:720px){.feature-grid{grid-template-columns:1fr}}
+.feature{
+  background:linear-gradient(180deg,#fff7ec,#fff);
+  border:1px solid var(--gold);border-radius:14px;padding:20px 16px;text-align:center;
+}
+.feature .icon-big{font-size:28px;margin-bottom:8px}
+.feature h5{font-size:13.5px;color:var(--accent-deep);margin-bottom:6px}
+.feature p{font-size:11.5px;color:var(--sub);line-height:1.8}
+
+/* CTA */
+.cta-zone{
+  background:linear-gradient(135deg,var(--leaf-deep) 0%,var(--leaf) 100%);
+  color:#fff;padding:32px 28px;border-radius:16px;text-align:center;margin-top:40px;
+}
+.cta-zone h2{font-family:"Yu Mincho",serif;font-size:20px;color:#fff;border:none;padding:0;margin-bottom:10px;display:block;letter-spacing:0.08em}
+.cta-zone p{font-size:12.5px;color:#fff;opacity:0.9;line-height:1.95;margin-bottom:18px}
+.cta-btn{display:inline-block;background:#fff;color:var(--leaf-deep);padding:12px 32px;border-radius:999px;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:0.2em;transition:all 0.2s;box-shadow:0 4px 14px rgba(0,0,0,0.18);margin:6px}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.25)}
+
+.note-box{
+  background:#fff7ec;border-left:3px solid var(--gold-deep);
+  padding:14px 18px;margin:14px 0;border-radius:0 6px 6px 0;font-size:12px;line-height:1.95;
+}
+
+footer{margin-top:64px;padding-top:32px;border-top:1px solid var(--line);text-align:center;font-size:11px;color:var(--mute);letter-spacing:0.15em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="head">
+    <div class="meta">— LUMINARIA INTERACTION DEMO —</div>
+    <h1><span class="em">ルミナリア</span>で 仲間と交流するには</h1>
+    <p class="sub">Re:alize 参加者同士が お互いの強み・異常値・目標を覗き合う 4つの方法</p>
+  </div>
+
+  <!-- ============ 01. 概要 ============ -->
+  <section id="overview">
+    <h2><span class="num">01</span>ルミナリアとは</h2>
+    <p class="lead">
+      Re:alize Quest の <strong>第4の街「交流の都ルミナリア」</strong>。<br>
+      街1で卵をもらい、街2で他者から強みをもらい、街3で自分の異常値を発見した参加者だけが たどり着く街。<br>
+      ここでは <em>Realize に参加している全員</em> のキャラクターと出会える。
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="icon-big">💎</div>
+        <h5>強みを覗ける</h5>
+        <p>あの人が他者から<br>もらった強みリスト</p>
+      </div>
+      <div class="feature">
+        <div class="icon-big">🐾</div>
+        <h5>動物を覗ける</h5>
+        <p>どんな相棒が<br>育っているか</p>
+      </div>
+      <div class="feature">
+        <div class="icon-big">⭐</div>
+        <h5>異常値を覗ける</h5>
+        <p>それぞれが見つけた<br>異常値ステートメント</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02. 4つの交流方法 ============ -->
+  <section id="methods">
+    <h2><span class="num">02</span>交流の 4つの方法</h2>
+    <p class="lead">参加者同士が同じ時間にオンラインで居なくても、<strong>非同期で常時繋がれる</strong> 設計。</p>
+  </section>
+
+  <!-- 方法① メンバーズボード -->
+  <section id="m1">
+    <h3>方法① 📋 メンバーズボード（自動表示）</h3>
+    <p class="lead">街4に到着した瞬間、<strong>参加者全員のカードが一覧で表示される</strong>。</p>
+
+    <div class="screen-mock">
+      <div class="screen-inner">
+        <h4>📋 ルミナリア メンバーズボード</h4>
+        <div class="sub-label">— MEMBERS —</div>
+        <p style="font-size:10px;color:#7ac8ff;margin-bottom:8px">★ クラウドから 18人 取得</p>
+        <div class="member-grid">
+          <div class="mock-card you">
+            <div style="font-size:8px;color:#ffd644;letter-spacing:0.2em;margin-bottom:3px">★ YOU ★</div>
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="1" width="6" height="1" fill="#f78ac0"/><rect x="4" y="2" width="8" height="2" fill="#f78ac0"/><rect x="5" y="4" width="5" height="3" fill="#fcd1a3"/><rect x="6" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="9" y="5" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="6" width="2" height="1" fill="#e63d6a"/><rect x="5" y="7" width="5" height="5" fill="#e63d6a"/><rect x="5" y="9" width="5" height="1" fill="#ffd644"/></svg>
+            <div class="nm">くみこ</div>
+            <div class="role">ENFP / 遊び人</div>
+          </div>
+          <div class="mock-card cloud">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="1" width="1" height="1" fill="#c45a8e"/><rect x="2" y="2" width="2" height="1" fill="#c45a8e"/><rect x="2" y="4" width="12" height="6" fill="#f78ac0"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="3" y="10" width="10" height="3" fill="#f78ac0"/></svg>
+            <div class="nm">かなみ</div>
+            <div class="role">ENFP / ねこ</div>
+            <div class="badge">☁ Lv.4 / Week 12</div>
+            <div class="progress"><div class="bar"><div class="bar-fill" style="width:78%"></div></div><div class="label">達成率 78%</div></div>
+          </div>
+          <div class="mock-card cloud">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="3" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="11" y="1" width="2" height="2" fill="#6a4a1f"/><rect x="2" y="3" width="12" height="9" fill="#a87132"/><rect x="4" y="5" width="3" height="3" fill="#fff"/><rect x="9" y="5" width="3" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="10" y="6" width="1" height="1" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#ffd644"/></svg>
+            <div class="nm">玲（れい）</div>
+            <div class="role">INTJ / フクロウ</div>
+            <div class="badge">☁ Lv.6 / Week 18</div>
+            <div class="progress"><div class="bar"><div class="bar-fill" style="width:92%"></div></div><div class="label">達成率 92%</div></div>
+          </div>
+          <div class="mock-card cloud">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="11" y="2" width="3" height="3" fill="#0e0e1a"/><rect x="2" y="4" width="12" height="8" fill="#fff"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="2" fill="#0e0e1a"/></svg>
+            <div class="nm">空（そら）</div>
+            <div class="role">ENFJ / パンダ</div>
+            <div class="badge">☁ Lv.3 / Week 8</div>
+            <div class="progress"><div class="bar"><div class="bar-fill" style="width:55%"></div></div><div class="label">達成率 55%</div></div>
+          </div>
+          <div class="mock-card cloud">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="1" width="3" height="3" fill="#e6814a"/><rect x="11" y="1" width="3" height="3" fill="#e6814a"/><rect x="2" y="4" width="12" height="6" fill="#e6814a"/><rect x="4" y="8" width="8" height="2" fill="#fff"/></svg>
+            <div class="nm">茜（あかね）</div>
+            <div class="role">ESTP / キツネ</div>
+            <div class="badge">☁ Lv.5 / Week 15</div>
+            <div class="progress"><div class="bar"><div class="bar-fill" style="width:84%"></div></div><div class="label">達成率 84%</div></div>
+          </div>
+          <div class="mock-card cloud">
+            <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="3" y="2" width="2" height="3" fill="#c89455"/><rect x="11" y="2" width="2" height="3" fill="#c89455"/><rect x="2" y="4" width="12" height="7" fill="#c89455"/><rect x="4" y="8" width="8" height="3" fill="#fff"/></svg>
+            <div class="nm">美世（みよ）</div>
+            <div class="role">ISFJ / シバイヌ</div>
+            <div class="badge">☁ Lv.4 / Week 11</div>
+            <div class="progress"><div class="bar"><div class="bar-fill" style="width:68%"></div></div><div class="label">達成率 68%</div></div>
+          </div>
+        </div>
+        <p style="font-size:9px;color:#7ac8ff;text-align:center;margin-top:8px">★ カードを<u>タップ</u>すると プロフィール詳細が見られる</p>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>💡 操作性のポイント</strong><br>
+      ・カードはタップだけで開ける（ボタンも不要）<br>
+      ・自分のカードは金枠で常に最上部<br>
+      ・☁ マーク＝クラウドから取得した実在の参加者<br>
+      ・5分ごと自動更新、または「↻ 更新」ボタンで即取得
+    </div>
+  </section>
+
+  <!-- 方法② 個別プロフィール -->
+  <section id="m2">
+    <h3>方法② 📖 個別プロフィール（カード タップで表示）</h3>
+    <p class="lead">気になる仲間のカードをタップすると、<strong>その人のプロフィール全部が一画面で見える</strong>。</p>
+
+    <div class="screen-mock">
+      <div class="profile-mock">
+        <h4 style="text-align:center;font-size:13px;color:#ffd644;letter-spacing:0.15em;margin-bottom:4px">📖 かなみさんのプロフィール</h4>
+        <div style="text-align:center;font-size:9px;color:#fcd5e6;letter-spacing:0.25em;margin-bottom:14px">— ENFP ・ ねこ —</div>
+        <svg class="avatar-large" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="1" width="1" height="1" fill="#c45a8e"/><rect x="2" y="2" width="2" height="1" fill="#c45a8e"/><rect x="2" y="3" width="3" height="1" fill="#f78ac0"/><rect x="13" y="1" width="1" height="1" fill="#c45a8e"/><rect x="12" y="2" width="2" height="1" fill="#c45a8e"/><rect x="11" y="3" width="3" height="1" fill="#f78ac0"/><rect x="2" y="4" width="12" height="6" fill="#f78ac0"/><rect x="4" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="10" y="6" width="2" height="2" fill="#0e0e1a"/><rect x="7" y="8" width="2" height="1" fill="#e63d6a"/><rect x="3" y="10" width="10" height="3" fill="#f78ac0"/><rect x="3" y="13" width="2" height="2" fill="#f78ac0"/><rect x="6" y="13" width="2" height="2" fill="#f78ac0"/><rect x="11" y="13" width="2" height="2" fill="#f78ac0"/></svg>
+
+        <div class="ijouchi-box">
+          <div class="label">— 異常値 —</div>
+          <div class="stmt">どんな人の「本当にやりたいこと」も<br>15分で引き出せる</div>
+        </div>
+
+        <h5 style="font-size:11px;color:#ffd644;margin:14px 0 6px">💎 強み</h5>
+        <ul style="padding-left:20px;font-size:11px;line-height:1.85;color:#fcd5e6">
+          <li>共感力</li>
+          <li>傾聴</li>
+          <li>言語化サポート</li>
+        </ul>
+
+        <div class="goal-box">
+          <div class="label">🎯 今の目標</div>
+          <div>半年で「言葉にできない悩み」を<br>抱える女性を50人サポート</div>
+        </div>
+
+        <div style="margin-top:14px;background:rgba(255,255,255,0.06);padding:10px;border-radius:4px">
+          <div class="row"><span>📅 現在の週</span><span class="em">Week 12 / 26</span></div>
+          <div class="row"><span>📊 達成率</span><span class="em">78%</span></div>
+          <div class="row"><span>📝 提出率</span><span class="em">92%</span></div>
+          <div class="row" style="border:none"><span>🐾 相棒レベル</span><span class="em">Lv.4</span></div>
+        </div>
+
+        <p style="font-size:10px;color:#fcd5e6;margin-top:12px;text-align:center">「はじめまして！あなたのこと、もう少し教えてくれる？<br>私ね、人の話を聞くのが大好きなの。」</p>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>💡 ここで分かること</strong><br>
+      ✦ <strong>異常値</strong>：その人だけの特別な強みステートメント<br>
+      ✦ <strong>強み一覧</strong>：他者からどんな強みをもらってきたか<br>
+      ✦ <strong>今の目標</strong>：何に向かって走っているか<br>
+      ✦ <strong>達成率・提出率</strong>：どれくらいの熱量で取り組んでいるか<br>
+      ✦ <strong>相棒レベル</strong>：強みを集めるほど上がる<br>
+      ✦ <strong>挨拶セリフ</strong>：その人らしさを表す一言
+    </div>
+  </section>
+
+  <!-- 方法③ 街を歩く -->
+  <section id="m3">
+    <h3>方法③ 🗺 街を歩いて直接「出会う」</h3>
+    <p class="lead">ルミナリアの街を主人公が歩き回り、<strong>仲間のキャラクターと現地で出会う</strong> こともできる。</p>
+
+    <div class="screen-mock">
+      <div class="screen-inner" style="background:#5fbb5f">
+        <div style="background:#3a8a3a;padding:10px;border:2px solid #fffbf3;border-radius:4px;font-family:DotGothic16,sans-serif;text-align:center;color:#fff">
+          <p style="margin:0;font-size:13px">🗺 街4：交流の都ルミナリア</p>
+          <p style="font-size:10px;color:#ffd644;margin-top:6px">▼ ▲ ◀ ▶ で 主人公が街を歩く</p>
+          <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:14px">
+            <div style="background:#a87132;padding:6px;font-size:9px;border-radius:3px">🦊 茜</div>
+            <div style="opacity:0">·</div>
+            <div style="background:#f78ac0;padding:6px;font-size:9px;border-radius:3px">🐱 かなみ</div>
+            <div style="opacity:0">·</div>
+            <div style="background:#5fbb5f;border:2px solid #ffd644;padding:6px;font-size:9px;border-radius:3px">★ YOU</div>
+            <div style="opacity:0">·</div>
+            <div style="background:#a87132;padding:6px;font-size:9px;border-radius:3px">🦉 玲</div>
+            <div style="opacity:0">·</div>
+          </div>
+          <p style="font-size:10px;margin-top:10px;color:#fcd5e6">★ 仲間に近づいて Aボタンで話しかける！</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>💡 ゲーム性の演出</strong><br>
+      ・各メンバーが街に立ち並んでいる（位置はランダム配置）<br>
+      ・自分のキャラを矢印キー／Dパッドで動かして近づく<br>
+      ・Aボタンで話しかける → プロフィール画面が開く<br>
+      ・「メンバーズボード」と同じプロフィールが見られるが、<strong>「歩いて出会う」体験</strong>がポケモンらしさを演出
+    </div>
+  </section>
+
+  <!-- 方法④ 管理者メッセージ -->
+  <section id="m4">
+    <h3>方法④ 💌 講師から個別メッセージが届く</h3>
+    <p class="lead">くみこ・清水CTO・他の講師から、ダッシュボード上に<strong>応援メッセージが届く</strong>。</p>
+
+    <div style="margin:18px 0">
+      <div class="msg-mock">
+        <div class="icon">
+          <svg viewBox="0 0 40 40" style="width:44px;height:44px"><circle cx="20" cy="20" r="18" fill="#f78ac0" stroke="#fff" stroke-width="2.5"/><text x="20" y="26" text-anchor="middle" font-size="16" font-family="Yu Mincho,serif" font-weight="700" fill="#fff">く</text></svg>
+        </div>
+        <div class="body">
+          <div class="name-line">くみこ <span class="role-tag">代表</span></div>
+          <div class="date">2026/06/26 10:35</div>
+          <div class="text">かなみさん、Week 12 でこの達成率はすごい！<br>「言葉にできない悩み」をすくい上げる解像度、<br>本当に異常値ですね。今のペースで走り抜けましょう🌸</div>
+        </div>
+      </div>
+      <div class="msg-mock">
+        <div class="icon">
+          <svg viewBox="0 0 40 40" style="width:44px;height:44px"><circle cx="20" cy="20" r="18" fill="#7ac8ff" stroke="#fff" stroke-width="2.5"/><text x="20" y="26" text-anchor="middle" font-size="16" font-family="Yu Mincho,serif" font-weight="700" fill="#fff">清</text></svg>
+        </div>
+        <div class="body">
+          <div class="name-line">清水CTO <span class="role-tag">CTO・技術</span></div>
+          <div class="date">2026/06/26 09:12</div>
+          <div class="text">かなみさんの異常値、対話の中で言語化されてきましたね。<br>「15分で引き出す」という時間軸入りの定義、すごく強い。<br>サービス設計に展開できそうな気がしました。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>💡 講師アイコン4種</strong><br>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 40 40" style="width:22px;height:22px"><circle cx="20" cy="20" r="18" fill="#f78ac0" stroke="#fff" stroke-width="2"/><text x="20" y="26" text-anchor="middle" font-size="14" font-family="Yu Mincho,serif" font-weight="700" fill="#fff">く</text></svg> くみこ（代表）</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 40 40" style="width:22px;height:22px"><circle cx="20" cy="20" r="18" fill="#7ac8ff" stroke="#fff" stroke-width="2"/><text x="20" y="26" text-anchor="middle" font-size="14" font-family="Yu Mincho,serif" font-weight="700" fill="#fff">清</text></svg> 清水CTO</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 40 40" style="width:22px;height:22px"><circle cx="20" cy="20" r="18" fill="#5fbb5f" stroke="#fff" stroke-width="2"/><text x="20" y="26" text-anchor="middle" font-size="14" font-family="Yu Mincho,serif" font-weight="700" fill="#fff">A</text></svg> 講師A</span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 40 40" style="width:22px;height:22px"><circle cx="20" cy="20" r="18" fill="#ffd644" stroke="#fff" stroke-width="2"/><text x="20" y="26" text-anchor="middle" font-size="14" font-family="Yu Mincho,serif" font-weight="700" fill="#fff">B</text></svg> 講師B</span><br>
+      ・1分ごとに自動更新（ページ開いたまま放置でも届く）<br>
+      ・admin から個別宛にメッセージ送信可能<br>
+      ・参加者は<strong>「誰から届いたか」が一目で分かる</strong>
+    </div>
+  </section>
+
+  <!-- ============ 03. 操作フロー ============ -->
+  <section id="flow">
+    <h2><span class="num">03</span>参加者の操作フロー（タップ動線）</h2>
+    <p class="lead">スマホで指1本で完結。ボタンは最大3階層まで。</p>
+
+    <div class="flow-step">
+      <div class="step-num">1</div>
+      <div>
+        <h4>ダッシュボード or ゲームから「街4」へ</h4>
+        <p>ゲーム内：街3で異常値を発見 → 「⚔ NEW AREA UNLOCKED」演出 → 「▶ 街4へ行く！」ボタン<br>または、メニュー → 🚀 街ワープ → 街4を選択</p>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="step-num">2</div>
+      <div>
+        <h4>到着で メンバーズボードが自動表示</h4>
+        <p>クラウドから 全参加者のカードを取得して即表示。「☁ クラウドから 18人 取得」と表示される。</p>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="step-num">3</div>
+      <div>
+        <h4>気になる仲間をタップ</h4>
+        <p>動物アイコン・名前・MBTI・達成率バーが見えるので、<br>「同じMBTIの人」「達成率が高い人」「気になる名前」などをタップ。</p>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="step-num">4</div>
+      <div>
+        <h4>プロフィール詳細が開く</h4>
+        <p>その人の <strong>異常値・強み・目標・進捗</strong> がすべて見える。<br>「あの人もこんな悩みを乗り越えたんだ」「同じMBTIだ！」と発見できる。</p>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="step-num">5</div>
+      <div>
+        <h4>街を歩いて「現地で会う」</h4>
+        <p>メンバーズボードを閉じて、Dパッドで自分のキャラを動かす。<br>仲間のキャラに近づいて Aボタンで話しかけても、同じプロフィールが見られる。</p>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="step-num">6</div>
+      <div>
+        <h4>ダッシュボードに戻ると 講師からメッセージ</h4>
+        <p>講師がプロフィールを見て送ってくれたメッセージが届いている。<br>1分以内に自動更新されるので、リアルタイムに近い体験。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 04. 裏側の仕組み ============ -->
+  <section id="tech">
+    <h2><span class="num">04</span>裏側のしくみ（補足）</h2>
+    <p class="lead">「同時オンライン」ではなく <strong>「常時データ共有」</strong> 型。リアルタイム接続より圧倒的に安定。</p>
+
+    <h3>データの流れ</h3>
+    <pre style="background:#1a1a2a;color:#7ac8ff;padding:18px;border-radius:8px;font-family:'SF Mono','Menlo',monospace;font-size:11px;line-height:1.9;overflow-x:auto;white-space:pre-wrap;letter-spacing:0">
+[各参加者のスマホ]
+  ↕（操作のたびに2.5秒デバウンスで同期）
+[Supabase クラウドDB]
+  ├ realize_members（強み・異常値・OKR・達成率）
+  └ realize_comments（講師からのメッセージ）
+  ↕
+[ルミナリア] → 5分ごとに全員取得して表示
+[ダッシュボード] → メッセージは1分ごとに取得</pre>
+
+    <div class="note-box">
+      <strong>💡 なぜ「非同期共有」がベストか</strong><br>
+      ✦ 同時オンライン不要：自分の好きな時間に他者を覗ける<br>
+      ✦ 接続切れの心配なし：データさえ保存されてればOK<br>
+      ✦ 完全無料運用：Supabase 無料枠で 500MB / 月50,000リクエスト（20-100名なら余裕）<br>
+      ✦ プライバシー安全：anon key 公開でも RLS で守られる
+    </div>
+  </section>
+
+  <!-- ============ 05. ユーザー視点で得られる体験 ============ -->
+  <section id="value">
+    <h2><span class="num">05</span>参加者にとっての価値</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="icon-big">🌸</div>
+        <h5>一人じゃない感</h5>
+        <p>「自分だけが頑張ってる」<br>感覚がなくなる</p>
+      </div>
+      <div class="feature">
+        <div class="icon-big">💡</div>
+        <h5>気づきが増える</h5>
+        <p>「あの人もこんな悩みを<br>乗り越えたんだ」</p>
+      </div>
+      <div class="feature">
+        <div class="icon-big">🤝</div>
+        <h5>同類を発見</h5>
+        <p>同じMBTI・同じ動物の<br>仲間がすぐ分かる</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-zone">
+    <h2>🌟 実際にデモを体験してみる</h2>
+    <p>テスト用URLで すぐ触れます。<br>体験版（卵まで）と本番版（全機能）の両方で確認できます。</p>
+    <a href="quest_v2.html?u=demo_test&name=ゲスト&demo=1&reset=1" class="cta-btn">🎮 体験版で開く</a>
+    <a href="quest_v2.html?u=test_kumiko&name=くみこ" class="cta-btn">🎯 本番フローで開く</a>
+    <a href="admin.html" class="cta-btn">⚙ 管理者ボード</a>
+  </div>
+
+  <footer>
+    <span style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--leaf);margin-bottom:6px;display:block">— Re:alize Quest ／ Luminaria Interaction Demo —</span>
+    Operated by Merone Inc. ／ Copyright © 2026
+  </footer>
+
+</div>
+</body>
+</html>
