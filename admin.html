@@ -253,6 +253,8 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
       <button class="btn" onclick="updateUrl()">URL生成</button>
     </div>
 
+    <div id="existingIdWarn" style="display:none;background:#fdebe5;border:2px solid #c25b3f;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12px;line-height:1.7;color:#c25b3f"></div>
+
     <div>
       <label style="font-size:11px;color:var(--mute);letter-spacing:0.15em;display:block;margin-bottom:6px">使い方説明ページ（最初に送る）</label>
       <div class="url-display" id="welcomeUrl">—</div>
@@ -408,6 +410,21 @@ function updateUrl(){
     document.getElementById('dashboardUrl').textContent = '—';
     document.getElementById('lineTmpl').textContent = '参加者IDを入れると、ここにテンプレが出ます';
     return;
+  }
+  // 既存IDチェック（本番モードのみ）
+  const mode0 = getUrlMode();
+  if(mode0 === 'live'){
+    const existing = _allMembers.find(m => m.id === slug);
+    if(existing){
+      const warn = document.getElementById('existingIdWarn');
+      if(warn){
+        warn.style.display = 'block';
+        warn.innerHTML = '⚠ <strong>このID「'+escapeAdmin(slug)+'」は既にデータあり</strong>（'+escapeAdmin(existing.name||'匿名')+' / '+(existing.mbti||'未診断')+'）。<br>そのまま配布すると<strong>過去データが復元</strong>されます。新規受講生なら一度「✕」で削除してから生成してください。';
+      }
+    } else {
+      const warn = document.getElementById('existingIdWarn');
+      if(warn) warn.style.display = 'none';
+    }
   }
   const welcomeUrl = buildUrl(slug, 'welcome', { name:dispName });
   const dashboardUrl = buildUrl(slug, 'dashboard', { name:dispName });

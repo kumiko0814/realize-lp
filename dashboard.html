@@ -1400,8 +1400,8 @@ function render(){
     document.getElementById('kittenName').textContent = OJI_NAMES[stage];
     document.getElementById('stageLabel').textContent = `STAGE ${stageNum} — ${OJI_NAMES[stage]}`;
     badge.textContent = 'WARNING — おじ化進行中';
-  } else if(animal){
-    // MBTI診断済み → 固有動物（孵化済み）
+  } else if(animal && eggReceived){
+    // 卵受領済み + MBTI診断済み → 固有動物（孵化済み）
     document.getElementById('kittenSvg').innerHTML = ANIMAL_SVG[animal];
     document.getElementById('kittenName').textContent = ANIMAL_NAME[animal];
     document.getElementById('stageLabel').textContent = `★ ${mbti} — ${ANIMAL_ROLE[animal]}`;
@@ -1421,9 +1421,9 @@ function render(){
   }
 
   // mood（ゲーム未着手時は卵案内）
-  if(!animal && !eggReceived){
+  if(!eggReceived){
     document.getElementById('moodText').innerHTML = '▶ <strong style="color:#c25b3f">ゲームであなただけの卵を受け取りましょう！</strong><br>右下の「⚔ NEW RPG ▶ PLAY」から始められます。';
-  } else if(!animal && eggReceived){
+  } else if(!animal){
     document.getElementById('moodText').innerHTML = '▶ <strong style="color:#c25b3f">卵を受け取った！</strong><br>次は <strong>MBTIの館</strong> で診断を受けると、相棒が孵化します。';
   } else {
     document.getElementById('moodText').textContent = getMood(route, stage);
