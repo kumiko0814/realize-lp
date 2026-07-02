@@ -1632,6 +1632,14 @@ function triggerPop(){
   setTimeout(()=>hero.classList.remove('kitten-pop'), 800);
 }
 
+let _cloudSyncTimer = null;
+function debouncedCloudSync(){
+  if(_cloudSyncTimer) clearTimeout(_cloudSyncTimer);
+  _cloudSyncTimer = setTimeout(() => {
+    if(typeof syncMyProgressToCloud === 'function') syncMyProgressToCloud();
+  }, 1500);
+}
+
 function bindKREdit(){
   document.getElementById('krEditList').addEventListener('input', e => {
     const t = e.target;
@@ -1648,6 +1656,7 @@ function bindKREdit(){
       if(sub) sub.com = parseFloat(t.value) || 0;
     }
     saveState(state);
+    debouncedCloudSync(); // 目標編集を即クラウド保存
     // don't full render here, just KR progress & weekly
     renderWeeklyInputs(); renderKRProgress();
   });
@@ -1735,7 +1744,9 @@ setTimeout(ensure3GoalSlotsVisible, 1500);
 
 document.getElementById('goalInput').addEventListener('input', e => {
   state.goal = e.target.value;
+  state.dream = e.target.value;
   saveState(state);
+  debouncedCloudSync();
 });
 
 document.getElementById('userNameInput').addEventListener('input', e => {
@@ -1999,6 +2010,11 @@ render = function(){
 
 bindKREdit();
 render();
+
+// クラウドから目標を復元（起動直後・非同期）
+setTimeout(() => { restoreFromCloud(); }, 500);
+// 5分ごとに自動的にクラウド同期（バックアップ）
+setInterval(() => { if(typeof syncMyProgressToCloud === 'function') syncMyProgressToCloud(); }, 5*60*1000);
 
 // ===== ONBOARDING =====
 // 初回起動（履歴が空）の場合のみ表示
@@ -2289,6 +2305,40 @@ function getSupa(){
   if(typeof supabase === 'undefined') return null;
   try { _supaClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey); return _supaClient; }
   catch(e){ return null; }
+}
+
+// クラウドから自分の目標データを復元（起動時に呼ぶ）
+async function restoreFromCloud(){
+  const client = getSupa();
+  if(!client || userKey === 'guest' || isDemo) return;
+  try {
+    const { data, error } = await client.from('realize_members').select('okr_data,current_week').eq('id', userKey).maybeSingle();
+    if(error || !data) return;
+    let changed = false;
+    // okr_data から目標を復元（localStorageより新しければ）
+    if(data.okr_data){
+      let okr = data.okr_data;
+      if(typeof okr === 'string'){ try { okr = JSON.parse(okr); } catch(e){ okr = null; } }
+      if(okr && Array.isArray(okr.krs) && okr.krs.length > 0){
+        const hasLocalInput = state.krs && state.krs.some(kr => (kr.name||'').trim() || (kr.subs||[]).some(s => (s.name||'').trim()));
+        if(!hasLocalInput){
+          state.krs = normalizeKrs(okr.krs);
+          if(okr.dream) state.dream = okr.dream;
+          changed = true;
+        }
+      }
+    }
+    // current_week 復元
+    if(data.current_week && data.current_week > (state.currentWeek||1)){
+      state.currentWeek = data.current_week;
+      changed = true;
+    }
+    if(changed){
+      saveState(state);
+      render();
+      console.log('☁ クラウドから目標を復元しました');
+    }
+  } catch(e){ console.warn('restoreFromCloud error:', e); }
 }
 
 // quest_v2 連動の動物SVG（10種類）
