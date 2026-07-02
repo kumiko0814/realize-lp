@@ -634,10 +634,11 @@ body{
 
   <!-- STATS -->
   <section class="stats">
-    <div class="stat-card">
+    <div class="stat-card" style="position:relative">
       <div class="stat-label">経過週</div>
       <div><span class="stat-num" id="curWeek">1</span><span class="stat-unit">/ 26</span></div>
       <div class="stat-desc" id="progressLine">あるべきライン 4%</div>
+      <button onclick="rewindWeek()" title="間違えて次週に進んでしまった時に戻す" style="position:absolute;top:8px;right:8px;background:transparent;border:1px solid #ece5d8;color:#8b8278;font-size:10px;padding:2px 8px;border-radius:12px;cursor:pointer;font-family:inherit">◀ 週を戻す</button>
     </div>
     <div class="stat-card">
       <div class="stat-label">CHA達成率</div>
@@ -669,8 +670,12 @@ body{
   <section class="weekly-input">
     <h3>今週の振り返り <span style="font-family:'Cormorant Garamond',serif;color:var(--mute);font-size:12px;font-weight:400;font-style:italic">— Week <span id="weekNumInput">1</span></span></h3>
     <p class="lead" id="weeklyLead">各サブ目標の「今週、何回／どれだけできたか」を数値で入力。空欄＝0で計算されます。<br><strong style="color:var(--accent)">★ 毎週日曜日に この入力で 1週間を振り返ります。</strong></p>
+    <div style="background:#fff8e8;border:1px solid #ffd644;border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;line-height:1.75;color:#5a4a00">
+      💡 <strong>下の「振り返りを確定して次週へ」ボタンを押すと、1週間進みます</strong>。<br>
+      　目標そのものの編集は<strong>自動保存</strong>なので、このボタン操作は不要です。
+    </div>
     <div id="weeklyInputs"></div>
-    <button class="btn-save" id="btnSaveWeek">今週の進捗を保存して、相棒を育てる</button>
+    <button class="btn-save" id="btnSaveWeek">📅 今週の振り返りを確定して 次週へ進む</button>
   </section>
 
   <!-- KR EDIT -->
@@ -681,6 +686,9 @@ body{
     </div>
     <div class="accordion-body" id="krEditBody">
       <p class="card-sub">大目標を1つ、目標を3つまで設定できます。<br>各目標には <strong style="color:#c25b3f">CHA（チャレンジ目標数値）</strong> と <strong style="color:#5a7050">COM（コミット目標数値）</strong> を入力してください。</p>
+      <div style="background:#f0f9f0;border:1px solid #5a7050;border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;line-height:1.7;color:#3a5a30">
+        ✅ <strong>入力した内容は自動的に保存されます</strong>（保存ボタン不要）。ページを離れても目標は消えません。
+      </div>
       <div class="goal-row">
         <label>大目標</label>
         <input id="goalInput" placeholder="例：2028年に100日間 海外旅行に行く"/>
@@ -911,14 +919,7 @@ function loadState(){
   if(raw){
     try{
       const loaded = JSON.parse(raw);
-      // 古いサンプル排除（正規版）
-      if(!isDemo && loaded.krs && loaded.krs.length === 3){
-        const looksLikeOldSample = loaded.krs.some(kr =>
-          kr.name && (kr.name.includes('健康管理') || kr.name.includes('副収入') || kr.name.includes('視野'))
-        );
-        if(looksLikeOldSample){ loaded.krs = []; }
-      }
-      // 必ず3枠化
+      // 必ず3枠化（ユーザー入力の目標は絶対に消さない）
       loaded.krs = normalizeKrs(loaded.krs);
       localStorage.setItem(storageKey, JSON.stringify(loaded));
       return loaded;
@@ -1573,7 +1574,29 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<
    ACTIONS
    ============================================================ */
 
+// 誤って次週に進んでしまった時のリカバリ
+function rewindWeek(){
+  if(state.currentWeek <= 1){ alert('もう Week 1 です'); return; }
+  if(!confirm(`現在 Week ${state.currentWeek} → Week ${state.currentWeek - 1} に戻しますか？\n\n（間違えて進んでしまった場合の巻き戻し用です）`)) return;
+  const targetWeek = state.currentWeek - 1;
+  // その週の履歴を削除
+  state.krs.forEach(kr => (kr.subs||[]).forEach(sub => {
+    if(sub.history && sub.history.length >= targetWeek) sub.history = sub.history.slice(0, targetWeek - 1);
+  }));
+  state.currentWeek = targetWeek;
+  saveState(state);
+  render();
+  alert(`Week ${state.currentWeek} に戻しました`);
+}
+
 function saveWeek(){
+  // 週送りの確認（誤タップ防止）
+  const isSun = isSunday();
+  const msg = isSun
+    ? `今週（Week ${state.currentWeek}）の振り返りを確定して、Week ${Math.min(state.currentWeek+1, TOTAL_WEEKS)} に進みますか？\n\n（目標の編集は自動保存されているのでこの操作は不要です）`
+    : `⚠ まだ今週の途中です（今日は${['日','月','火','水','木','金','土'][new Date().getDay()]}曜日）。\n\n進捗を保存して、Week ${Math.min(state.currentWeek+1, TOTAL_WEEKS)} に進みますか？\n\n★ 通常この操作は「毎週日曜日」に行います。\n★ 目標の編集内容は自動保存されているので、この操作は不要です。`;
+  if(!confirm(msg)) return;
+
   const inputs = document.querySelectorAll('#weeklyInputs input[type=number]');
   const w = state.currentWeek - 1;
   inputs.forEach(input => {
