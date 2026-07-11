@@ -288,8 +288,8 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
 
   <!-- MEMBER LIST -->
   <section class="card">
-    <h2>③ 既存参加者リスト（3期メンバー）</h2>
-    <p class="sub">既存OKRシートの参加者一覧。各人のIDからURLを生成済み。</p>
+    <h2>③ 参加者リスト（24名）</h2>
+    <p class="sub">現在の参加者一覧。各人のIDからURLを生成済み。「開く」で本人のダッシュボード、「📋」でLINE送付テンプレをコピー。</p>
     <div class="member-list" id="memberList"></div>
   </section>
 
@@ -357,29 +357,30 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
 const BASE = location.origin + location.pathname.replace(/[^/]+$/, '');
 
 const MEMBERS = [
-  {name:'水谷萌', id:'mizutani'},
+  {name:'北澤実果子', id:'kitazawa'},
+  {name:'園田泰葉（ソノダヤスハ）', id:'yasuha'},
+  {name:'佐藤葉月（サトウハヅキ）', id:'satouhazuki'},
+  {name:'大山可奈子（オオヤマカナコ）', id:'oyama'},
+  {name:'佐藤梨枝（サトウリエ）', id:'satourie'},
+  {name:'松田あゆみ（マツダアユミ）', id:'matsuda'},
+  {name:'石川愛子（イシカワアイコ）', id:'chuntarou'},
+  {name:'岡野潤子（オカノジュンコ）', id:'junko'},
+  {name:'米本恵美子（ヨネモトエミコ）', id:'yonemoto'},
+  {name:'宮田真歩（ミヤタマホ）', id:'miyatamaho'},
+  {name:'堂佛聡子（ドウブツサトコ）', id:'dobutsu'},
+  {name:'前田美早（マエダミサ）', id:'maeda'},
+  {name:'奥原清美（オクハラキヨミ）', id:'kiyomi'},
+  {name:'引野実希（ヒキノミキ）', id:'hikino'},
+  {name:'牧野優子（マキノユウコ）', id:'makino'},
+  {name:'櫛部多愛（クシベタエ）', id:'kushibe'},
   {name:'佐伯真由美', id:'saeki'},
-  {name:'宇野瞳（HITOMI）', id:'hitomi'},
-  {name:'堂佛聡子', id:'dobutsu'},
-  {name:'森恵子（もりけいこ）', id:'mori'},
-  {name:'大山可奈子（かなこ）', id:'oyama'},
-  {name:'小倉可奈未（Kanami）', id:'kanami'},
-  {name:'石川愛子（ちゅん太郎）', id:'chuntaro'},
-  {name:'福島Butt尚子', id:'fukushima'},
-  {name:'牧野優子', id:'makino'},
-  {name:'宮田佳菜子（kana）', id:'kana'},
-  {name:'北澤実果子（Kitazawa）', id:'kitazawa'},
-  {name:'岩田佳子', id:'iwata'},
-  {name:'湯浅郁子（いくさん）', id:'iku'},
-  {name:'石原あさみ', id:'ishihara'},
-  {name:'米本恵美子（のの）', id:'nono'},
-  {name:'原田惇子（はらだあつこ）', id:'harada'},
-  {name:'田原まり子', id:'tahara'},
-  {name:'上鶴清美（きよみ）', id:'kiyomi'},
-  {name:'園田泰葉', id:'sonoda'},
-  {name:'岡野潤子（JUNKO）', id:'junko'},
-  {name:'池田駿人', id:'ikeda'},
-  {name:'上田ひかる', id:'ueda'}
+  {name:'宮田佳菜子（ミヤタカナコ）', id:'kana'},
+  {name:'石原あさみ（イシハラアサミ）', id:'ishihara'},
+  {name:'水谷萌（ミズタニモエ）', id:'mizutani'},
+  {name:'宮代安希子（ミヤシロアキコ）', id:'miyashiro'},
+  {name:'森恵子（モリケイコ）', id:'mori'},
+  {name:'春日裕希乃（カスガユキノ）', id:'yukino'},
+  {name:'名嘉眞勢津子（ナカマセツコ）', id:'nakama'}
 ];
 
 function getUrlMode(){
