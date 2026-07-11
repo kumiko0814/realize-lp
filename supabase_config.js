@@ -10,3 +10,16 @@ const SUPABASE_CONFIG = {
   // 接続が有効か（url/key 両方あれば true）
   get enabled(){ return !!(this.url && this.anonKey); }
 };
+
+// ============================================================
+// Re:alize OKR → スプレッドシート 自動同期
+// ============================================================
+// GAS Web App の URL をここに貼る（デプロイ後に更新）
+// くみこの手順：
+//  1. scripts/realize-okr-sync/gas_webhook.gs を https://script.google.com に貼る
+//  2. デプロイ → ウェブアプリ → アクセス「全員」→ URL取得
+//  3. その URL を下の gasWebhookUrl に貼る
+const OKR_SYNC_CONFIG = {
+  gasWebhookUrl: '', // ← ここに GAS URL を貼る（空だと同期しない）
+  get enabled(){ return !!this.gasWebhookUrl; }
+};

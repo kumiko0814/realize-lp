@@ -727,7 +727,25 @@ function showMemberDetail(id){
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📝 提出率</span><span style="font-weight:700">${m.submission_rate||0}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="color:#5a5a5a">🐾 相棒レベル</span><span style="font-weight:700">Lv.${m.companion_level||1}</span></div>
     </div>
-    ${krsList.length ? `<h4 style="font-size:13px;color:#5a7050;margin-bottom:6px">🎯 OKR目標</h4>${krsList.map((kr,i) => `<div style="background:#fff;border:1px solid #f5eee2;padding:10px 12px;border-radius:6px;margin-bottom:6px"><div style="font-weight:700;font-size:12px">GOAL ${i+1}：${escapeAdmin(kr.name||'')}</div>${(kr.subs||[]).map(s=>s.name?`<div style="font-size:11px;color:#5a5a5a;margin-top:4px">・${escapeAdmin(s.name)}（CHA:${s.cha||0}／COM:${s.com||0}）</div>`:'').join('')}</div>`).join('')}` : ''}
+    ${okr.dream ? `<div style="background:linear-gradient(135deg,#fff8f0,#fffaf5);border:2px solid #c25b3f;padding:12px 14px;border-radius:8px;margin-bottom:10px"><div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.2em;font-weight:700;margin-bottom:4px">★ 大目標</div><div style="font-size:13px;font-weight:600;line-height:1.6">${escapeAdmin(okr.dream)}</div></div>` : ''}
+    ${krsList.length ? `<h4 style="font-size:13px;color:#5a7050;margin-bottom:6px">🎯 小目標3つ × 行動目標3つ（合計9個）</h4>${krsList.map((kr,i) => {
+      const subs = (kr.subs||[]).filter(s => s.name || s.cha || s.com);
+      const subRows = [0,1,2].map(subIdx => {
+        const s = (kr.subs||[])[subIdx] || {};
+        const cumul = (s.history||[]).reduce((a,b)=>a+(Number(b)||0),0);
+        const chaP = s.cha ? Math.round(cumul/s.cha*100) : 0;
+        const comP = s.com ? Math.round(cumul/s.com*100) : 0;
+        return `<div style="background:#fdfbf6;border:1px solid #f5eee2;padding:7px 10px;border-radius:5px;margin-top:4px;font-size:11px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#c25b3f;font-weight:700;font-size:9.5px;letter-spacing:0.1em">行動目標 ${i+1}-${subIdx+1}</span>${s.cha ? `<span style="font-size:9.5px;color:#8b8278">CHA達成 <b style="color:#c25b3f">${chaP}%</b>／COM達成 <b style="color:#5a7050">${comP}%</b></span>` : ''}</div>
+          <div style="color:#3a3a3a;line-height:1.5;margin-top:2px">${s.name ? escapeAdmin(s.name) : '<span style="color:#c8c0b0">（未入力）</span>'}</div>
+          ${s.cha || s.com ? `<div style="color:#8b8278;font-size:10px;margin-top:2px">目標 CHA:${s.cha||0} ／ COM:${s.com||0} ／ 累計 ${cumul}</div>` : ''}
+        </div>`;
+      }).join('');
+      return `<div style="background:#fff;border:1px solid #ece5d8;padding:10px 12px;border-radius:8px;margin-bottom:8px">
+        <div style="font-weight:700;font-size:12.5px;color:#c25b3f;padding-bottom:4px;border-bottom:1px dashed #f5eee2;margin-bottom:6px">KR ${i+1}：${escapeAdmin(kr.name||'（小目標未入力）')}</div>
+        ${subRows}
+      </div>`;
+    }).join('')}` : '<div style="background:#fef5f0;border:1px dashed #e6a695;padding:12px;border-radius:8px;color:#c25b3f;font-size:11.5px;text-align:center">まだ目標が入力されていません</div>'}
     ${allStrengths.length ? `<h4 style="font-size:13px;color:#5a7050;margin:14px 0 6px">💎 強み (${allStrengths.length}個)</h4><ul style="padding-left:20px;font-size:11.5px;line-height:1.85">${allStrengths.slice(0,15).map(s=>`<li>${escapeAdmin(s)}</li>`).join('')}${allStrengths.length>15?`<li style="color:#8b8278">…他 ${allStrengths.length-15}個</li>`:''}</ul>` : ''}
     <div style="font-size:10px;color:#8b8278;text-align:right;margin-top:14px">最終更新：${m.updated_at ? new Date(m.updated_at).toLocaleString('ja-JP') : '—'}</div>
 

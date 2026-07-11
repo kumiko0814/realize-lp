@@ -685,67 +685,102 @@ body{
       <div class="arrow">▾</div>
     </div>
     <div class="accordion-body" id="krEditBody">
-      <p class="card-sub">大目標を1つ、目標を3つまで設定できます。<br>各目標には <strong style="color:#c25b3f">CHA（チャレンジ目標数値）</strong> と <strong style="color:#5a7050">COM（コミット目標数値）</strong> を入力してください。</p>
+      <p class="card-sub"><strong>大目標1つ</strong> → <strong style="color:#c25b3f">小目標3つ</strong> → 各小目標に <strong style="color:#5a7050">行動目標3つ（合計9個）</strong> を入力してください。</p>
       <div style="background:#f0f9f0;border:1px solid #5a7050;border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;line-height:1.7;color:#3a5a30">
         ✅ <strong>入力した内容は自動的に保存されます</strong>（保存ボタン不要）。ページを離れても目標は消えません。
       </div>
-      <div class="goal-row">
-        <label>大目標</label>
-        <input id="goalInput" placeholder="例：2028年に100日間 海外旅行に行く"/>
+      <div class="goal-row" style="background:linear-gradient(135deg,#fff8f0,#fffaf5);border:2px solid #c25b3f;padding:16px 18px;border-radius:12px;margin-bottom:20px">
+        <label style="font-size:11px;color:#c25b3f;letter-spacing:0.2em;font-weight:700;display:block;margin-bottom:6px">★ 大目標 (BIG DREAM)</label>
+        <input id="goalInput" placeholder="例：2028年に100日間 海外旅行に行く" style="width:100%;padding:12px 14px;border:1px solid #ece5d8;border-radius:6px;font-family:inherit;font-size:15px;font-weight:600"/>
       </div>
       <div id="krEditList">
-        <!-- 3つのKR枠を直接HTMLで配置（JSが動かなくても表示される） -->
+        <!-- 3つの小目標×3行動目標＝9枠固定 -->
         <div class="kr-block kr-slot" data-slot="0" style="background:#fdfbf6;border:1px solid #ece5d8;border-radius:12px;padding:18px;margin-bottom:14px">
-          <div style="background:#c25b3f;color:#fff;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;font-weight:700;letter-spacing:0.2em;padding:4px 14px;border-radius:14px;display:inline-block;margin-bottom:12px">GOAL 1</div>
-          <input type="text" placeholder="目標1（例：健康管理 / 副収入を作る / 視野を広げる）" data-edit="kr-name" data-kr="0" style="width:100%;padding:10px 12px;border:2px solid #ece5d8;border-radius:6px;font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px"/>
-          <div style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:12px 14px">
-            <div style="font-size:10.5px;color:#8b8278;letter-spacing:0.18em;margin-bottom:6px">▼ 数値目標</div>
-            <input type="text" placeholder="どんなアクション？（例：毎日1時間運動する）" data-edit="sub-name" data-kr="0" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:8px"/>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <div>
-                <label style="display:block;font-size:10px;color:#c25b3f;letter-spacing:0.1em;margin-bottom:3px;font-weight:600">🎯 チャレンジ目標数値</label>
-                <input type="number" min="0" step="0.5" placeholder="例：45" data-edit="sub-cha" data-kr="0" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right"/>
-              </div>
-              <div>
-                <label style="display:block;font-size:10px;color:#5a7050;letter-spacing:0.1em;margin-bottom:3px;font-weight:600">✅ コミット目標数値</label>
-                <input type="number" min="0" step="0.5" placeholder="例：25" data-edit="sub-com" data-kr="0" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right"/>
-              </div>
+          <div style="background:#c25b3f;color:#fff;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;font-weight:700;letter-spacing:0.2em;padding:4px 14px;border-radius:14px;display:inline-block;margin-bottom:12px">KR 1（小目標1）</div>
+          <input type="text" placeholder="小目標1（例：健康管理 / 副収入を作る / 視野を広げる）" data-edit="kr-name" data-kr="0" style="width:100%;padding:10px 12px;border:2px solid #ece5d8;border-radius:6px;font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px"/>
+          <div style="font-size:10px;color:#8b8278;letter-spacing:0.18em;margin-bottom:8px;font-weight:600">▼ 行動目標 3つ（この小目標のために何をするか）</div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 1-1</div>
+            <input type="text" placeholder="どんなアクション？（例：毎日1時間運動する）" data-edit="sub-name" data-kr="0" data-sub="0" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="0" data-sub="0" title="チャレンジ目標数値" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="0" data-sub="0" title="コミット目標数値" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+            </div>
+          </div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 1-2</div>
+            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="0" data-sub="1" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="0" data-sub="1" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="0" data-sub="1" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+            </div>
+          </div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 1-3</div>
+            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="0" data-sub="2" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="0" data-sub="2" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="0" data-sub="2" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
             </div>
           </div>
         </div>
+
         <div class="kr-block kr-slot" data-slot="1" style="background:#fdfbf6;border:1px solid #ece5d8;border-radius:12px;padding:18px;margin-bottom:14px">
-          <div style="background:#c25b3f;color:#fff;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;font-weight:700;letter-spacing:0.2em;padding:4px 14px;border-radius:14px;display:inline-block;margin-bottom:12px">GOAL 2</div>
-          <input type="text" placeholder="目標2（任意・空でOK）" data-edit="kr-name" data-kr="1" style="width:100%;padding:10px 12px;border:2px solid #ece5d8;border-radius:6px;font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px"/>
-          <div style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:12px 14px">
-            <div style="font-size:10.5px;color:#8b8278;letter-spacing:0.18em;margin-bottom:6px">▼ 数値目標</div>
-            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="1" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:8px"/>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <div>
-                <label style="display:block;font-size:10px;color:#c25b3f;letter-spacing:0.1em;margin-bottom:3px;font-weight:600">🎯 チャレンジ目標数値</label>
-                <input type="number" min="0" step="0.5" placeholder="例：45" data-edit="sub-cha" data-kr="1" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right"/>
-              </div>
-              <div>
-                <label style="display:block;font-size:10px;color:#5a7050;letter-spacing:0.1em;margin-bottom:3px;font-weight:600">✅ コミット目標数値</label>
-                <input type="number" min="0" step="0.5" placeholder="例：25" data-edit="sub-com" data-kr="1" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right"/>
-              </div>
+          <div style="background:#c25b3f;color:#fff;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;font-weight:700;letter-spacing:0.2em;padding:4px 14px;border-radius:14px;display:inline-block;margin-bottom:12px">KR 2（小目標2）</div>
+          <input type="text" placeholder="小目標2（任意・空でOK）" data-edit="kr-name" data-kr="1" style="width:100%;padding:10px 12px;border:2px solid #ece5d8;border-radius:6px;font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px"/>
+          <div style="font-size:10px;color:#8b8278;letter-spacing:0.18em;margin-bottom:8px;font-weight:600">▼ 行動目標 3つ</div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 2-1</div>
+            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="1" data-sub="0" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="1" data-sub="0" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="1" data-sub="0" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+            </div>
+          </div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 2-2</div>
+            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="1" data-sub="1" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="1" data-sub="1" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="1" data-sub="1" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+            </div>
+          </div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 2-3</div>
+            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="1" data-sub="2" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="1" data-sub="2" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="1" data-sub="2" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
             </div>
           </div>
         </div>
+
         <div class="kr-block kr-slot" data-slot="2" style="background:#fdfbf6;border:1px solid #ece5d8;border-radius:12px;padding:18px;margin-bottom:14px">
-          <div style="background:#c25b3f;color:#fff;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;font-weight:700;letter-spacing:0.2em;padding:4px 14px;border-radius:14px;display:inline-block;margin-bottom:12px">GOAL 3</div>
-          <input type="text" placeholder="目標3（任意・空でOK）" data-edit="kr-name" data-kr="2" style="width:100%;padding:10px 12px;border:2px solid #ece5d8;border-radius:6px;font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px"/>
-          <div style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:12px 14px">
-            <div style="font-size:10.5px;color:#8b8278;letter-spacing:0.18em;margin-bottom:6px">▼ 数値目標</div>
-            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="2" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:8px"/>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <div>
-                <label style="display:block;font-size:10px;color:#c25b3f;letter-spacing:0.1em;margin-bottom:3px;font-weight:600">🎯 チャレンジ目標数値</label>
-                <input type="number" min="0" step="0.5" placeholder="例：45" data-edit="sub-cha" data-kr="2" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right"/>
-              </div>
-              <div>
-                <label style="display:block;font-size:10px;color:#5a7050;letter-spacing:0.1em;margin-bottom:3px;font-weight:600">✅ コミット目標数値</label>
-                <input type="number" min="0" step="0.5" placeholder="例：25" data-edit="sub-com" data-kr="2" data-sub="0" style="width:100%;padding:8px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right"/>
-              </div>
+          <div style="background:#c25b3f;color:#fff;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;font-weight:700;letter-spacing:0.2em;padding:4px 14px;border-radius:14px;display:inline-block;margin-bottom:12px">KR 3（小目標3）</div>
+          <input type="text" placeholder="小目標3（任意・空でOK）" data-edit="kr-name" data-kr="2" style="width:100%;padding:10px 12px;border:2px solid #ece5d8;border-radius:6px;font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px"/>
+          <div style="font-size:10px;color:#8b8278;letter-spacing:0.18em;margin-bottom:8px;font-weight:600">▼ 行動目標 3つ</div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 3-1</div>
+            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="2" data-sub="0" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="2" data-sub="0" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="2" data-sub="0" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+            </div>
+          </div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 3-2</div>
+            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="2" data-sub="1" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="2" data-sub="1" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="2" data-sub="1" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+            </div>
+          </div>
+          <div class="action-goal-block" style="background:#fff;border:1px solid #f5eee2;border-radius:8px;padding:10px 12px">
+            <div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.15em;margin-bottom:4px;font-weight:700">行動目標 3-3</div>
+            <input type="text" placeholder="どんなアクション？" data-edit="sub-name" data-kr="2" data-sub="2" style="width:100%;padding:7px 10px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;margin-bottom:6px;font-size:13px"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <input type="number" min="0" step="0.5" placeholder="🎯 CHA" data-edit="sub-cha" data-kr="2" data-sub="2" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
+              <input type="number" min="0" step="0.5" placeholder="✅ COM" data-edit="sub-com" data-kr="2" data-sub="2" style="padding:6px 8px;border:1px solid #ece5d8;border-radius:5px;font-family:inherit;text-align:right;font-size:12px"/>
             </div>
           </div>
         </div>
@@ -899,15 +934,21 @@ const isDemo = (new URLSearchParams(location.search)).get('demo') === '1';
 
 function normalizeKrs(krs){
   if(!Array.isArray(krs)) krs = [];
-  // 各KRに subs を必ず1つ用意
+  // 各KRに subs を必ず3個用意（行動目標3つ固定）
   krs.forEach(kr => {
-    if(!kr.subs || !Array.isArray(kr.subs) || kr.subs.length === 0){
-      kr.subs = [{ name:'', cha:0, com:0, history:[] }];
+    if(!kr.subs || !Array.isArray(kr.subs)) kr.subs = [];
+    while(kr.subs.length < 3){
+      kr.subs.push({ name:'', cha:0, com:0, history:[] });
     }
+    kr.subs = kr.subs.slice(0, 3);
   });
-  // 3枠固定
+  // 3枠固定（小目標3つ）
   while(krs.length < 3){
-    krs.push({ name:'', subs:[{ name:'', cha:0, com:0, history:[] }] });
+    krs.push({ name:'', subs:[
+      { name:'', cha:0, com:0, history:[] },
+      { name:'', cha:0, com:0, history:[] },
+      { name:'', cha:0, com:0, history:[] }
+    ] });
   }
   return krs.slice(0,3);
 }
@@ -1479,18 +1520,20 @@ function renderKREdit(){
   if(typeof isDemoMode !== 'undefined' && isDemoMode) return;
   ensureKrSlots();
   const goalInput = document.getElementById('goalInput');
-  if(goalInput) goalInput.value = state.goal || '';
-  // 既存の3つの kr-slot に値を流し込む
+  if(goalInput) goalInput.value = state.goal || state.dream || '';
+  // 3つの小目標 × 各3つの行動目標 = 9枠に値を流し込む
   state.krs.forEach((kr, krIdx) => {
     const krName = document.querySelector('input[data-edit="kr-name"][data-kr="'+krIdx+'"]');
     if(krName) krName.value = kr.name || '';
-    const sub = (kr.subs && kr.subs[0]) || {};
-    const subName = document.querySelector('input[data-edit="sub-name"][data-kr="'+krIdx+'"][data-sub="0"]');
-    const subCha = document.querySelector('input[data-edit="sub-cha"][data-kr="'+krIdx+'"][data-sub="0"]');
-    const subCom = document.querySelector('input[data-edit="sub-com"][data-kr="'+krIdx+'"][data-sub="0"]');
-    if(subName) subName.value = sub.name || '';
-    if(subCha) subCha.value = sub.cha || '';
-    if(subCom) subCom.value = sub.com || '';
+    for(let subIdx = 0; subIdx < 3; subIdx++){
+      const sub = (kr.subs && kr.subs[subIdx]) || {};
+      const subName = document.querySelector('input[data-edit="sub-name"][data-kr="'+krIdx+'"][data-sub="'+subIdx+'"]');
+      const subCha = document.querySelector('input[data-edit="sub-cha"][data-kr="'+krIdx+'"][data-sub="'+subIdx+'"]');
+      const subCom = document.querySelector('input[data-edit="sub-com"][data-kr="'+krIdx+'"][data-sub="'+subIdx+'"]');
+      if(subName) subName.value = sub.name || '';
+      if(subCha) subCha.value = sub.cha || '';
+      if(subCom) subCom.value = sub.com || '';
+    }
   });
 }
 
@@ -1637,7 +1680,39 @@ function debouncedCloudSync(){
   if(_cloudSyncTimer) clearTimeout(_cloudSyncTimer);
   _cloudSyncTimer = setTimeout(() => {
     if(typeof syncMyProgressToCloud === 'function') syncMyProgressToCloud();
+    if(typeof syncToSpreadsheet === 'function') syncToSpreadsheet();
   }, 1500);
+}
+
+// GAS Web App 経由でスプレッドシートに自動同期
+async function syncToSpreadsheet(){
+  if(typeof OKR_SYNC_CONFIG === 'undefined' || !OKR_SYNC_CONFIG.enabled) return;
+  if(!userKey || userKey === 'guest' || isDemo) return;
+  try {
+    const nameParam = (new URLSearchParams(location.search)).get('name') || '';
+    const qv2raw = localStorage.getItem('re_alize_quest_v2_' + userKey);
+    const qv2 = qv2raw ? JSON.parse(qv2raw) : {};
+    const chaR = getCharRatesByWeek(state.currentWeek);
+    const comR = getComRatesByWeek(state.currentWeek);
+    const submission = getSubmissionRate();
+    const payload = {
+      userId: userKey,
+      userName: state.userName || qv2.name || nameParam || '',
+      dream: state.goal || state.dream || '',
+      krs: state.krs || [],
+      currentWeek: state.currentWeek || 1,
+      achievementRate: Math.round(((chaR||0) + (comR||0))/2 * 100),
+      submissionRate: Math.round((submission||0) * 100),
+      timestamp: new Date().toISOString()
+    };
+    // GAS Web App は CORS preflight 対応が難しいので no-cors で投げる（レスポンス見ない）
+    fetch(OKR_SYNC_CONFIG.gasWebhookUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    }).catch(e => console.warn('Sheet sync error:', e));
+  } catch(e){ console.warn('syncToSpreadsheet exception:', e); }
 }
 
 function bindKREdit(){
