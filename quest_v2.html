@@ -249,6 +249,18 @@ svg{image-rendering:pixelated}
   </div>
 </div>
 
+<!-- クラウド復元中のフルスクリーンロード -->
+<div id="cloudLoadingOverlay" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#1a1a2a 0%,#2a1a3a 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;color:#ffd644;font-family:DotGothic16,monospace">
+  <div style="width:64px;height:64px;border:4px solid rgba(255,214,68,0.2);border-top-color:#ffd644;border-radius:50%;animation:cloudSpin 1s linear infinite;margin-bottom:24px"></div>
+  <div style="font-size:14px;letter-spacing:0.3em;margin-bottom:8px">☁ CLOUD SYNC ☁</div>
+  <div style="font-size:11px;color:#fcd5e6;letter-spacing:0.15em;text-align:center;line-height:1.8">
+    クラウドから前回の進捗を<br>
+    復元しています...<br>
+    <span style="font-size:9px;color:#8b8278;margin-top:8px;display:inline-block">画面が消えるまで少しお待ちください</span>
+  </div>
+  <style>@keyframes cloudSpin{to{transform:rotate(360deg)}}</style>
+</div>
+
 <div class="frame" id="frame" style="display:none">
   <div class="status-bar">
     <div class="status-left">
@@ -2492,15 +2504,27 @@ function showHowTo(){
 async function startGame(){
   document.getElementById('titleScreen').style.display = 'none';
   document.getElementById('howtoScreen').classList.remove('show');
+  // クラウド復元中のロード表示（先に）
+  const overlay = document.getElementById('cloudLoadingOverlay');
+  const isCloudEnabled = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.enabled && userKey !== 'guest' && !isDemo);
+  let restored = false;
+  if(isCloudEnabled){
+    overlay.style.display = 'flex';
+    try {
+      // タイムアウト付き（最大5秒）でクラウド復元
+      restored = await Promise.race([
+        loadFromCloud(),
+        new Promise(resolve => setTimeout(() => resolve(false), 5000))
+      ]);
+    } catch(e){ console.warn('cloud restore error:', e); }
+    overlay.style.display = 'none';
+  }
   document.getElementById('frame').style.display = 'flex';
   try {
     renderStage();
     renderHero();
     renderStatus();
-    // クラウドから進捗復元（バックグラウンド・サイレント）
-    const restored = await loadFromCloud();
     if(restored){
-      renderStage(); renderHero(); renderStatus();
       setMsg('▼ ☁ <span class="mind">クラウドから前回の続きを 復元しました！</span>\n  メニュー(B) で 進捗を確認できます。');
     }
     // MBTI診断済み → dashboardへ直行するか提案（ゲーム完了後の再訪用）
