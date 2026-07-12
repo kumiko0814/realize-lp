@@ -691,9 +691,14 @@ async function loadFromCloud(){
     if(error || !data) return false;
     const cloudUpdated = data.updated_at ? new Date(data.updated_at).getTime() : 0;
     const localUpdated = state.lastVisit ? new Date(state.lastVisit).getTime() : 0;
-    // クラウドの方が新しい OR ローカルが空のときに復元
+    // クラウドの方が新しい OR ローカルが空 OR クラウドMBTIとローカルMBTIが不一致
     const isLocalEmpty = !state.mbti && (state.progress.strengthsFromOthers || []).filter(s=>s).length === 0;
-    if(cloudUpdated > localUpdated || isLocalEmpty){
+    const mbtiMismatch = data.mbti && state.mbti && data.mbti !== state.mbti;
+    const animalMismatch = data.animal_key && state.animal && data.animal_key !== state.animal;
+    if(cloudUpdated > localUpdated || isLocalEmpty || mbtiMismatch || animalMismatch){
+      if(mbtiMismatch || animalMismatch){
+        console.warn('☁ ローカルとクラウドで不一致 → クラウド優先で復元', {local:{mbti:state.mbti, animal:state.animal}, cloud:{mbti:data.mbti, animal:data.animal_key}});
+      }
       console.log('☁ クラウドから進捗を復元', data);
       if(data.name && !state.name) state.name = data.name;
       if(data.mbti) state.mbti = data.mbti;
