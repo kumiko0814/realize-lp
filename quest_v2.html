@@ -262,6 +262,7 @@ svg{image-rendering:pixelated}
     </div>
     <div class="status-right">
       <div class="kakera">★ 進行度 <span id="progressNum">0</span> / 10</div>
+      <div class="warp-btn" onclick="goToDashboard()" title="目標入力・進捗確認ページへ" style="background:#c25b3f;color:#fff;padding:2px 8px;border-radius:4px;font-weight:bold;font-size:10px">📊 マイページ</div>
       <div class="warp-btn" onclick="openMenu()" style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:4px;font-weight:bold;font-size:10px">📜 B=メニュー</div>
     </div>
   </div>
@@ -2373,6 +2374,13 @@ function openExchange(ex){
   showModal(`<h2>📜 ${escapeHtml(board.description || 'メッセージ掲示板')}</h2>${(board.messages||[]).map(m=>`<div style="background:rgba(255,255,255,0.05);padding:10px;margin:8px 0;border-left:3px solid var(--gold)"><p class="em" style="font-size:11px">${escapeHtml(m.from)}</p><p style="font-size:12px">${escapeHtml(m.text)}</p></div>`).join('')}<div class="modal-actions"><button class="btn" onclick="closeModal()">読んだ</button></div>`);
 }
 
+// マイページ（dashboard.html）に移動
+function goToDashboard(){
+  const nm = (new URLSearchParams(location.search)).get('name') || state.name || '';
+  const url = 'dashboard.html?u=' + encodeURIComponent(userKey) + (nm ? '&name=' + encodeURIComponent(nm) : '');
+  location.href = url;
+}
+
 function openMenu(){
   if(currentModal) return;
   const inTown4 = state.currentTown === 'town4';
@@ -2489,6 +2497,19 @@ async function startGame(){
     if(restored){
       renderStage(); renderHero(); renderStatus();
       setMsg('▼ ☁ <span class="mind">クラウドから前回の続きを 復元しました！</span>\n  メニュー(B) で 進捗を確認できます。');
+    }
+    // MBTI診断済み → dashboardへ直行するか提案（ゲーム完了後の再訪用）
+    if(state.mbti && state.progress && state.progress.eggReceived){
+      const skipKey = 'realize_skip_dashboard_prompt_' + userKey;
+      if(!sessionStorage.getItem(skipKey)){
+        setTimeout(()=>{
+          if(confirm('前回すでにMBTI診断済みです！\n\n目標入力・進捗確認は「📊 マイページ」で行えます。\n\nマイページに直行しますか？\n（「キャンセル」でこのままゲームを続けます）')){
+            goToDashboard();
+          } else {
+            sessionStorage.setItem(skipKey, '1');
+          }
+        }, 1200);
+      }
     }
   } catch(e){
     console.error('Game init error:', e);
