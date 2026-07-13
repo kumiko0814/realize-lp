@@ -815,6 +815,12 @@ body{
       <div class="card-meta">CHA / COM 達成率</div>
     </div>
     <div id="krProgress"></div>
+    <!-- LINE共有ボタン群 -->
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button onclick="copyProgressForLine()" style="flex:1;min-width:180px;background:#2b3a5a;color:#fff;border:none;padding:11px 16px;border-radius:10px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;letter-spacing:0.05em">📋 進捗をコピー（グループLINE用）</button>
+      <button onclick="copyProgressSimple()" style="flex:1;min-width:140px;background:#f0e6db;color:#5a4a30;border:1px solid #d4c5a5;padding:11px 16px;border-radius:10px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;letter-spacing:0.05em">✂ シンプル版</button>
+    </div>
+    <p style="font-size:10.5px;color:#8b8278;margin-top:8px;text-align:center">タップでコピー → LINEに貼り付けるだけ！スクショ不要</p>
   </section>
 
   <!-- HISTORY -->
@@ -1551,6 +1557,112 @@ function renderKREdit(){
       if(subCom) subCom.value = sub.com || '';
     }
   });
+}
+
+// 📋 進捗をLINE送付用テキストにしてクリップボードにコピー
+function _buildProgressText(mode){
+  const name = state.userName || (new URLSearchParams(location.search)).get('name') || '';
+  const week = state.currentWeek || 1;
+  const dream = state.goal || state.dream || '';
+  const qv2raw = localStorage.getItem('re_alize_quest_v2_' + userKey);
+  const qv2 = qv2raw ? (function(){ try { return JSON.parse(qv2raw); } catch(e){ return {}; } })() : {};
+  const mbti = qv2.mbti || '';
+  const animalName = (function(){
+    const map = {neko:'ねこ',usagi:'うさぎ',panda:'パンダ',fukurou:'フクロウ',kitsune:'キツネ',shibainu:'シバイヌ',risu:'リス',hamster:'ハムスター',penguin:'ペンギン',tamago:'たまご'};
+    return qv2.animal && map[qv2.animal] ? map[qv2.animal] : '';
+  })();
+
+  const lines = [];
+  if(mode === 'full'){
+    lines.push(`━━━━━━━━━━━━━━━`);
+    lines.push(`🌿 Re:alize 週次進捗 Week ${week}／26`);
+    if(name) lines.push(`👤 ${name}${animalName ? '（相棒：'+animalName+'）' : ''}`);
+    lines.push(`━━━━━━━━━━━━━━━`);
+    if(dream){
+      lines.push(``);
+      lines.push(`✨ 大目標`);
+      lines.push(`　${dream}`);
+    }
+    lines.push(``);
+    lines.push(`🎯 KR別の累計進捗`);
+  } else {
+    // シンプル版
+    lines.push(`【Week ${week}/26】${name ? name+' さん' : ''}`);
+    if(dream) lines.push(`✨ ${dream}`);
+    lines.push(``);
+  }
+
+  let anyOutput = false;
+  (state.krs || []).forEach((kr, i) => {
+    const subs = (kr.subs || []).filter(s => (s.name||'').trim() && s.cha);
+    if(subs.length === 0) return;
+    anyOutput = true;
+    lines.push(``);
+    lines.push(`■ KR${i+1}：${kr.name || '（未設定）'}`);
+    subs.forEach((s, j) => {
+      const cumul = (s.history || []).reduce((a,b) => a + (Number(b) || 0), 0);
+      const cha = Number(s.cha) || 0;
+      const com = Number(s.com) || 0;
+      const chaP = cha ? Math.round(cumul/cha*100) : 0;
+      const comP = com ? Math.round(cumul/com*100) : 0;
+      if(mode === 'full'){
+        lines.push(`　${j+1}. ${s.name}`);
+        lines.push(`　　累計 ${cumul} ／ CHA ${cha} → ${chaP}%`);
+        lines.push(`　　　　　　　COM ${com} → ${comP}%`);
+      } else {
+        lines.push(`　・${s.name}：${cumul}／${cha}（${chaP}%）`);
+      }
+    });
+  });
+
+  if(!anyOutput){
+    return '（まだ目標が入力されていません。マイページで目標を設定してからご利用ください）';
+  }
+
+  if(mode === 'full'){
+    lines.push(``);
+    lines.push(`━━━━━━━━━━━━━━━`);
+    lines.push(`今週も一歩ずつ、コツコツと🌱`);
+  }
+  return lines.join('\n');
+}
+
+function copyProgressForLine(){
+  const text = _buildProgressText('full');
+  navigator.clipboard.writeText(text).then(() => {
+    _showProgressCopyToast('📋 進捗をコピーしました！LINEに貼り付けてね ✨');
+  }).catch(() => {
+    // フォールバック：textarea経由
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); _showProgressCopyToast('コピーしました ✨'); } catch(e){ alert('コピーできませんでした：\n\n' + text); }
+    document.body.removeChild(ta);
+  });
+}
+
+function copyProgressSimple(){
+  const text = _buildProgressText('simple');
+  navigator.clipboard.writeText(text).then(() => {
+    _showProgressCopyToast('✂ シンプル版をコピーしました ✨');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); _showProgressCopyToast('コピーしました ✨'); } catch(e){ alert(text); }
+    document.body.removeChild(ta);
+  });
+}
+
+function _showProgressCopyToast(msg){
+  let el = document.getElementById('progressCopyToast');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'progressCopyToast';
+    el.style.cssText = 'position:fixed;left:50%;top:20%;transform:translateX(-50%);background:#2b3a5a;color:#fff;padding:14px 24px;border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.25);z-index:9999;letter-spacing:0.05em;opacity:0;transition:opacity 0.2s';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 2200);
 }
 
 function renderKRProgress(){
