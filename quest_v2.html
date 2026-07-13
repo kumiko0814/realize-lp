@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>Re:alize Quest ｜ 異常値の冒険</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
@@ -207,44 +204,60 @@ svg{image-rendering:pixelated}
 }
 </style>
 </head>
-<body style="background:#3a2a4a">
+<body>
 
-<!-- 🆘 絶対に真っ黒にならない：pure HTML の救出UI（JS/CSS/フォント読込前でも表示） -->
-<div id="bootShield" style="position:fixed;left:0;top:0;right:0;bottom:0;background:#3a2a4a;background:linear-gradient(135deg,#2a1a3a 0%,#5a3a5a 100%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif">
-  <div style="font-size:24px;color:#fcd5e6;letter-spacing:0.15em;margin-bottom:10px;font-weight:bold">Re:alize Quest</div>
-  <div style="font-size:11px;color:#ffd644;letter-spacing:0.3em;margin-bottom:24px">— 異常値の冒険 —</div>
-  <div style="font-size:12px;color:#fcd5e6;letter-spacing:0.15em;margin-bottom:32px;line-height:1.8">
-    ページを準備しています...<br>
-    <span style="font-size:9px;color:#a090a0">2秒ほどでゲーム画面が出ます</span>
+<!-- 🆘 タイトル画面兼救出UI（pure HTML・JS不要で描画される最強の起動画面） -->
+<div id="bootShield" style="position:fixed;left:0;top:0;right:0;bottom:0;background:linear-gradient(135deg,#1a1a2a 0%,#3a2a4a 50%,#5a3a5a 100%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;overflow-y:auto">
+  <div style="font-size:32px;color:#fcd5e6;letter-spacing:0.12em;margin-bottom:8px;font-weight:800;text-shadow:3px 3px 0 #2a1a3a;line-height:1.2">Re:alize Quest</div>
+  <div style="font-size:12px;color:#ffd644;letter-spacing:0.3em;margin-bottom:32px">— 異常値の冒険 —</div>
+  <div style="width:80px;height:80px;background:#fff;border:3px solid #ffd644;border-radius:12px;padding:6px;margin-bottom:32px">
+    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+      <rect x="6" y="2" width="4" height="1" fill="#fff"/><rect x="5" y="3" width="6" height="1" fill="#fff"/>
+      <rect x="4" y="4" width="8" height="2" fill="#fff"/><rect x="3" y="6" width="10" height="5" fill="#fff"/>
+      <rect x="4" y="11" width="8" height="2" fill="#fff"/><rect x="5" y="13" width="6" height="1" fill="#fff"/>
+      <rect x="6" y="5" width="1" height="1" fill="#f6a0c4"/><rect x="9" y="6" width="1" height="1" fill="#ffd644"/>
+      <rect x="5" y="8" width="1" height="1" fill="#f6a0c4"/><rect x="7" y="7" width="2" height="1" fill="#c25b3f"/>
+      <rect x="8" y="8" width="1" height="1" fill="#c25b3f"/><rect x="7" y="9" width="1" height="1" fill="#c25b3f"/>
+    </svg>
   </div>
-  <!-- 即使える手動ボタン群（JSに依存しない） -->
-  <a href="javascript:void(0)" onclick="try{document.getElementById('bootShield').style.display='none';var ts=document.getElementById('titleScreen');if(ts){ts.style.display='flex';ts.style.zIndex='9999';}}catch(e){}" style="background:#e63d6a;color:#fff;border:none;padding:14px 32px;border-radius:24px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.1em;text-decoration:none;display:inline-block;margin-bottom:16px;box-shadow:0 4px 12px rgba(230,61,106,0.5)">▶ ゲームを開始する</a>
+  <a href="javascript:void(0)" onclick="bootStartGame()" style="background:#e63d6a;color:#fff;border:none;padding:16px 40px;border-radius:28px;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.15em;text-decoration:none;display:inline-block;margin-bottom:14px;box-shadow:0 4px 16px rgba(230,61,106,0.6)">▶ ゲームを開始する</a>
   <br>
-  <a id="rescueDashLink" href="dashboard.html" style="color:#fcd5e6;border:1px solid #fcd5e6;padding:10px 22px;border-radius:20px;font-size:11px;text-decoration:none;display:inline-block;margin-top:4px;letter-spacing:0.05em">📊 マイページ（目標入力）へ</a>
-  <div style="margin-top:20px;font-size:9px;color:#8a7a8a;letter-spacing:0.1em;line-height:1.7">
-    もし画面がずっと同じ場合<br>
-    Safariの設定 → Safari → 履歴とWebサイトデータを消去<br>
-    をお試しください
+  <a id="rescueDashLink" href="dashboard.html" style="color:#fcd5e6;border:1.5px solid #fcd5e6;padding:11px 26px;border-radius:22px;font-size:12px;text-decoration:none;display:inline-block;margin-top:6px;letter-spacing:0.05em">📊 マイページ（目標入力）へ</a>
+  <div style="margin-top:24px;font-size:10px;color:#a090a0;letter-spacing:0.05em;line-height:1.8;max-width:300px">
+    ★ ゲームを開始 → 博士から卵をもらう<br>
+    ★ MBTI診断 → 相棒キャラが決まる<br>
+    ★ 4つの街を旅して "異常値" を発見しよう
   </div>
 </div>
 <script>
-// dashboard へのリンクに URL parameters をコピー
-try {
-  var dashLink = document.getElementById('rescueDashLink');
-  if(dashLink){ dashLink.href = 'dashboard.html' + window.location.search; }
-} catch(e){}
-</script>
-<script>
-// 2秒後に自動的にbootShieldを消して titleScreen を表示
-setTimeout(function(){
+// dashboard リンクに URL params をコピー
+(function(){
   try {
-    var el = document.getElementById('bootShield');
-    if(el){ el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(function(){ el.style.display='none'; }, 300); }
+    var dashLink = document.getElementById('rescueDashLink');
+    if(dashLink){ dashLink.href = 'dashboard.html' + (window.location.search || ''); }
   } catch(e){}
-}, 2000);
+})();
+// bootStartGame: bootShield を消して既存の howto → startGame フローに繋ぐ
+function bootStartGame(){
+  try {
+    var shield = document.getElementById('bootShield');
+    if(shield){ shield.style.display = 'none'; }
+    var ts = document.getElementById('titleScreen');
+    if(ts){ ts.style.display = 'none'; }
+    if(typeof showHowTo === 'function'){
+      showHowTo();
+    } else {
+      // showHowTo がまだ定義されてない場合、howtoScreen を直接表示
+      var hs = document.getElementById('howtoScreen');
+      if(hs){ hs.classList.add('show'); hs.style.display = 'flex'; }
+    }
+  } catch(e){
+    console.error('bootStartGame error:', e);
+    alert('起動エラー：ページを再読み込みしてください');
+  }
+}
 </script>
-
-<div class="title-screen" id="titleScreen">
+<div class="title-screen" id="titleScreen" style="display:none">
   <div class="title-logo">Re:alize Quest</div>
   <div class="title-logo2">— 異常値の冒険 —</div>
   <div class="title-sub">A Self-Discovery RPG</div>
