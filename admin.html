@@ -213,6 +213,42 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
     </div>
   </section>
 
+  <!-- ===== 要ケア受講生セクション ===== -->
+  <section class="card" id="careSectionCard">
+    <h2 style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <span style="color:#c25b3f">⚠ 要ケア受講生</span>
+      <button class="btn" onclick="renderCareMembers()" style="font-size:12px;padding:8px 16px;background:#c25b3f">↻ 更新</button>
+    </h2>
+    <p class="sub">以下のいずれかに該当する受講生を自動検知。早めにフォローしてください。</p>
+    <!-- 統計サマリ -->
+    <div id="careSummary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px">
+      <div style="background:#fdf2f0;border:2px solid #c25b3f;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:#c25b3f" id="careTotal">—</div>
+        <div style="font-size:11px;color:#8b8278;margin-top:2px">要ケア 合計</div>
+      </div>
+      <div style="background:#fff8f0;border:1px solid #e6a695;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:18px;font-weight:700;color:#c25b3f" id="careNoMbti">—</div>
+        <div style="font-size:11px;color:#8b8278;margin-top:2px">MBTI未診断</div>
+      </div>
+      <div style="background:#fff8f0;border:1px solid #e6a695;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:18px;font-weight:700;color:#c9a574" id="careNoGoal">—</div>
+        <div style="font-size:11px;color:#8b8278;margin-top:2px">目標未入力</div>
+      </div>
+      <div style="background:#fff8f0;border:1px solid #e6a695;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:18px;font-weight:700;color:#a67a26" id="careStalled">—</div>
+        <div style="font-size:11px;color:#8b8278;margin-top:2px">1週間更新なし</div>
+      </div>
+      <div style="background:#fff8f0;border:1px solid #e6a695;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:18px;font-weight:700;color:#5a7050" id="careNoAccess">—</div>
+        <div style="font-size:11px;color:#8b8278;margin-top:2px">未アクセス</div>
+      </div>
+    </div>
+    <!-- 要ケアカード一覧 -->
+    <div id="careMemberList">
+      <p style="text-align:center;padding:20px;color:#8b8278;font-size:12px">「📊 全メンバーの進捗」を読み込んだ後に自動表示されます</p>
+    </div>
+  </section>
+
   <!-- メンバー詳細モーダル -->
   <div id="memberModalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeMemberModal()">
     <div id="memberModal" style="background:#fff;border-radius:16px;padding:32px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.2)"></div>
@@ -791,6 +827,7 @@ async function loadMembers(){
     _allMembers = data || [];
     count.textContent = '— ' + _allMembers.length + ' 名 参加中 —';
     renderMembers();
+    renderCareMembers();
     // 自律チェック
     try { checkIdMismatches(); } catch(e){ console.warn('ID mismatch check:', e); }
   } catch(e){
@@ -866,6 +903,146 @@ function renderMembers(){
       </div>
     `;
   }).join('') + '</div>';
+}
+
+/* ===================================
+   要ケア受講生 自動検知 & テンプレ生成
+   =================================== */
+function renderCareMembers(){
+  const listEl = document.getElementById('careMemberList');
+  if(!listEl) return;
+
+  // Supabase登録者IDセット
+  const supabaseIds = new Set(_allMembers.map(m => m.id));
+
+  // 本番メンバーのみ対象（test_ prefix除外）
+  const productionMembers = MEMBERS.filter(m => !m.id.startsWith('test_') && !m.id.startsWith('demo'));
+
+  const now = Date.now();
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+  // 各カテゴリで分類
+  const careCards = [];
+
+  // Supabase未登録（配布したURLをまだ開いていない可能性）
+  const noAccess = productionMembers.filter(m => !supabaseIds.has(m.id));
+  noAccess.forEach(m => {
+    careCards.push({ member: m, supaData: null, reasons: ['no_access'], label: 'Supabase未登録（未アクセス）' });
+  });
+
+  // Supabase登録済みメンバーの各種チェック
+  _allMembers
+    .filter(m => !m.id.startsWith('test_') && !m.id.startsWith('demo') && m.id !== 'guest')
+    .forEach(m => {
+      const reasons = [];
+      const regDate = m.created_at ? new Date(m.created_at).getTime() : (m.updated_at ? new Date(m.updated_at).getTime() : now);
+      const daysSinceReg = (now - regDate) / (1000 * 60 * 60 * 24);
+      const updatedAt = m.updated_at ? new Date(m.updated_at).getTime() : 0;
+      const daysSinceUpdate = updatedAt ? Math.floor((now - updatedAt) / (24 * 60 * 60 * 1000)) : 999;
+
+      // MBTI未診断 & 登録から3日以上
+      if(!m.mbti && daysSinceReg >= 3) reasons.push('no_mbti');
+
+      // 目標未入力 & 登録から3日以上
+      let hasGoal = false;
+      if(m.current_goal){
+        try {
+          const o = JSON.parse(m.current_goal);
+          hasGoal = !!(o.dream || (o.krs && o.krs.some(k => k.name)));
+        } catch(e){ hasGoal = !!(m.current_goal.trim()); }
+      }
+      if(!hasGoal && daysSinceReg >= 3) reasons.push('no_goal');
+
+      // 1週間更新なし
+      if(daysSinceUpdate >= 7) reasons.push('stalled');
+
+      if(reasons.length > 0){
+        careCards.push({ member: m, supaData: m, reasons, daysSinceUpdate, daysSinceReg });
+      }
+    });
+
+  // 統計集計
+  const countNoMbti = careCards.filter(c => c.reasons.includes('no_mbti')).length;
+  const countNoGoal = careCards.filter(c => c.reasons.includes('no_goal')).length;
+  const countStalled = careCards.filter(c => c.reasons.includes('stalled')).length;
+  const countNoAccess = careCards.filter(c => c.reasons.includes('no_access')).length;
+  // 重複を除いた合計
+  const uniqueIds = new Set(careCards.map(c => (c.supaData ? c.supaData.id : c.member.id)));
+
+  document.getElementById('careTotal').textContent = uniqueIds.size + '名';
+  document.getElementById('careNoMbti').textContent = countNoMbti + '名';
+  document.getElementById('careNoGoal').textContent = countNoGoal + '名';
+  document.getElementById('careStalled').textContent = countStalled + '名';
+  document.getElementById('careNoAccess').textContent = countNoAccess + '名';
+
+  if(careCards.length === 0){
+    listEl.innerHTML = '<div style="background:#f5f9f0;border:2px solid #7a9070;border-radius:10px;padding:20px;text-align:center;color:#5a7050;font-size:13px">全員順調です。要ケア受講生はいません。</div>';
+    return;
+  }
+
+  // カードをレンダリング（重複IDが出た場合は最初の1枚のみ）
+  const renderedIds = new Set();
+  const cards = careCards.map(c => {
+    const id = c.supaData ? c.supaData.id : c.member.id;
+    const name = c.supaData ? (c.supaData.name || c.member.name) : c.member.name;
+    if(renderedIds.has(id)) return '';
+    renderedIds.add(id);
+
+    const reasons = c.reasons;
+    const isRedAlert = reasons.includes('no_mbti') || (reasons.includes('stalled') && (c.daysSinceUpdate||0) >= 14) || reasons.includes('no_access');
+    const borderColor = isRedAlert ? '#c25b3f' : '#c9a574';
+    const bgColor = isRedAlert ? '#fff8f7' : '#fffbf4';
+    const badgeColor = isRedAlert ? '#c25b3f' : '#c9a574';
+
+    // 理由バッジ
+    const reasonBadges = reasons.map(r => {
+      const label = { no_mbti:'MBTI未診断', no_goal:'目標未入力', stalled:`${c.daysSinceUpdate||0}日更新なし`, no_access:'未アクセス' }[r] || r;
+      const color = r === 'no_mbti' ? '#c25b3f' : r === 'stalled' ? '#a67a26' : r === 'no_access' ? '#5a7050' : '#c9a574';
+      return `<span style="background:${color};color:#fff;font-size:9px;padding:2px 8px;border-radius:999px;letter-spacing:0.1em;font-weight:700">${label}</span>`;
+    }).join(' ');
+
+    // テンプレ文ボタン用データ
+    const displayName = name.split('（')[0];
+    const templateKey = reasons.includes('no_mbti') ? 'no_mbti' : reasons.includes('no_goal') ? 'no_goal' : reasons.includes('stalled') ? 'stalled' : 'no_access';
+
+    return `
+      <div style="background:${bgColor};border:2px solid ${borderColor};border-radius:12px;padding:16px;position:relative">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px">${escapeAdmin(name)}</div>
+            <div style="font-size:9.5px;color:#8b8278;font-family:'SF Mono','Menlo',monospace;margin-bottom:6px">${escapeAdmin(id)}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${reasonBadges}</div>
+          </div>
+          ${c.supaData ? `<button onclick='showMemberDetail(${JSON.stringify(id)})' style="background:#fff;border:1px solid ${borderColor};color:${borderColor};padding:5px 12px;border-radius:6px;font-family:inherit;font-size:11px;cursor:pointer;white-space:nowrap">詳細</button>` : ''}
+        </div>
+        ${c.supaData && c.supaData.updated_at ? `<div style="font-size:10px;color:#8b8278;margin-bottom:10px">最終更新：${new Date(c.supaData.updated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>` : (reasons.includes('no_access') ? `<div style="font-size:10px;color:#5a7050;margin-bottom:10px">URLをまだ一度も開いていない可能性があります</div>` : '')}
+        <button onclick='copyCareTemplate(${JSON.stringify(displayName)}, ${JSON.stringify(templateKey)})' style="width:100%;background:${badgeColor};color:#fff;border:none;padding:8px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.08em">📋 対処テンプレをコピー</button>
+      </div>
+    `;
+  }).join('');
+
+  listEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">' + cards + '</div>';
+}
+
+// 要ケア受講生向け LINEフォローアップテンプレ生成 & コピー
+function copyCareTemplate(name, type){
+  const templates = {
+    no_mbti: `${name}さん、こんにちは。。\n\nRe:alizeをご利用いただきありがとうございます☺️\n\nまだMBTI診断が完了していないようなので、ご確認させていただきました。\n\n診断は5〜10分ほどで完了します♪\nマイページにアクセスして「MBTI診断を受ける」から進めてみてください。\n\n診断が完了すると、あなただけの動物キャラクターが届きます。。\nお待ちしていますね！`,
+    no_goal: `${name}さん、こんにちは。。\n\nマイページをご確認いただいていますか？☺️\n\n「大目標（Dream）」と「行動目標」の入力がまだのようです。\n入力は3〜5分ほどでできますよ。\n\n目標を入れると相棒がどんどん成長していきます。。\nまずは「どんな未来を目指したいか」を自由に書いてみてください♪`,
+    stalled: `${name}さん、こんにちは。。\n\n最近ご様子はいかがですか？\n\nしばらくマイページの更新がないようだったので、個別にご連絡しました。\n\n何か困ったことや、進めにくいことがあれば気軽に教えてくださいね☺️\n一緒に解決しましょう。`,
+    no_access: `${name}さん、こんにちは。。\n\n以前お送りしたRe:alizeのURLは届いていますか？\n\nまだ開けていない場合は、再度お送りしますね。\nよろしければ教えていただけると嬉しいです☺️`
+  };
+  const text = templates[type] || templates.stalled;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('LINEフォローアップテンプレをコピーしました ✓');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); showToast('コピーしました ✓'); } catch(e){ showToast('コピー失敗：手動で選択してください'); }
+    document.body.removeChild(ta);
+  });
 }
 
 // 管理者プロフィール
