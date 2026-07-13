@@ -455,6 +455,78 @@ body{
 }
 .modal-close:hover{background:var(--accent-deep)}
 
+/* ===== SELF-CHECK MODAL ===== */
+.sc-modal-bg{
+  position:fixed;inset:0;background:rgba(30,20,15,0.6);z-index:2000;
+  display:none;align-items:flex-start;justify-content:center;
+  padding:20px 16px 40px;overflow-y:auto;
+  backdrop-filter:blur(3px);
+}
+.sc-modal-bg.show{display:flex;animation:fadeIn 0.3s ease}
+.sc-modal{
+  background:#fffaf6;border:1px solid var(--line);border-radius:20px;
+  padding:28px 24px 24px;max-width:480px;width:100%;
+  box-shadow:0 16px 48px rgba(0,0,0,0.2);
+  margin:auto;
+}
+.sc-title{
+  font-family:"Yu Mincho","游明朝",serif;font-size:17px;font-weight:600;
+  letter-spacing:0.06em;color:var(--ink);margin-bottom:4px;
+  display:flex;align-items:center;gap:10px;
+}
+.sc-sub{font-size:11.5px;color:var(--mute);letter-spacing:0.08em;margin-bottom:18px}
+.sc-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:11px 14px;border-radius:10px;margin-bottom:8px;
+  border:1px solid var(--line-soft);background:#fff;
+  font-size:12.5px;line-height:1.7;
+}
+.sc-item.sc-ok{border-color:#b5d04e;background:#f7faf0}
+.sc-item.sc-ng{border-color:#e8a890;background:#fff8f6}
+.sc-item.sc-warn{border-color:#f0d77a;background:#fffbe6}
+.sc-item.sc-checking{opacity:0.6}
+.sc-icon{font-size:16px;flex-shrink:0;margin-top:1px;line-height:1}
+.sc-label{font-weight:600;font-size:12.5px;color:var(--ink)}
+.sc-tip{font-size:11px;color:var(--sub);margin-top:3px;line-height:1.65}
+.sc-tip.ng{color:#c25b3f}
+.sc-tip.warn{color:#8a6e1c}
+.sc-divider{height:1px;background:var(--line-soft);margin:16px 0}
+.sc-contact{
+  background:#fff8f0;border:1px solid #f0d6cc;border-radius:12px;
+  padding:14px 16px;font-size:12px;line-height:1.85;color:var(--ink);
+}
+.sc-contact .lbl{
+  font-size:10px;color:var(--mute);letter-spacing:0.15em;margin-bottom:6px;
+  font-family:"Cormorant Garamond",serif;font-style:italic;
+}
+.sc-contact strong{color:var(--accent)}
+.sc-close{
+  display:block;width:100%;margin-top:16px;
+  background:var(--leaf);color:#fff;border:none;
+  font-family:inherit;font-size:13px;font-weight:600;letter-spacing:0.12em;
+  padding:13px 24px;border-radius:999px;cursor:pointer;transition:all 0.25s;
+}
+.sc-close:hover{background:var(--leaf-deep)}
+.sc-run-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:inherit;font-size:10px;letter-spacing:0.1em;font-weight:600;
+  color:var(--mute);background:transparent;border:1px solid var(--line);
+  border-radius:999px;padding:3px 10px;cursor:pointer;margin-top:6px;
+  transition:all 0.2s;
+}
+.sc-run-btn:hover{border-color:var(--leaf);color:var(--leaf)}
+
+/* 動作確認ボタン（ヘッダー右） */
+.btn-check{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:inherit;font-size:11px;letter-spacing:0.08em;
+  color:var(--mute);background:transparent;
+  border:1px solid var(--line);border-radius:999px;
+  padding:5px 12px;cursor:pointer;transition:all 0.2s;
+  white-space:nowrap;
+}
+.btn-check:hover{border-color:var(--leaf);color:var(--leaf);background:#f7faf0}
+
 /* ===== ONBOARDING ===== */
 .onboard{
   background:linear-gradient(135deg,#fff8f0 0%,#fce8eb 100%);
@@ -564,12 +636,88 @@ body{
       <div class="app-logo">Re:alize</div>
       <div class="app-logo-sub">OKR ダッシュボード <span id="demoLabel" style="display:none;color:#c25b3f;font-size:11px;margin-left:8px;background:#fce4e0;padding:2px 8px;border-radius:12px;letter-spacing:0.1em">体験版</span></div>
     </div>
-    <div class="user-info">
-      <input id="userNameInput" placeholder="お名前" value=""/>
+    <div class="user-info" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn-check" onclick="openSelfCheck()" title="動作確認">🩺 動作確認</button>
+        <input id="userNameInput" placeholder="お名前" value=""/>
+      </div>
       <span id="weekLabel">— Week 1 / 26 —</span>
-      <a href="welcome.html" class="help-link" style="display:block;margin-top:4px">📖 使い方を見る</a>
+      <a href="welcome.html" class="help-link" style="margin-top:0">📖 使い方を見る</a>
     </div>
   </header>
+
+  <!-- SELF-CHECK MODAL -->
+  <div class="sc-modal-bg" id="scModalBg" onclick="if(event.target===this)closeSelfCheck()">
+    <div class="sc-modal">
+      <div class="sc-title">🩺 動作確認チェック</div>
+      <div class="sc-sub">このアプリが正しく動いているかを自分でチェックできます</div>
+      <div id="scItems">
+        <div class="sc-item sc-checking" id="sc_ls">
+          <div class="sc-icon" id="sc_ls_icon">…</div>
+          <div>
+            <div class="sc-label">データの一時保存（localStorage）</div>
+            <div class="sc-tip" id="sc_ls_tip">確認中…</div>
+          </div>
+        </div>
+        <div class="sc-item sc-checking" id="sc_supa">
+          <div class="sc-icon" id="sc_supa_icon">…</div>
+          <div>
+            <div class="sc-label">Supabase 接続</div>
+            <div class="sc-tip" id="sc_supa_tip">確認中…</div>
+          </div>
+        </div>
+        <div class="sc-item sc-checking" id="sc_data">
+          <div class="sc-icon" id="sc_data_icon">…</div>
+          <div>
+            <div class="sc-label">クラウドへの自分のデータ保存</div>
+            <div class="sc-tip" id="sc_data_tip">確認中…</div>
+          </div>
+        </div>
+        <div class="sc-item sc-checking" id="sc_mbti">
+          <div class="sc-icon" id="sc_mbti_icon">…</div>
+          <div>
+            <div class="sc-label">MBTI診断の完了</div>
+            <div class="sc-tip" id="sc_mbti_tip">確認中…</div>
+          </div>
+        </div>
+        <div class="sc-item sc-checking" id="sc_goal">
+          <div class="sc-icon" id="sc_goal_icon">…</div>
+          <div>
+            <div class="sc-label">大目標の入力</div>
+            <div class="sc-tip" id="sc_goal_tip">確認中…</div>
+          </div>
+        </div>
+        <div class="sc-item sc-checking" id="sc_krs">
+          <div class="sc-icon" id="sc_krs_icon">…</div>
+          <div>
+            <div class="sc-label">行動目標の入力数</div>
+            <div class="sc-tip" id="sc_krs_tip">確認中…</div>
+          </div>
+        </div>
+        <div class="sc-item sc-checking" id="sc_week">
+          <div class="sc-icon" id="sc_week_icon">…</div>
+          <div>
+            <div class="sc-label">今週のデータ記録</div>
+            <div class="sc-tip" id="sc_week_tip">確認中…</div>
+          </div>
+        </div>
+        <div class="sc-item sc-checking" id="sc_link">
+          <div class="sc-icon" id="sc_link_icon">…</div>
+          <div>
+            <div class="sc-label">ゲーム（Re:alize Quest）へのリンク</div>
+            <div class="sc-tip" id="sc_link_tip">確認中…</div>
+          </div>
+        </div>
+      </div>
+      <div class="sc-divider"></div>
+      <div class="sc-contact">
+        <div class="lbl">HELP — 困ったときは</div>
+        <strong>森川くみこにLINEで連絡</strong>してください。<br>
+        ※ このチェック結果のスクリーンショットも一緒に送ってもらえると助かります。
+      </div>
+      <button class="sc-close" onclick="closeSelfCheck()">閉じる</button>
+    </div>
+  </div>
 
   <!-- DEMO PANEL (?demo=1 のとき表示) -->
   <div class="demo-panel" id="demoPanel" style="display:none">
@@ -2940,6 +3088,162 @@ setInterval(loadAdminMessages, 60000); // 1分ごと
 setTimeout(refreshPeers, 1000);
 // 5分ごと自動更新
 setInterval(refreshPeers, 300000);
+
+/* =============================================
+   セルフチェック機能
+   ============================================= */
+function scSet(id, status, tip){
+  // status: 'ok' | 'ng' | 'warn'
+  const item = document.getElementById('sc_' + id);
+  const icon = document.getElementById('sc_' + id + '_icon');
+  const tipEl = document.getElementById('sc_' + id + '_tip');
+  if(!item || !icon || !tipEl) return;
+  item.className = 'sc-item sc-' + status;
+  icon.textContent = status === 'ok' ? '✓' : status === 'warn' ? '!' : '✕';
+  tipEl.textContent = tip;
+  tipEl.className = 'sc-tip' + (status === 'ng' ? ' ng' : status === 'warn' ? ' warn' : '');
+}
+
+async function runSelfCheck(){
+  // 全アイテムをチェック中に戻す
+  ['ls','supa','data','mbti','goal','krs','week','link'].forEach(id => {
+    const item = document.getElementById('sc_' + id);
+    const icon = document.getElementById('sc_' + id + '_icon');
+    const tipEl = document.getElementById('sc_' + id + '_tip');
+    if(item) item.className = 'sc-item sc-checking';
+    if(icon) icon.textContent = '…';
+    if(tipEl) tipEl.textContent = '確認中…';
+  });
+
+  // 1) localStorage 読み書き
+  try {
+    const key = '__sc_test__';
+    localStorage.setItem(key, '1');
+    const val = localStorage.getItem(key);
+    localStorage.removeItem(key);
+    if(val === '1') scSet('ls', 'ok', 'データの一時保存ができています');
+    else scSet('ls', 'ng', '読み書きに失敗しています。ブラウザの設定でCookieやサイトデータが許可されているか確認してください');
+  } catch(e){
+    scSet('ls', 'ng', '読み書きに失敗: ' + e.message + ' — プライベートモードを解除するか、ストレージ設定を確認してください');
+  }
+
+  // 2) Supabase 接続確認
+  const client = getSupa();
+  if(!client){
+    scSet('supa', 'warn', 'Supabase設定が未接続です。オフライン環境でも基本機能は使えます');
+    scSet('data', 'warn', 'Supabase未接続のためスキップ');
+  } else {
+    try {
+      const { error } = await client.from('realize_members').select('id').limit(1);
+      if(error){
+        scSet('supa', 'ng', '接続エラー: ' + error.message + ' — ネット環境を確認してください');
+        scSet('data', 'warn', 'Supabase接続エラーのためスキップ');
+      } else {
+        scSet('supa', 'ok', 'Supabaseに接続できています');
+        // 3) 自分のデータがSupabaseにあるか
+        if(userKey === 'guest' || isDemo){
+          scSet('data', 'warn', 'ゲスト/体験版モードではクラウド保存はされません');
+        } else {
+          const { data: myData, error: myErr } = await client.from('realize_members').select('id,name').eq('id', userKey).maybeSingle();
+          if(myErr){
+            scSet('data', 'ng', '自分のデータ取得に失敗: ' + myErr.message);
+          } else if(!myData){
+            scSet('data', 'warn', 'まだクラウドに保存されていません。振り返りを保存すると自動的に登録されます');
+          } else {
+            scSet('data', 'ok', 'クラウドにデータが保存されています（' + (myData.name || userKey) + '）');
+          }
+        }
+      }
+    } catch(e){
+      scSet('supa', 'ng', 'ネットワークエラー: ' + e.message + ' — ネット環境を確認してください');
+      scSet('data', 'warn', 'Supabase接続エラーのためスキップ');
+    }
+  }
+
+  // 4) MBTI診断済みか
+  const mbtiResult = getMBTIFromQuest ? getMBTIFromQuest() : null;
+  if(mbtiResult){
+    scSet('mbti', 'ok', 'MBTI診断済みです（' + mbtiResult + '）');
+  } else {
+    scSet('mbti', 'warn', '未診断です。ゲーム（Re:alize Quest）でMBTI診断を完了すると、相棒が孵化します');
+  }
+
+  // 5) 大目標が入力されているか
+  const goalVal = (state.dream || state.goal || '').trim();
+  if(goalVal){
+    scSet('goal', 'ok', '大目標が入力されています: 「' + goalVal.slice(0, 30) + (goalVal.length > 30 ? '…' : '') + '」');
+  } else {
+    scSet('goal', 'ng', '大目標が未入力です。「目標を編集／設定する」セクションから入力してください');
+  }
+
+  // 6) 行動目標の入力数（9個中いくつ）
+  let filledCount = 0;
+  if(state.krs && Array.isArray(state.krs)){
+    state.krs.forEach(kr => {
+      if(Array.isArray(kr.subs)){
+        kr.subs.forEach(s => { if((s.name||'').trim()) filledCount++; });
+      }
+    });
+  }
+  if(filledCount >= 9){
+    scSet('krs', 'ok', '行動目標が9つ全て入力されています（' + filledCount + ' / 9）');
+  } else if(filledCount >= 1){
+    scSet('krs', 'warn', '行動目標が' + filledCount + '個入力中です（目標は9個 / 9）。続きを入力してください');
+  } else {
+    scSet('krs', 'ng', '行動目標が未入力です（0 / 9）。「目標を編集／設定する」から入力してください');
+  }
+
+  // 7) 今週のデータが記録されているか
+  const curWk = state.currentWeek || 1;
+  let hasThisWeek = false;
+  if(state.krs && Array.isArray(state.krs)){
+    state.krs.forEach(kr => {
+      if(Array.isArray(kr.subs)){
+        kr.subs.forEach(s => {
+          if(Array.isArray(s.history) && s.history.length >= curWk && s.history[curWk-1] != null && s.history[curWk-1] !== ''){
+            hasThisWeek = true;
+          }
+        });
+      }
+    });
+  }
+  if(hasThisWeek){
+    scSet('week', 'ok', '今週（Week ' + curWk + '）のデータが記録されています');
+  } else if(curWk <= 1){
+    scSet('week', 'warn', 'Week 1 は振り返りを確定するとデータが記録されます。目標を入力してから「今週の振り返り」を保存してください');
+  } else {
+    scSet('week', 'warn', '今週（Week ' + curWk + '）の振り返りデータがまだありません。画面上の「今週の振り返り」を入力して保存してください');
+  }
+
+  // 8) quest_v2.html へのリンク確認（ページが存在するか fetch で確認）
+  const questEl = document.getElementById('ijouchiLink');
+  const questHref = questEl ? questEl.href : (location.origin + location.pathname.replace('dashboard.html','') + 'quest_v2.html');
+  try {
+    const res = await fetch(questHref, { method:'HEAD', cache:'no-store' });
+    if(res.ok || res.status === 304){
+      scSet('link', 'ok', 'ゲームページへのリンクが正常です');
+    } else {
+      scSet('link', 'warn', 'ゲームページ（quest_v2.html）が見つかりません（HTTP ' + res.status + '）。URLを確認してください');
+    }
+  } catch(e){
+    scSet('link', 'warn', 'リンク確認に失敗しました（ネットワークエラー）。ゲームページのURLを直接開いて確認してください');
+  }
+}
+
+function openSelfCheck(){
+  const bg = document.getElementById('scModalBg');
+  if(!bg) return;
+  bg.classList.add('show');
+  runSelfCheck();
+}
+function closeSelfCheck(){
+  const bg = document.getElementById('scModalBg');
+  if(bg) bg.classList.remove('show');
+}
+// ESCキーで閉じる
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeSelfCheck();
+});
 </script>
 
 </body>
