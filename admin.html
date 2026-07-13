@@ -172,9 +172,12 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
 
   <!-- ===== 新セクション：全員の進捗（Supabase連動） ===== -->
   <section class="card" id="memberDashSection">
-    <h2 style="display:flex;justify-content:space-between;align-items:center">
+    <h2 style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <span>📊 全メンバーの進捗 <span style="color:var(--mute);font-size:12px;font-weight:400;font-family:'Cormorant Garamond',serif;font-style:italic" id="memberCount">— 読み込み中 —</span></span>
-      <button class="btn" onclick="loadMembers()" style="font-size:12px;padding:8px 16px">↻ 更新</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="runHealthCheck()" style="font-size:12px;padding:8px 16px;background:#5a7050;color:#fff">🩺 システム診断</button>
+        <button class="btn" onclick="loadMembers()" style="font-size:12px;padding:8px 16px">↻ 更新</button>
+      </div>
     </h2>
     <p class="sub">Supabaseに登録されている全参加者の進捗をリアルタイム表示。各カードをクリックで詳細表示。</p>
     <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
@@ -575,6 +578,102 @@ function getSupaAdmin(){
 }
 
 let _allMembers = [];
+// 🩺 システム健全性診断 —— 過去のインシデントを二度と繰り返さないため
+async function runHealthCheck(){
+  const modal = document.getElementById('memberModal');
+  const bg = document.getElementById('memberModalBg');
+  modal.innerHTML = `
+    <h3 style="font-size:18px;font-weight:700;color:#5a7050;margin-bottom:6px">🩺 システム健全性診断</h3>
+    <p style="font-size:11.5px;color:#8b8278;margin-bottom:16px">受講生に不具合が起きる前に、システム全体をチェックします。</p>
+    <div id="hcResults" style="font-size:12.5px;line-height:1.9"></div>
+    <div style="margin-top:18px;text-align:right"><button onclick="closeMemberModal()" style="background:#1a1a1a;color:#fff;border:none;padding:8px 20px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">閉じる</button></div>
+  `;
+  bg.style.display = 'flex';
+  const res = document.getElementById('hcResults');
+  const log = (msg) => { res.innerHTML += msg + '<br>'; };
+  const ok = (msg) => log(`<span style="color:#5a7050">✅ ${msg}</span>`);
+  const ng = (msg) => log(`<span style="color:#c25b3f;font-weight:700">❌ ${msg}</span>`);
+  const wait = (msg) => log(`<span style="color:#8b8278">⏳ ${msg}…</span>`);
+
+  const client = getSupaAdmin();
+  if(!client){ ng('Supabase 未接続'); return; }
+
+  // Check 1: Supabase接続と読み込み
+  wait('Supabase から参加者データ取得中');
+  let members = [];
+  try {
+    const { data, error } = await client.from('realize_members').select('*').limit(50);
+    if(error) throw error;
+    members = data || [];
+    ok(`Supabase 接続 OK （${members.length}名 取得）`);
+  } catch(e){ ng(`Supabase 接続エラー：${e.message}`); return; }
+
+  // Check 2: 必須カラム存在確認
+  if(members.length > 0){
+    const m0 = members[0];
+    const required = ['id','name','mbti','animal_key','current_goal','strengths_town2','strengths_others','ijouchi','updated_at'];
+    const missing = required.filter(k => !(k in m0));
+    if(missing.length === 0) ok('必須カラム 全て存在');
+    else ng(`カラム欠損：${missing.join(', ')}`);
+  }
+
+  // Check 3: OKR保存動作テスト（書き込み→読み込みラウンドトリップ）
+  wait('OKR保存書き込みテスト実施中');
+  const testId = '__hc_' + Date.now();
+  const testGoal = JSON.stringify({goal:'ヘルスチェック', krs:[], currentWeek:1, syncedAt:new Date().toISOString()});
+  try {
+    const { error: e1 } = await client.from('realize_members').upsert({
+      id: testId, name: '__healthcheck__', current_goal: testGoal, updated_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+    if(e1) throw e1;
+    const { data: readback } = await client.from('realize_members').select('current_goal').eq('id', testId).maybeSingle();
+    if(!readback || !readback.current_goal) throw new Error('書き込みが読み戻せない');
+    const parsed = JSON.parse(readback.current_goal);
+    if(parsed.goal !== 'ヘルスチェック') throw new Error('内容が一致しない');
+    ok('OKR保存 書き込み→読み込み OK（現行方式：current_goal に JSON）');
+    // クリーンアップ
+    await client.from('realize_members').delete().eq('id', testId);
+  } catch(e){ ng(`OKR保存テスト失敗：${e.message}`); }
+
+  // Check 4: presence / battles テーブル存在確認
+  wait('リアルタイム機能テーブル確認中');
+  try {
+    const { error: pe } = await client.from('realize_presence').select('user_id').limit(1);
+    if(pe) ng(`realize_presence テーブルエラー：${pe.message}`);
+    else ok('realize_presence テーブル OK（オンライン管理）');
+  } catch(e){ ng(`presence: ${e.message}`); }
+  try {
+    const { error: be } = await client.from('realize_battles').select('id').limit(1);
+    if(be) ng(`realize_battles テーブルエラー：${be.message}`);
+    else ok('realize_battles テーブル OK（リアルタイム対戦）');
+  } catch(e){ ng(`battles: ${e.message}`); }
+
+  // Check 5: 停滞メンバー（1週間以上更新なし）検知
+  const oneWeekAgo = Date.now() - 7*24*60*60*1000;
+  const stalled = members.filter(m => {
+    if(!m.updated_at) return true;
+    return new Date(m.updated_at).getTime() < oneWeekAgo;
+  });
+  if(stalled.length === 0) ok('全メンバー 1週間以内に更新あり');
+  else log(`<span style="color:#c9a574">⚠ ${stalled.length}名 が1週間以上更新なし：${stalled.slice(0,5).map(m=>m.name||m.id).join(', ')}${stalled.length>5?'...他':''}</span>`);
+
+  // Check 6: 目標未入力メンバー
+  const noGoal = members.filter(m => {
+    if(!m.current_goal) return true;
+    try { const o = JSON.parse(m.current_goal); return !o.krs || o.krs.every(k => !k.name && (k.subs||[]).every(s => !s.name)); }
+    catch(e){ return !m.current_goal.trim(); }
+  });
+  if(noGoal.length === 0) ok('全メンバー 目標入力済み');
+  else log(`<span style="color:#c9a574">⚠ ${noGoal.length}名 が目標未入力：${noGoal.slice(0,5).map(m=>m.name||m.id).join(', ')}${noGoal.length>5?'...他':''}</span>`);
+
+  // Check 7: MBTI診断未完了
+  const noMbti = members.filter(m => !m.mbti);
+  if(noMbti.length === 0) ok('全メンバー MBTI診断完了');
+  else log(`<span style="color:#c9a574">⚠ ${noMbti.length}名 が MBTI未診断</span>`);
+
+  log('<br><strong style="color:#5a7050">診断完了</strong>。⚠マークは要対応・❌は緊急対応が必要。');
+}
+
 async function loadMembers(){
   const dash = document.getElementById('memberDash');
   const count = document.getElementById('memberCount');
