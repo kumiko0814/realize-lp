@@ -43,8 +43,11 @@ svg{image-rendering:pixelated}
 .kakera{font-size:11px;color:var(--sakura)}
 .warp-btn{font-size:10px;color:var(--mind);cursor:pointer;text-decoration:underline}
 
-.stage-wrap{position:relative;width:100%;aspect-ratio:20/12;background:var(--grass);border:3px solid var(--msg-border);overflow:hidden;min-height:200px}
-.stage{position:absolute;inset:0}
+/* iOS対策: aspect-ratio非対応ブラウザ向けにpadding-top擬似要素方式で20:12比率を維持 */
+.stage-wrap{position:relative;width:100%;background:var(--grass);border:3px solid var(--msg-border);overflow:hidden}
+.stage-wrap::before{content:'';display:block;padding-top:60%}/* 12/20=0.6 */
+@supports (aspect-ratio:20/12){.stage-wrap::before{display:none}.stage-wrap{aspect-ratio:20/12;min-height:200px}}
+.stage{position:absolute;top:0;left:0;right:0;bottom:0}/* iOS対策: inset:0 を分解 */
 .tile{position:absolute;width:5%;height:8.333%;display:flex;align-items:center;justify-content:center}
 .tile svg{width:100%;height:100%}
 
@@ -97,7 +100,8 @@ svg{image-rendering:pixelated}
 .ab-btn.b:active{box-shadow:0 1px 0 #1a1a3a}
 .hint{font-size:9px;color:var(--gold);text-align:center;letter-spacing:0.15em;margin-top:2px}
 
-.title-screen{position:fixed;inset:0;background:#000;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;color:var(--white)}
+/* iOS対策: inset:0 を top/left/right/bottom に分解 */
+.title-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;color:var(--white)}
 .title-logo{font-size:34px;color:var(--sakura);letter-spacing:0.18em;text-shadow:4px 4px 0 var(--dress-d);margin-bottom:6px;line-height:1.3}
 .title-logo2{font-size:18px;color:var(--gold);letter-spacing:0.2em;margin-bottom:8px}
 .title-sub{font-size:11px;letter-spacing:0.3em;color:var(--mind);margin-bottom:32px}
@@ -107,7 +111,8 @@ svg{image-rendering:pixelated}
 .title-press:hover{background:var(--accent);border-color:var(--sakura)}
 .title-note{position:absolute;bottom:16px;font-size:8px;letter-spacing:0.2em;color:#5a5a7a}
 
-.howto-screen{position:fixed;inset:0;background:#0e0e1a;z-index:900;display:none;flex-direction:column;align-items:center;padding:24px 20px;overflow-y:auto;color:var(--white)}
+/* iOS対策: inset:0 を top/left/right/bottom に分解 */
+.howto-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:#0e0e1a;z-index:900;display:none;flex-direction:column;align-items:center;padding:24px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch;color:var(--white)}
 .howto-screen.show{display:flex}
 .howto-screen h2{font-size:22px;color:var(--gold);letter-spacing:0.2em;text-shadow:3px 3px 0 var(--dress-d);margin-bottom:8px}
 .howto-sub{font-size:11px;color:var(--sakura);letter-spacing:0.2em;margin-bottom:24px}
@@ -117,7 +122,8 @@ svg{image-rendering:pixelated}
 .howto-card .pink{color:var(--sakura)}
 .howto-actions{margin-top:14px;display:flex;gap:10px}
 
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:800;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+/* iOS対策: inset:0 を top/left/right/bottom に分解 */
+.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:800;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 .modal-bg.show{display:flex;animation:fadeIn 0.3s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .modal{background:var(--msg-bg);border:4px solid var(--msg-border);padding:22px 22px;max-width:560px;width:100%;color:var(--white);max-height:90vh;overflow-y:auto}
@@ -168,7 +174,8 @@ svg{image-rendering:pixelated}
 .indoor-wall{background:#3a2a1a;border:1px solid #1a0a00}
 
 /* ポケモン風 演出 */
-.screen-flash{position:fixed;inset:0;background:#fff;z-index:10000;opacity:0;animation:screenFlash 0.8s ease-out;pointer-events:none}
+/* iOS対策: inset:0 を top/left/right/bottom に分解 */
+.screen-flash{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:10000;opacity:0;animation:screenFlash 0.8s ease-out;pointer-events:none}
 @keyframes screenFlash{0%{opacity:0}25%{opacity:0.95}100%{opacity:0}}
 
 .egg-presentation{
@@ -207,27 +214,31 @@ svg{image-rendering:pixelated}
 </head>
 <body>
 
-<!-- 🆘 タイトル画面兼救出UI（pure HTML・JS不要で描画される最強の起動画面） -->
-<div id="bootShield" style="position:fixed;left:0;top:0;right:0;bottom:0;background:linear-gradient(135deg,#1a1a2a 0%,#3a2a4a 50%,#5a3a5a 100%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;overflow-y:auto">
-  <div style="font-size:32px;color:#fcd5e6;letter-spacing:0.12em;margin-bottom:8px;font-weight:800;text-shadow:3px 3px 0 #2a1a3a;line-height:1.2">Re:alize Quest</div>
-  <div style="font-size:12px;color:#ffd644;letter-spacing:0.3em;margin-bottom:32px">— 異常値の冒険 —</div>
-  <div style="width:80px;height:80px;background:#fff;border:3px solid #ffd644;border-radius:12px;padding:6px;margin-bottom:32px">
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
-      <rect x="6" y="2" width="4" height="1" fill="#fff"/><rect x="5" y="3" width="6" height="1" fill="#fff"/>
-      <rect x="4" y="4" width="8" height="2" fill="#fff"/><rect x="3" y="6" width="10" height="5" fill="#fff"/>
-      <rect x="4" y="11" width="8" height="2" fill="#fff"/><rect x="5" y="13" width="6" height="1" fill="#fff"/>
-      <rect x="6" y="5" width="1" height="1" fill="#f6a0c4"/><rect x="9" y="6" width="1" height="1" fill="#ffd644"/>
-      <rect x="5" y="8" width="1" height="1" fill="#f6a0c4"/><rect x="7" y="7" width="2" height="1" fill="#c25b3f"/>
-      <rect x="8" y="8" width="1" height="1" fill="#c25b3f"/><rect x="7" y="9" width="1" height="1" fill="#c25b3f"/>
-    </svg>
+<!-- 起動画面：マイページ優先、ゲームは体験オプション -->
+<div id="bootShield" style="position:fixed;left:0;top:0;right:0;bottom:0;background:linear-gradient(135deg,#1a1a2a 0%,#3a2a4a 50%,#5a3a5a 100%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;overflow-y:auto;-webkit-overflow-scrolling:touch">
+  <div style="font-size:30px;color:#fcd5e6;letter-spacing:0.12em;margin-bottom:8px;font-weight:800;text-shadow:3px 3px 0 #2a1a3a;line-height:1.2">Re:alize Quest</div>
+  <div style="font-size:11px;color:#ffd644;letter-spacing:0.3em;margin-bottom:28px">— 異常値の冒険 —</div>
+
+  <!-- メインCTA：マイページへ -->
+  <a id="rescueDashLink" href="dashboard.html" style="background:#e63d6a;color:#fff;padding:18px 44px;border-radius:32px;font-size:15px;font-weight:800;text-decoration:none;display:inline-block;margin-bottom:8px;box-shadow:0 6px 20px rgba(230,61,106,0.5);letter-spacing:0.1em;min-width:240px">
+    📊 目標を入力する
+  </a>
+  <div style="font-size:10px;color:#a090a0;letter-spacing:0.05em;margin-bottom:32px;line-height:1.6">
+    ★ こちらから始めてください<br>
+    大目標・小目標3つ・行動目標9つを設定
   </div>
-  <a href="javascript:void(0)" onclick="bootStartGame()" style="background:#e63d6a;color:#fff;border:none;padding:16px 40px;border-radius:28px;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.15em;text-decoration:none;display:inline-block;margin-bottom:14px;box-shadow:0 4px 16px rgba(230,61,106,0.6)">▶ ゲームを開始する</a>
-  <br>
-  <a id="rescueDashLink" href="dashboard.html" style="color:#fcd5e6;border:1.5px solid #fcd5e6;padding:11px 26px;border-radius:22px;font-size:12px;text-decoration:none;display:inline-block;margin-top:6px;letter-spacing:0.05em">📊 マイページ（目標入力）へ</a>
-  <div style="margin-top:24px;font-size:10px;color:#a090a0;letter-spacing:0.05em;line-height:1.8;max-width:300px">
-    ★ ゲームを開始 → 博士から卵をもらう<br>
-    ★ MBTI診断 → 相棒キャラが決まる<br>
-    ★ 4つの街を旅して "異常値" を発見しよう
+
+  <!-- サブ導線：ゲーム（オプション） -->
+  <div style="border-top:1px dashed rgba(252,213,230,0.3);padding-top:24px;width:100%;max-width:340px">
+    <div style="font-size:10px;color:#8a7a8a;letter-spacing:0.2em;margin-bottom:14px">— ゲームで診断・冒険する（任意）—</div>
+    <a href="javascript:void(0)" onclick="bootStartGame()" style="background:transparent;color:#fcd5e6;border:1.5px solid #fcd5e6;padding:10px 24px;border-radius:22px;font-size:12px;text-decoration:none;display:inline-block;letter-spacing:0.05em">
+      🎮 MBTI診断＋4つの街を冒険
+    </a>
+    <div style="margin-top:12px;font-size:9.5px;color:#7a6a7a;line-height:1.7;max-width:280px;margin-left:auto;margin-right:auto">
+      MBTI診断で相棒キャラが決まる<br>
+      街1〜4を歩いて "異常値" を発見<br>
+      <span style="color:#c9a0a0">★ ゲームが動かない場合は<br>マイページから直接目標入力できます</span>
+    </div>
   </div>
 </div>
 <script>
@@ -303,7 +314,8 @@ function bootStartGame(){
 </div>
 
 <!-- クラウド復元中のフルスクリーンロード -->
-<div id="cloudLoadingOverlay" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#1a1a2a 0%,#2a1a3a 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;color:#ffd644;font-family:DotGothic16,monospace">
+<!-- iOS対策: inset:0 を top/left/right/bottom に分解 -->
+<div id="cloudLoadingOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1a1a2a 0%,#2a1a3a 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;color:#ffd644;font-family:DotGothic16,monospace">
   <div style="width:64px;height:64px;border:4px solid rgba(255,214,68,0.2);border-top-color:#ffd644;border-radius:50%;animation:cloudSpin 1s linear infinite;margin-bottom:24px"></div>
   <div style="font-size:14px;letter-spacing:0.3em;margin-bottom:8px">☁ CLOUD SYNC ☁</div>
   <div style="font-size:11px;color:#fcd5e6;letter-spacing:0.15em;text-align:center;line-height:1.8">
@@ -2625,10 +2637,40 @@ async function startGame(){
     document.body.style.background = 'linear-gradient(180deg,#3a2a5a 0%,#1e1e2a 100%)';
   }
 
+  // iOS対策: 8秒経ってもゲーム画面未表示なら dashboard.html へ自動遷移
+  const gameRenderTimeout = setTimeout(function(){
+    const fr = document.getElementById('frame');
+    if(!fr || fr.style.display === 'none' || fr.style.display === ''){
+      console.warn('iOS対策: 8秒タイムアウト - dashboard.html へ遷移');
+      window.location.href = 'dashboard.html' + (window.location.search || '');
+    }
+  }, 8000);
+
+  // iOS対策: renderStage / renderHero / renderStatus を独立 try-catch で囲み、どこで失敗したか明示
   try {
-    renderStage();
-    renderHero();
-    renderStatus();
+    try {
+      renderStage();
+    } catch(e1){
+      console.error('iOS対策: renderStage 失敗', e1);
+      // renderStage 失敗時のフォールバック UI（真っ黒回避）
+      const stageEl = document.getElementById('stage');
+      if(stageEl){
+        stageEl.innerHTML = '<div style="padding:30px 20px;color:#fff;text-align:center;font-family:DotGothic16,sans-serif;line-height:1.9;font-size:12px"><div style="font-size:14px;color:#ffd644;margin-bottom:14px">⚠ 街1を読み込めませんでした</div>再読み込みするか、マイページから目標入力に進めます。<br><br><button onclick="location.reload()" style="background:#3a76d6;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px;margin-right:8px">再読み込み</button><button onclick="goToDashboard()" style="background:#c25b3f;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">📊 マイページへ</button></div>';
+      }
+    }
+    try {
+      renderHero();
+    } catch(e2){
+      console.error('iOS対策: renderHero 失敗', e2);
+    }
+    try {
+      renderStatus();
+    } catch(e3){
+      console.error('iOS対策: renderStatus 失敗', e3);
+    }
+
+    clearTimeout(gameRenderTimeout); // 正常描画できたのでタイムアウト解除
+
     if(restored){
       setMsg('▼ ☁ <span class="mind">クラウドから前回の続きを 復元しました！</span>\n  メニュー(B) で 進捗を確認できます。');
     }
@@ -2636,7 +2678,7 @@ async function startGame(){
     if(state.mbti && state.progress && state.progress.eggReceived){
       const skipKey = 'realize_skip_dashboard_prompt_' + userKey;
       if(!sessionStorage.getItem(skipKey)){
-        setTimeout(()=>{
+        setTimeout(function(){
           if(confirm('前回すでにMBTI診断済みです！\n\n目標入力・進捗確認は「📊 マイページ」で行えます。\n\nマイページに直行しますか？\n（「キャンセル」でこのままゲームを続けます）')){
             goToDashboard();
           } else {
@@ -2646,11 +2688,12 @@ async function startGame(){
       }
     }
   } catch(e){
-    console.error('Game init error:', e);
+    console.error('iOS対策: Game init 全体エラー', e);
+    clearTimeout(gameRenderTimeout);
     // ステージが空/エラーでも、少なくとも操作UIは見せる
     const stage = document.getElementById('stage');
     if(stage && !stage.innerHTML.trim()){
-      stage.innerHTML = '<div style="padding:30px 20px;color:#fff;text-align:center;font-family:DotGothic16,sans-serif;line-height:1.9;font-size:12px"><div style="font-size:14px;color:#ffd644;margin-bottom:14px">⚠ ステージの描画に失敗しました</div>もう一度 <b>Cmd+Shift+R</b> で再読み込みしてください。<br>それでもダメな場合、下の「マイページ」ボタンから目標入力に進めます。<br><br><button onclick="goToDashboard()" style="background:#c25b3f;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">📊 マイページへ</button></div>';
+      stage.innerHTML = '<div style="padding:30px 20px;color:#fff;text-align:center;font-family:DotGothic16,sans-serif;line-height:1.9;font-size:12px"><div style="font-size:14px;color:#ffd644;margin-bottom:14px">⚠ ステージの描画に失敗しました</div>もう一度リロードしてください。<br>それでもダメな場合、下の「マイページ」ボタンから目標入力に進めます。<br><br><button onclick="goToDashboard()" style="background:#c25b3f;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">📊 マイページへ</button></div>';
     }
     if(typeof setMsg === 'function'){
       setMsg('▼ <span class="red">起動エラー：' + (e.message||'unknown') + '</span>\n  マイページに進むか、リロードしてください。');
