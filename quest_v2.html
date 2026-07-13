@@ -206,6 +206,53 @@ svg{image-rendering:pixelated}
 </head>
 <body>
 
+<!-- ⚠ 真っ黒画面防止：DOMより先にレンダリングされる緊急UI -->
+<div id="bootShield" style="position:fixed;inset:0;background:linear-gradient(135deg,#1a1a2a 0%,#3a2a4a 100%);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ffd644;font-family:'DotGothic16',monospace;text-align:center;padding:20px">
+  <div style="font-size:20px;color:#fcd5e6;letter-spacing:0.2em;text-shadow:3px 3px 0 #2a1a3a;margin-bottom:10px">Re:alize Quest</div>
+  <div style="font-size:11px;color:#ffd644;letter-spacing:0.3em;margin-bottom:24px">— 異常値の冒険 —</div>
+  <div style="width:48px;height:48px;border:3px solid rgba(252,213,230,0.2);border-top-color:#fcd5e6;border-radius:50%;animation:bootSpin 1s linear infinite;margin-bottom:16px"></div>
+  <div style="font-size:11px;color:#fcd5e6;letter-spacing:0.15em">ページを準備しています...</div>
+  <div id="bootRescue" style="display:none;margin-top:24px;text-align:center">
+    <div style="font-size:11px;color:#ffd644;margin-bottom:12px;line-height:1.8">読み込みに時間がかかっています。<br>下のボタンをタップしてください。</div>
+    <button onclick="rescueFromBoot()" style="background:#e63d6a;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-family:'DotGothic16',monospace;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.1em;box-shadow:0 4px 12px rgba(230,61,106,0.4)">▶ タイトル画面へ</button>
+    <div style="margin-top:12px"><button onclick="location.href='dashboard.html'+location.search" style="background:transparent;color:#fcd5e6;border:1px solid #fcd5e6;padding:8px 16px;border-radius:20px;font-family:'DotGothic16',monospace;font-size:10px;cursor:pointer">📊 マイページへ避難</button></div>
+  </div>
+  <style>@keyframes bootSpin{to{transform:rotate(360deg)}}</style>
+</div>
+<script>
+// bootShield 制御：正常起動なら消える、失敗なら救出ボタン
+(function(){
+  var hidden = false;
+  function hideShield(){
+    if(hidden) return;
+    hidden = true;
+    var el = document.getElementById('bootShield');
+    if(el){ el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(function(){ el.style.display='none'; }, 300); }
+  }
+  // titleScreen が見えたら shield を消す
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      var ts = document.getElementById('titleScreen');
+      if(ts && ts.offsetHeight > 0){ hideShield(); }
+    }, 300);
+  });
+  // 5秒経っても hidden にならなければ救出UI表示
+  setTimeout(function(){
+    if(!hidden){
+      var r = document.getElementById('bootRescue');
+      if(r) r.style.display = 'block';
+    }
+  }, 5000);
+  window.__hideBootShield = hideShield;
+})();
+function rescueFromBoot(){
+  var el = document.getElementById('bootShield');
+  if(el){ el.style.display = 'none'; }
+  var ts = document.getElementById('titleScreen');
+  if(ts){ ts.style.display = 'flex'; ts.style.zIndex = '2500'; }
+}
+</script>
+
 <div class="title-screen" id="titleScreen">
   <div class="title-logo">Re:alize Quest</div>
   <div class="title-logo2">— 異常値の冒険 —</div>
