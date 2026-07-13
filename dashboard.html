@@ -2652,17 +2652,67 @@ async function restoreFromCloud(){
   const client = getSupa();
   if(!client || userKey === 'guest' || isDemo) return;
   try {
-    // current_goal に JSON 文字列で全OKR情報を格納
-    const { data, error } = await client.from('realize_members').select('current_goal').eq('id', userKey).maybeSingle();
+    // MBTI/動物/強み/異常値 も一緒に取得（PC⇄携帯連携のため必須）
+    const { data, error } = await client.from('realize_members').select('current_goal,name,mbti,role,animal_key,ijouchi,strengths_others,strengths_town2,strengths_additional,my_strength_answer').eq('id', userKey).maybeSingle();
     if(error || !data) return;
     let changed = false;
+
+    // 【重要】quest_v2 の localStorage にキャラ情報を復元（卵→本キャラ化）
+    if(data.mbti || data.animal_key){
+      const qv2Key = 're_alize_quest_v2_' + userKey;
+      let qv2 = {};
+      try { const raw = localStorage.getItem(qv2Key); if(raw) qv2 = JSON.parse(raw); } catch(e){}
+      const hadMbti = !!qv2.mbti;
+      if(data.name && !qv2.name) qv2.name = data.name;
+      if(data.mbti) qv2.mbti = data.mbti;
+      if(data.role) qv2.role = data.role;
+      if(data.animal_key) qv2.animal = data.animal_key;
+      if(!qv2.progress) qv2.progress = {};
+      if(data.mbti){
+        qv2.progress.mbtiCompleted = true;
+        qv2.progress.eggReceived = true;
+        qv2.progress.hatched = true;
+        qv2.progress.professorMet = true;
+      }
+      if(Array.isArray(data.strengths_others) && data.strengths_others.length){
+        qv2.progress.strengthsFromOthers = data.strengths_others.concat(['','','','','']).slice(0,5);
+        qv2.progress.town1Cleared = data.strengths_others.length >= 5;
+      }
+      if(Array.isArray(data.strengths_town2) && data.strengths_town2.length){
+        qv2.progress.town2NpcStrengths = [
+          data.strengths_town2.slice(0,2),
+          data.strengths_town2.slice(2,4),
+          data.strengths_town2.slice(4,6)
+        ];
+        if(data.strengths_town2.length >= 6) qv2.progress.town2GymOpen = true;
+      }
+      if(Array.isArray(data.strengths_additional) && data.strengths_additional.length){
+        qv2.progress.additionalStrengths = data.strengths_additional.map(s => typeof s === 'string' ? {text:s} : s);
+      }
+      if(data.my_strength_answer){
+        qv2.progress.myStrengthAnswer = data.my_strength_answer;
+        qv2.progress.town2GymCleared = true;
+        qv2.progress.town2GymLeaderOpen = true;
+        qv2.progress.town2WelcomeShown = true;
+      }
+      if(data.ijouchi){
+        qv2.progress.town3IjouchiStatement = data.ijouchi;
+        qv2.progress.town3Cleared = true;
+      }
+      localStorage.setItem(qv2Key, JSON.stringify(qv2));
+      if(!hadMbti && data.mbti){
+        console.log('☁ quest_v2 の キャラ情報を復元しました：', data.mbti, data.animal_key);
+        changed = true;
+      }
+    }
+
+    // current_goal に JSON 文字列で全OKR情報を格納
     let okr = null;
     if(data.current_goal){
       try {
         const parsed = JSON.parse(data.current_goal);
         if(parsed && typeof parsed === 'object') okr = parsed;
       } catch(e){
-        // 旧仕様（大目標だけ）はテキストのまま state.goal に
         if(!state.goal) state.goal = data.current_goal;
       }
     }
@@ -2675,7 +2725,6 @@ async function restoreFromCloud(){
         changed = true;
       }
     }
-    // current_week 復元
     if(okr && okr.currentWeek && okr.currentWeek > (state.currentWeek||1)){
       state.currentWeek = okr.currentWeek;
       changed = true;
@@ -2683,7 +2732,7 @@ async function restoreFromCloud(){
     if(changed){
       saveState(state);
       render();
-      console.log('☁ クラウドから目標を復元しました');
+      console.log('☁ クラウドから復元しました');
     }
   } catch(e){ console.warn('restoreFromCloud error:', e); }
 }
