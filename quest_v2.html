@@ -2504,22 +2504,29 @@ function showHowTo(){
 async function startGame(){
   document.getElementById('titleScreen').style.display = 'none';
   document.getElementById('howtoScreen').classList.remove('show');
-  // クラウド復元中のロード表示（先に）
   const overlay = document.getElementById('cloudLoadingOverlay');
   const isCloudEnabled = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.enabled && userKey !== 'guest' && !isDemo);
   let restored = false;
-  if(isCloudEnabled){
+
+  // クラウド復元（失敗しても・遅くても必ず先に進む）
+  if(isCloudEnabled && overlay){
     overlay.style.display = 'flex';
-    try {
-      // タイムアウト付き（最大5秒）でクラウド復元
-      restored = await Promise.race([
-        loadFromCloud(),
-        new Promise(resolve => setTimeout(() => resolve(false), 5000))
-      ]);
-    } catch(e){ console.warn('cloud restore error:', e); }
-    overlay.style.display = 'none';
   }
-  document.getElementById('frame').style.display = 'flex';
+  try {
+    if(isCloudEnabled){
+      restored = await Promise.race([
+        loadFromCloud().catch(e => { console.warn('loadFromCloud error:', e); return false; }),
+        new Promise(resolve => setTimeout(() => resolve(false), 3000))  // 3秒でタイムアウト
+      ]);
+    }
+  } catch(e){ console.warn('cloud restore error:', e); }
+  finally {
+    // 何があっても overlay は必ず消す＋ゲーム画面を必ず表示
+    if(overlay) overlay.style.display = 'none';
+    const frame = document.getElementById('frame');
+    if(frame) frame.style.display = 'flex';
+  }
+
   try {
     renderStage();
     renderHero();
