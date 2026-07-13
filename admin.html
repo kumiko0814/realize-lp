@@ -291,8 +291,17 @@ h2{font-size:16px;font-weight:700;margin-bottom:14px;letter-spacing:0.06em}
 
   <!-- MEMBER LIST -->
   <section class="card">
-    <h2>③ 参加者リスト（24名）</h2>
-    <p class="sub">現在の参加者一覧。各人のIDからURLを生成済み。「開く」で本人のダッシュボード、「📋」でLINE送付テンプレをコピー。</p>
+    <h2 style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <span>③ 参加者リスト（24名）</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn" onclick="exportMembersCSV()" style="font-size:11px;padding:6px 12px">📥 URL一覧CSV</button>
+        <button class="btn" onclick="bulkCopyLineTemplates()" style="font-size:11px;padding:6px 12px;background:#5a7050;color:#fff">📋 全員分のLINEテンプレ</button>
+      </div>
+    </h2>
+    <p class="sub">現在の参加者一覧。各人のIDからURLを生成済み。「開く」で本人のダッシュボード、「📋」でLINE送付テンプレをコピー。<br>
+      ★ 上部の「📥 URL一覧CSV」で全員のURLを一括ダウンロード可。「📋 全員分のLINEテンプレ」で24人全員分の送付文面を一括コピー。
+    </p>
+    <div id="idMismatchAlert" style="display:none;background:#fdebe5;border:2px solid #c25b3f;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#c25b3f"></div>
     <div class="member-list" id="memberList"></div>
   </section>
 
@@ -513,6 +522,98 @@ function copyMember(slug){
   navigator.clipboard.writeText(buildUrl(slug, 'welcome'));
   showToast('使い方URLをコピーしました ✓');
 }
+
+// 📥 URL一覧CSV出力（24名分の全URL）
+function exportMembersCSV(){
+  const header = ['名前', 'ID', 'マイページURL', 'ゲームURL', '使い方URL'];
+  const rows = [header];
+  MEMBERS.forEach(m => {
+    const name = m.name;
+    const id = m.id;
+    const dashUrl = buildUrl(id, 'dashboard', { name });
+    const questUrl = buildUrl(id, 'quest_v2', { name });
+    const welcomeUrl = buildUrl(id, 'welcome', { name });
+    rows.push([name, id, dashUrl, questUrl, welcomeUrl]);
+  });
+  const csv = rows.map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const bom = '﻿'; // Excel向けBOM
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'realize_URLs_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('CSV をダウンロードしました ✓');
+}
+
+// 📋 全員分のLINE配布テンプレを一括コピー
+function bulkCopyLineTemplates(){
+  const blocks = MEMBERS.map(m => {
+    const name = m.name;
+    const id = m.id;
+    const dashUrl = buildUrl(id, 'dashboard', { name });
+    const questUrl = buildUrl(id, 'quest_v2', { name });
+    const welcomeUrl = buildUrl(id, 'welcome', { name });
+    return `━━━━━━━━━━━━━━━━━━━━
+【送付先】${name}
+
+${name.split('（')[0]} さん
+
+Re:alize の専用ページをお送りします🌿
+
+📖 まずは使い方（1分）
+${welcomeUrl}
+
+📊 マイページ（目標入力）
+${dashUrl}
+
+🎮 ゲーム（相棒とお散歩）
+${questUrl}
+
+★ 3つとも同じアカウントで繋がっています
+★ PC/スマホ どちらでも同じ内容が見られます
+※ ブックマークすると迷わなくて便利です
+
+森川`;
+  }).join('\n\n');
+  navigator.clipboard.writeText(blocks).then(() => {
+    showToast(`${MEMBERS.length}名分のLINEテンプレをコピーしました ✓`);
+  });
+}
+
+// ⚠ ID不一致自動検知 (MEMBERSリストのIDとSupabase実データを突き合わせ)
+function checkIdMismatches(){
+  const alert = document.getElementById('idMismatchAlert');
+  if(!alert || !_allMembers.length) return;
+  const memberIds = new Set(MEMBERS.map(m => m.id));
+  // Supabaseにあるがリストにない（要確認）
+  const supaOnly = _allMembers.filter(m => {
+    if(memberIds.has(m.id)) return false;
+    if(!m.id) return false;
+    if(m.id.startsWith('test') || m.id.startsWith('demo') || m.id === 'guest' || m.id === '{ID}') return false;
+    return true;
+  });
+  // リストにあるがSupabaseにない（配布URL未使用 = OKだが参考情報）
+  const supabaseIds = new Set(_allMembers.map(m => m.id));
+  const listOnly = MEMBERS.filter(m => !supabaseIds.has(m.id));
+
+  if(supaOnly.length === 0 && listOnly.length === 0){
+    alert.style.display = 'none';
+    return;
+  }
+  let html = '';
+  if(supaOnly.length > 0){
+    html += `<strong>⚠ 参加者リストに載ってないIDが Supabase に ${supaOnly.length}件あります：</strong><br>`;
+    html += supaOnly.map(m => `　・<code style="background:#fff;padding:1px 6px;border-radius:3px">${escapeAdmin(m.id)}</code>（${escapeAdmin(m.name||'匿名')}）`).join('<br>');
+    html += '<br><span style="font-size:11px;color:#a04030">→ 参加者リストと違うURLを使っている可能性。この人達に正しいURLを送り直してください。</span><br>';
+  }
+  if(listOnly.length > 0){
+    html += (supaOnly.length > 0 ? '<br>' : '') + `<span style="color:#8b6b30">📋 参加者リストにあるがまだ未使用（要配布 or 未アクセス）：${listOnly.length}名 — ${listOnly.map(m=>m.name.split('（')[0]).slice(0,10).join(' / ')}${listOnly.length>10?'...他':''}</span>`;
+  }
+  alert.innerHTML = html;
+  alert.style.display = 'block';
+}
 function openUrl(slug, page){
   window.open(buildUrl(slug, page), '_blank');
 }
@@ -690,6 +791,8 @@ async function loadMembers(){
     _allMembers = data || [];
     count.textContent = '— ' + _allMembers.length + ' 名 参加中 —';
     renderMembers();
+    // 自律チェック
+    try { checkIdMismatches(); } catch(e){ console.warn('ID mismatch check:', e); }
   } catch(e){
     dash.innerHTML = '<p style="text-align:center;padding:30px;color:#c25b3f">通信エラー：' + e.message + '</p>';
   }
@@ -729,10 +832,16 @@ function renderMembers(){
     const o = _parseOkr(m);
     const rate = o.achievementRate ?? m.achievement_rate ?? 0;
     const week = o.currentWeek || m.current_week || 0;
+    // 停滞判定：1週間以上更新なし
+    const daysSinceUpdate = m.updated_at ? Math.floor((Date.now() - new Date(m.updated_at).getTime()) / (24*60*60*1000)) : 999;
+    const isStalled = daysSinceUpdate >= 7;
+    const stalledBadge = isStalled ? `<div style="position:absolute;top:-8px;left:10px;background:#c9a574;color:#fff;font-size:9px;padding:2px 8px;border-radius:10px;letter-spacing:0.1em;font-weight:700">⚠ ${daysSinceUpdate}日 更新なし</div>` : '';
+    const cardBorder = isStalled ? 'border:2px solid #c9a574' : 'border:1px solid #ece5d8';
     const strengthsTotal = ((m.strengths_others||[]).length + (m.strengths_town2||[]).length + (m.strengths_additional||[]).length);
     const updated = m.updated_at ? new Date(m.updated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
     return `
-      <div style="position:relative;background:#fdfbf6;border:1px solid #ece5d8;border-radius:12px;padding:14px 12px;transition:all 0.2s">
+      <div style="position:relative;background:#fdfbf6;${cardBorder};border-radius:12px;padding:14px 12px;transition:all 0.2s">
+        ${stalledBadge}
         <button onclick='deleteMember(${JSON.stringify(m.id)},${JSON.stringify(m.name||"")})' title="このIDを削除" style="position:absolute;top:6px;right:6px;background:rgba(194,91,63,0.1);color:#c25b3f;border:1px solid #c25b3f;width:24px;height:24px;border-radius:50%;font-family:inherit;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0;z-index:2">✕</button>
         <div onclick='showMemberDetail(${JSON.stringify(m.id)})' style="cursor:pointer">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
