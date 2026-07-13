@@ -214,6 +214,38 @@ svg{image-rendering:pixelated}
 </head>
 <body>
 
+<!-- 🐞 画面内デバッグロガー（?debug=1 で有効・iPhone Safariの原因特定用） -->
+<div id="debugLog" style="display:none;position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.9);color:#0f0;padding:8px 12px;font-family:Menlo,monospace;font-size:10px;z-index:2147483646;max-height:35vh;overflow-y:auto;line-height:1.5;-webkit-overflow-scrolling:touch"></div>
+<script>
+window.__dlog = function(msg){
+  try {
+    var d = document.getElementById('debugLog');
+    if(!d) return;
+    var line = document.createElement('div');
+    var t = new Date();
+    var stamp = ('0'+t.getMinutes()).slice(-2)+':'+('0'+t.getSeconds()).slice(-2)+'.'+('00'+t.getMilliseconds()).slice(-3);
+    line.textContent = '['+stamp+'] '+msg;
+    d.appendChild(line);
+    d.scrollTop = d.scrollHeight;
+  } catch(e){}
+};
+(function(){
+  if(window.location.search && window.location.search.indexOf('debug=1') !== -1){
+    var d = document.getElementById('debugLog');
+    if(d) d.style.display = 'block';
+    window.__dlog('DEBUG mode ON - UA: ' + navigator.userAgent.substr(0,80));
+    window.__dlog('URL: ' + window.location.href.substr(0,100));
+    window.__dlog('DOM ready check');
+    window.addEventListener('error', function(e){
+      window.__dlog('❌ JS ERROR: ' + (e.message||'?') + ' @ ' + (e.filename||'?').split('/').pop() + ':' + (e.lineno||'?'));
+    });
+    window.addEventListener('unhandledrejection', function(e){
+      window.__dlog('❌ PROMISE REJ: ' + (e.reason && e.reason.message || e.reason || '?'));
+    });
+  }
+})();
+</script>
+
 <!-- 起動画面：マイページ優先、ゲームは体験オプション -->
 <div id="bootShield" style="position:fixed;left:0;top:0;right:0;bottom:0;background:linear-gradient(135deg,#1a1a2a 0%,#3a2a4a 50%,#5a3a5a 100%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;overflow-y:auto;-webkit-overflow-scrolling:touch">
   <div style="font-size:30px;color:#fcd5e6;letter-spacing:0.12em;margin-bottom:8px;font-weight:800;text-shadow:3px 3px 0 #2a1a3a;line-height:1.2">Re:alize Quest</div>
@@ -2591,6 +2623,21 @@ function showHowTo(){
   document.getElementById('howtoScreen').classList.add('show');
 }
 async function startGame(){
+  if(window.__dlog) window.__dlog('▶ startGame called');
+  // 🆘 【最重要】startGame 呼ばれた瞬間、body に絶対配置の緊急脱出ボタンを固定表示
+  // → どんな状況（真っ黒・renderStage失敗・CSS崩壊）でも必ず「マイページへ」タップできる
+  try {
+    var _emergencyExists = document.getElementById('emergencyDashBtn');
+    if(!_emergencyExists){
+      var _emergencyBtn = document.createElement('a');
+      _emergencyBtn.id = 'emergencyDashBtn';
+      _emergencyBtn.href = 'dashboard.html' + (window.location.search || '');
+      _emergencyBtn.innerHTML = '📊 マイページで目標入力する';
+      _emergencyBtn.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#e63d6a;color:#fff;padding:16px 32px;border-radius:28px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,\"Hiragino Sans\",sans-serif;font-size:14px;font-weight:800;z-index:2147483647;box-shadow:0 6px 24px rgba(230,61,106,0.7);letter-spacing:0.05em;white-space:nowrap;-webkit-tap-highlight-color:transparent';
+      document.body.appendChild(_emergencyBtn);
+    }
+  } catch(e){ console.warn('emergency button err', e); }
+
   // タイトル画面・使い方画面を確実に消す
   const ts = document.getElementById('titleScreen');
   const hs = document.getElementById('howtoScreen');
@@ -2617,15 +2664,18 @@ async function startGame(){
   // クラウド復元（失敗しても・遅くても必ず先に進む）
   if(isCloudEnabled && overlay){
     overlay.style.display = 'flex';
+    if(window.__dlog) window.__dlog('cloud overlay shown');
   }
   try {
     if(isCloudEnabled){
+      if(window.__dlog) window.__dlog('loadFromCloud start');
       restored = await Promise.race([
-        loadFromCloud().catch(e => { console.warn('loadFromCloud error:', e); return false; }),
+        loadFromCloud().catch(e => { if(window.__dlog) window.__dlog('loadFromCloud err: '+(e.message||e)); return false; }),
         new Promise(resolve => setTimeout(() => resolve(false), 3000))
       ]);
+      if(window.__dlog) window.__dlog('loadFromCloud done, restored='+restored);
     }
-  } catch(e){ console.warn('cloud restore error:', e); }
+  } catch(e){ if(window.__dlog) window.__dlog('cloud restore err: '+(e.message||e)); }
   finally {
     // overlay を DOM から完全削除（表示状態を確実にリセット）
     if(overlay){
@@ -2654,9 +2704,12 @@ async function startGame(){
   // iOS対策: renderStage / renderHero / renderStatus を独立 try-catch で囲み、どこで失敗したか明示
   try {
     try {
+      if(window.__dlog) window.__dlog('renderStage start');
       renderStage();
+      if(window.__dlog) window.__dlog('✓ renderStage OK');
     } catch(e1){
       console.error('iOS対策: renderStage 失敗', e1);
+      if(window.__dlog) window.__dlog('❌ renderStage FAIL: '+(e1.message||e1));
       // renderStage 失敗時のフォールバック UI（真っ黒回避）
       const stageEl = document.getElementById('stage');
       if(stageEl){
@@ -2664,14 +2717,20 @@ async function startGame(){
       }
     }
     try {
+      if(window.__dlog) window.__dlog('renderHero start');
       renderHero();
+      if(window.__dlog) window.__dlog('✓ renderHero OK');
     } catch(e2){
       console.error('iOS対策: renderHero 失敗', e2);
+      if(window.__dlog) window.__dlog('❌ renderHero FAIL: '+(e2.message||e2));
     }
     try {
+      if(window.__dlog) window.__dlog('renderStatus start');
       renderStatus();
+      if(window.__dlog) window.__dlog('✓ renderStatus OK');
     } catch(e3){
       console.error('iOS対策: renderStatus 失敗', e3);
+      if(window.__dlog) window.__dlog('❌ renderStatus FAIL: '+(e3.message||e3));
     }
 
     clearTimeout(gameRenderTimeout); // 正常描画できたのでタイムアウト解除

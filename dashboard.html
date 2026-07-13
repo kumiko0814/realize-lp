@@ -33,13 +33,13 @@ body{
 
 /* ============= HEADER ============= */
 .app-header{
-  display:flex;justify-content:space-between;align-items:center;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
   padding:16px 24px;background:var(--card);border:1px solid var(--line);
   border-radius:18px;margin-bottom:20px;
 }
-.app-title{display:flex;align-items:center;gap:14px}
+.app-title{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .app-logo{font-family:"Cormorant Garamond",serif;font-size:20px;letter-spacing:0.25em;color:var(--leaf-deep);font-weight:600}
-.app-logo-sub{font-size:11px;color:var(--mute);letter-spacing:0.15em;border-left:1px solid var(--line);padding-left:14px;margin-left:6px}
+.app-logo-sub{font-size:11px;color:var(--mute);letter-spacing:0.15em;border-left:1px solid var(--line);padding-left:14px;margin-left:6px;white-space:nowrap}
 .user-info{text-align:right;font-size:12px;color:var(--mute)}
 .user-name{font-size:13px;font-weight:700;color:var(--ink);display:block}
 .user-info input{
@@ -48,6 +48,16 @@ body{
   padding:2px 0;outline:none;
 }
 .user-info input:focus{border-bottom-color:var(--accent)}
+/* スマホ対応 */
+@media (max-width:640px){
+  .app-header{flex-direction:column;align-items:stretch;padding:14px 16px;gap:10px}
+  .app-title{justify-content:center}
+  .app-logo{font-size:18px}
+  .app-logo-sub{font-size:10px;border-left:none;padding-left:0;margin-left:0}
+  .user-info{align-items:center !important;text-align:center}
+  .user-info > div{justify-content:center}
+  .user-info input{text-align:center}
+}
 
 /* ============= HERO (キャラエリア) ============= */
 .hero-card{
@@ -712,7 +722,7 @@ body{
       <div class="sc-divider"></div>
       <div class="sc-contact">
         <div class="lbl">HELP — 困ったときは</div>
-        <strong>森川くみこにLINEで連絡</strong>してください。<br>
+        <strong>Re:alize専用LINEにご連絡ください</strong>。<br>
         ※ このチェック結果のスクリーンショットも一緒に送ってもらえると助かります。
       </div>
       <button class="sc-close" onclick="closeSelfCheck()">閉じる</button>
