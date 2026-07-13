@@ -793,10 +793,21 @@ function monitorSVG(){return `<svg viewBox="0 0 16 16" shape-rendering="crispEdg
 
 function renderStage(){
   const space = currentSpaceData();
-  const map = space.map;
   const stage = document.getElementById('stage');
   const wrap = document.querySelector('.stage-wrap');
   stage.innerHTML = '';
+  // 街データが読み込めていない or マップ不正の場合はフォールバック
+  if(!space || !space.map || !Array.isArray(space.map) || space.map.length === 0){
+    console.warn('renderStage: space.map is invalid, fallback to town1', {currentTown: state.currentTown});
+    state.currentTown = 'town1';
+    state.indoors = null;
+    saveState();
+    const fallback = currentSpaceData();
+    if(!fallback || !fallback.map){ stage.innerHTML = '<div style="padding:20px;color:#fff;text-align:center">マップ読み込みエラー。ページを再読み込みしてください。</div>'; return; }
+    setTimeout(() => { renderStage(); renderHero(); renderStatus(); }, 100);
+    return;
+  }
+  const map = space.map;
   // 屋内なら背景を変える
   if(space.isIndoor){
     wrap.classList.add('indoor');

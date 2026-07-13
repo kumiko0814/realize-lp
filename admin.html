@@ -616,10 +616,20 @@ function renderMembers(){
     dash.innerHTML = '<p style="text-align:center;padding:30px;color:#8b8278">該当する参加者がいません</p>';
     return;
   }
+  // current_goal に JSON 格納された OKR を各カードでも参照
+  function _parseOkr(m){
+    let o = {};
+    if(m.current_goal){
+      try { const p = JSON.parse(m.current_goal); if(p && typeof p === 'object') o = p; } catch(e){}
+    }
+    if(m.okr_data) o = Object.assign({}, m.okr_data, o);
+    return o;
+  }
   dash.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">' + list.map(m => {
     const animal = (m.animal_key && ANIMAL_SVG_ADMIN[m.animal_key]) ? m.animal_key : 'tamago';
-    const rate = m.achievement_rate || 0;
-    const week = m.current_week || 0;
+    const o = _parseOkr(m);
+    const rate = o.achievementRate ?? m.achievement_rate ?? 0;
+    const week = o.currentWeek || m.current_week || 0;
     const strengthsTotal = ((m.strengths_others||[]).length + (m.strengths_town2||[]).length + (m.strengths_additional||[]).length);
     const updated = m.updated_at ? new Date(m.updated_at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
     return `
@@ -711,7 +721,16 @@ function showMemberDetail(id){
   if(!m) return;
   const animal = (m.animal_key && ANIMAL_SVG_ADMIN[m.animal_key]) ? m.animal_key : 'tamago';
   const allStrengths = [...(m.strengths_others||[]),...(m.strengths_town2||[]),...(m.strengths_additional||[])].filter(Boolean);
-  const okr = m.okr_data || {};
+  // OKR は current_goal に JSON 文字列で入っている（既存カラム制約回避）
+  let okr = {};
+  if(m.current_goal){
+    try { const parsed = JSON.parse(m.current_goal); if(parsed && typeof parsed === 'object') okr = parsed; }
+    catch(e){ okr = { goal: m.current_goal }; }
+  }
+  if(m.okr_data) okr = Object.assign({}, m.okr_data, okr); // 旧仕様も統合
+  const currentWeek = okr.currentWeek || m.current_week || 0;
+  const achievementRate = okr.achievementRate ?? m.achievement_rate ?? 0;
+  const submissionRate = okr.submissionRate ?? m.submission_rate ?? 0;
   const krsList = (okr.krs || []).filter(kr => kr.name || (kr.subs && kr.subs.some(s=>s.name)));
   document.getElementById('memberModal').innerHTML = `
     <div style="text-align:center;margin-bottom:18px">
@@ -722,9 +741,9 @@ function showMemberDetail(id){
     </div>
     ${m.ijouchi ? `<div style="background:linear-gradient(135deg,#fff7ec 0%,#fef3e0 100%);border:2px solid #c9a574;padding:14px;border-radius:8px;margin-bottom:14px"><div style="font-size:9.5px;color:#a67a26;letter-spacing:0.25em;margin-bottom:6px">— 異常値 —</div><div style="font-size:13px;line-height:1.85">${escapeAdmin(m.ijouchi)}</div></div>` : ''}
     <div style="background:#fdfbf6;border:1px solid #ece5d8;border-radius:8px;padding:14px;margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📅 現在の週</span><span style="font-weight:700">Week ${m.current_week||0} / 26</span></div>
-      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📊 達成率</span><span style="font-weight:700;color:#c25b3f">${m.achievement_rate||0}%</span></div>
-      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📝 提出率</span><span style="font-weight:700">${m.submission_rate||0}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📅 現在の週</span><span style="font-weight:700">Week ${currentWeek} / 26</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📊 達成率</span><span style="font-weight:700;color:#c25b3f">${achievementRate}%</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #f5eee2"><span style="color:#5a5a5a">📝 提出率</span><span style="font-weight:700">${submissionRate}%</span></div>
       <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="color:#5a5a5a">🐾 相棒レベル</span><span style="font-weight:700">Lv.${m.companion_level||1}</span></div>
     </div>
     ${okr.dream ? `<div style="background:linear-gradient(135deg,#fff8f0,#fffaf5);border:2px solid #c25b3f;padding:12px 14px;border-radius:8px;margin-bottom:10px"><div style="font-size:9.5px;color:#c25b3f;letter-spacing:0.2em;font-weight:700;margin-bottom:4px">★ 大目標</div><div style="font-size:13px;font-weight:600;line-height:1.6">${escapeAdmin(okr.dream)}</div></div>` : ''}

@@ -675,6 +675,21 @@ body{
       　目標そのものの編集は<strong>自動保存</strong>なので、このボタン操作は不要です。
     </div>
     <div id="weeklyInputs"></div>
+
+    <!-- 過去週の入力（週遅れで入れたい人向け） -->
+    <details style="background:#f5f9f0;border:1px dashed #5a7050;border-radius:8px;padding:10px 12px;margin:14px 0;font-size:12px">
+      <summary style="cursor:pointer;font-weight:700;color:#3a5a30">📅 過去の週の分を あとから入力する（週遅れでもOK）</summary>
+      <p style="font-size:11.5px;line-height:1.7;color:#5a5a5a;margin:8px 0">週が明けてしまっても、過去の週の振り返りを入力できます。<br>下のドロップダウンで週を選ぶと、その週の入力欄が表示されます。</p>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <label style="font-size:11.5px">週を選ぶ：</label>
+        <select id="pastWeekSelect" onchange="renderPastWeekInputs()" style="padding:6px 10px;border:1px solid #5a7050;border-radius:6px;font-family:inherit;font-size:12px"></select>
+      </div>
+      <div id="pastWeekInputs" style="margin-top:12px"></div>
+      <div id="pastWeekActions" style="display:none;margin-top:10px;text-align:right">
+        <button onclick="savePastWeek()" style="background:#5a7050;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-family:inherit;cursor:pointer;font-size:12px;font-weight:700">この週の分を保存</button>
+      </div>
+    </details>
+
     <button class="btn-save" id="btnSaveWeek">📅 今週の振り返りを確定して 次週へ進む</button>
   </section>
 
@@ -1478,6 +1493,7 @@ function render(){
   document.getElementById('paceDesc').textContent = route === 'fail' ? '直近の進捗低め' : '直近4週で判定';
 
   try { renderWeeklyInputs(); } catch(e){ console.error('renderWeeklyInputs err:', e); }
+  try { populatePastWeekSelect(); } catch(e){}
   try { renderKREdit(); } catch(e){ console.error('renderKREdit err:', e); }
   try { renderKRProgress(); } catch(e){ console.error('renderKRProgress err:', e); }
   try { renderHistory(); } catch(e){ console.error('renderHistory err:', e); }
@@ -1630,6 +1646,78 @@ function rewindWeek(){
   saveState(state);
   render();
   alert(`Week ${state.currentWeek} に戻しました`);
+}
+
+// 過去週入力：週選択ドロップダウンを構築
+function populatePastWeekSelect(){
+  const sel = document.getElementById('pastWeekSelect');
+  if(!sel) return;
+  const cur = state.currentWeek || 1;
+  const opts = ['<option value="">選択してください</option>'];
+  for(let w = 1; w < cur; w++){
+    opts.push(`<option value="${w}">Week ${w}</option>`);
+  }
+  if(opts.length === 1) opts.push('<option disabled>まだ過去週はありません</option>');
+  sel.innerHTML = opts.join('');
+}
+
+// 選択された過去週の入力欄を描画
+function renderPastWeekInputs(){
+  const sel = document.getElementById('pastWeekSelect');
+  const container = document.getElementById('pastWeekInputs');
+  const actions = document.getElementById('pastWeekActions');
+  if(!sel || !container || !actions) return;
+  const w = parseInt(sel.value);
+  container.innerHTML = '';
+  if(!w){ actions.style.display = 'none'; return; }
+  let hasAny = false;
+  state.krs.forEach((kr, krIdx) => {
+    (kr.subs || []).forEach((sub, subIdx) => {
+      if(!sub.name) return;
+      hasAny = true;
+      const currentVal = (sub.history && sub.history[w-1] !== undefined) ? sub.history[w-1] : '';
+      const row = document.createElement('div');
+      row.className = 'input-row';
+      row.innerHTML = `
+        <div class="label">
+          ${escapeHtml(sub.name)}
+          <small>${escapeHtml(kr.name || '')}　CHA:${sub.cha || '?'} ／ COM:${sub.com || '?'}</small>
+        </div>
+        <input type="number" min="0" placeholder="0" value="${currentVal}" data-past-kr="${krIdx}" data-past-sub="${subIdx}"/>
+      `;
+      container.appendChild(row);
+    });
+  });
+  if(!hasAny){
+    container.innerHTML = '<p style="font-size:12px;color:#8b8278;padding:12px">先に目標を入力してください</p>';
+    actions.style.display = 'none';
+  } else {
+    actions.style.display = 'block';
+  }
+}
+
+function savePastWeek(){
+  const sel = document.getElementById('pastWeekSelect');
+  const w = parseInt(sel && sel.value);
+  if(!w) return;
+  const inputs = document.querySelectorAll('[data-past-kr]');
+  inputs.forEach(input => {
+    const krIdx = parseInt(input.dataset.pastKr);
+    const subIdx = parseInt(input.dataset.pastSub);
+    const val = parseFloat(input.value) || 0;
+    const sub = getSubByIdx(krIdx, subIdx);
+    if(!sub) return;
+    if(!sub.history) sub.history = [];
+    while(sub.history.length < w) sub.history.push(0);
+    sub.history[w-1] = val;
+  });
+  saveState(state);
+  debouncedCloudSync();
+  render();
+  alert(`Week ${w} の振り返りを保存しました！`);
+  document.getElementById('pastWeekInputs').innerHTML = '';
+  document.getElementById('pastWeekActions').style.display = 'none';
+  sel.value = '';
 }
 
 function saveWeek(){
@@ -2387,25 +2475,32 @@ async function restoreFromCloud(){
   const client = getSupa();
   if(!client || userKey === 'guest' || isDemo) return;
   try {
-    const { data, error } = await client.from('realize_members').select('okr_data,current_week').eq('id', userKey).maybeSingle();
+    // current_goal に JSON 文字列で全OKR情報を格納
+    const { data, error } = await client.from('realize_members').select('current_goal').eq('id', userKey).maybeSingle();
     if(error || !data) return;
     let changed = false;
-    // okr_data から目標を復元（localStorageより新しければ）
-    if(data.okr_data){
-      let okr = data.okr_data;
-      if(typeof okr === 'string'){ try { okr = JSON.parse(okr); } catch(e){ okr = null; } }
-      if(okr && Array.isArray(okr.krs) && okr.krs.length > 0){
-        const hasLocalInput = state.krs && state.krs.some(kr => (kr.name||'').trim() || (kr.subs||[]).some(s => (s.name||'').trim()));
-        if(!hasLocalInput){
-          state.krs = normalizeKrs(okr.krs);
-          if(okr.dream) state.dream = okr.dream;
-          changed = true;
-        }
+    let okr = null;
+    if(data.current_goal){
+      try {
+        const parsed = JSON.parse(data.current_goal);
+        if(parsed && typeof parsed === 'object') okr = parsed;
+      } catch(e){
+        // 旧仕様（大目標だけ）はテキストのまま state.goal に
+        if(!state.goal) state.goal = data.current_goal;
+      }
+    }
+    if(okr && Array.isArray(okr.krs) && okr.krs.length > 0){
+      const hasLocalInput = state.krs && state.krs.some(kr => (kr.name||'').trim() || (kr.subs||[]).some(s => (s.name||'').trim()));
+      if(!hasLocalInput){
+        state.krs = normalizeKrs(okr.krs);
+        if(okr.dream || okr.goal) state.dream = okr.dream || okr.goal;
+        if(okr.goal) state.goal = okr.goal;
+        changed = true;
       }
     }
     // current_week 復元
-    if(data.current_week && data.current_week > (state.currentWeek||1)){
-      state.currentWeek = data.current_week;
+    if(okr && okr.currentWeek && okr.currentWeek > (state.currentWeek||1)){
+      state.currentWeek = okr.currentWeek;
       changed = true;
     }
     if(changed){
@@ -2449,6 +2544,18 @@ async function syncMyProgressToCloud(){
   const comR = getComRatesByWeek(state.currentWeek);
   const avgRate = (chaR + comR) / 2;
   const submission = getSubmissionRate();
+  // 既存カラムのみを使ってOKR全情報を current_goal に JSON で格納
+  const okrPack = JSON.stringify({
+    goal: state.goal || '',
+    dream: state.dream || state.goal || '',
+    krs: state.krs || [],
+    currentWeek: state.currentWeek || 1,
+    achievementRate: Math.round(avgRate * 100),
+    submissionRate: Math.round(submission * 100),
+    dashboardRoute: route,
+    dashboardStage: stage,
+    syncedAt: new Date().toISOString()
+  });
   const payload = {
     id: userKey,
     name: state.userName || qv2.name || nameParam || 'なまえ未設定',
@@ -2456,12 +2563,8 @@ async function syncMyProgressToCloud(){
     role: qv2.role || null,
     animal_key: qv2.animal || null,
     ijouchi: (qv2.progress && qv2.progress.town3IjouchiStatement) || null,
-    current_week: state.currentWeek,
-    submission_rate: Math.round(submission * 100),
-    achievement_rate: Math.round(avgRate * 100),
-    dashboard_route: route,
-    dashboard_stage: stage,
-    okr_data: { krs: state.krs || null, dream: state.dream || null },
+    current_goal: okrPack,
+    companion_level: Math.min(30, Math.max(1, Math.floor((state.currentWeek || 1)))),
     updated_at: new Date().toISOString()
   };
   try {
