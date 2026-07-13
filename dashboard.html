@@ -2176,6 +2176,17 @@ render();
 
 // クラウドから目標を復元（起動直後・非同期）
 setTimeout(() => { restoreFromCloud(); }, 500);
+// 起動時に localStorage → Supabase を1回強制同期（PC/携帯連携のため）
+setTimeout(() => {
+  if(userKey === 'guest' || isDemo) return;
+  const hasLocalData = state.krs && state.krs.some(kr =>
+    (kr.name||'').trim() || (kr.subs||[]).some(s => (s.name||'').trim())
+  );
+  if(hasLocalData && typeof syncMyProgressToCloud === 'function'){
+    syncMyProgressToCloud();
+    console.log('☁ 起動時に localStorage → Supabase を同期しました');
+  }
+}, 2500);
 // 5分ごとに自動的にクラウド同期（バックアップ）
 setInterval(() => { if(typeof syncMyProgressToCloud === 'function') syncMyProgressToCloud(); }, 5*60*1000);
 
