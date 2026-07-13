@@ -2513,11 +2513,28 @@ function showHowTo(){
   document.getElementById('howtoScreen').classList.add('show');
 }
 async function startGame(){
-  document.getElementById('titleScreen').style.display = 'none';
-  document.getElementById('howtoScreen').classList.remove('show');
+  // タイトル画面・使い方画面を確実に消す
+  const ts = document.getElementById('titleScreen');
+  const hs = document.getElementById('howtoScreen');
+  if(ts) ts.style.display = 'none';
+  if(hs){ hs.classList.remove('show'); hs.style.display = 'none'; }
+
   const overlay = document.getElementById('cloudLoadingOverlay');
   const isCloudEnabled = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.enabled && userKey !== 'guest' && !isDemo);
   let restored = false;
+
+  // 【緊急脱出ボタンを追加】overlay 内に「進めない場合はここをタップ」を仕込む
+  if(overlay){
+    overlay.innerHTML = `
+      <div style="width:64px;height:64px;border:4px solid rgba(255,214,68,0.2);border-top-color:#ffd644;border-radius:50%;animation:cloudSpin 1s linear infinite;margin-bottom:24px"></div>
+      <div style="font-size:14px;letter-spacing:0.3em;margin-bottom:8px">☁ CLOUD SYNC ☁</div>
+      <div style="font-size:11px;color:#fcd5e6;letter-spacing:0.15em;text-align:center;line-height:1.8">
+        クラウドから前回の進捗を<br>復元しています...
+      </div>
+      <button onclick="forceEnterGame()" style="margin-top:32px;background:#e63d6a;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.1em;box-shadow:0 4px 12px rgba(230,61,106,0.4)">▶ 進めない場合はここをタップ</button>
+      <style>@keyframes cloudSpin{to{transform:rotate(360deg)}}</style>
+    `;
+  }
 
   // クラウド復元（失敗しても・遅くても必ず先に進む）
   if(isCloudEnabled && overlay){
@@ -2527,15 +2544,25 @@ async function startGame(){
     if(isCloudEnabled){
       restored = await Promise.race([
         loadFromCloud().catch(e => { console.warn('loadFromCloud error:', e); return false; }),
-        new Promise(resolve => setTimeout(() => resolve(false), 3000))  // 3秒でタイムアウト
+        new Promise(resolve => setTimeout(() => resolve(false), 3000))
       ]);
     }
   } catch(e){ console.warn('cloud restore error:', e); }
   finally {
-    // 何があっても overlay は必ず消す＋ゲーム画面を必ず表示
-    if(overlay) overlay.style.display = 'none';
+    // overlay を DOM から完全削除（表示状態を確実にリセット）
+    if(overlay){
+      overlay.style.display = 'none';
+      overlay.style.visibility = 'hidden';
+      overlay.style.pointerEvents = 'none';
+    }
+    // frame を必ず前面表示
     const frame = document.getElementById('frame');
-    if(frame) frame.style.display = 'flex';
+    if(frame){
+      frame.style.display = 'flex';
+      frame.style.visibility = 'visible';
+      frame.style.opacity = '1';
+      frame.style.zIndex = '10';
+    }
   }
 
   try {
@@ -2560,9 +2587,42 @@ async function startGame(){
     }
   } catch(e){
     console.error('Game init error:', e);
-    setMsg('▼ <span class="red">起動エラー：' + e.message + '</span>\n  メニュー(B) → 全リセット を試してください。');
+    // ステージが空/エラーでも、少なくとも操作UIは見せる
+    const stage = document.getElementById('stage');
+    if(stage && !stage.innerHTML.trim()){
+      stage.innerHTML = '<div style="padding:30px 20px;color:#fff;text-align:center;font-family:DotGothic16,sans-serif;line-height:1.9;font-size:12px"><div style="font-size:14px;color:#ffd644;margin-bottom:14px">⚠ ステージの描画に失敗しました</div>もう一度 <b>Cmd+Shift+R</b> で再読み込みしてください。<br>それでもダメな場合、下の「マイページ」ボタンから目標入力に進めます。<br><br><button onclick="goToDashboard()" style="background:#c25b3f;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">📊 マイページへ</button></div>';
+    }
+    if(typeof setMsg === 'function'){
+      setMsg('▼ <span class="red">起動エラー：' + (e.message||'unknown') + '</span>\n  マイページに進むか、リロードしてください。');
+    }
   }
 }
+
+// 🆘 緊急脱出：overlayが消えないケースの手動解除
+window.forceEnterGame = function(){
+  console.warn('🆘 forceEnterGame called by user');
+  const overlay = document.getElementById('cloudLoadingOverlay');
+  if(overlay){
+    overlay.style.display = 'none';
+    overlay.style.visibility = 'hidden';
+    overlay.style.pointerEvents = 'none';
+  }
+  const frame = document.getElementById('frame');
+  if(frame){
+    frame.style.display = 'flex';
+    frame.style.visibility = 'visible';
+    frame.style.opacity = '1';
+    frame.style.zIndex = '10';
+  }
+  try {
+    renderStage(); renderHero(); renderStatus();
+  } catch(e){
+    console.error('forceEnterGame render error:', e);
+    // ステージが真っ暗のままの場合、代替案内を出す
+    const stage = document.getElementById('stage');
+    if(stage) stage.innerHTML = '<div style="padding:30px 20px;color:#fff;text-align:center;font-family:DotGothic16,sans-serif;line-height:2;font-size:12px"><div style="font-size:14px;color:#ffd644;margin-bottom:14px">☁ 一時的にゲームが読み込めません</div>マイページ（目標入力）は下のボタンから使えます！<br><br><button onclick="goToDashboard()" style="background:#c25b3f;color:#fff;border:none;padding:12px 26px;border-radius:24px;font-family:inherit;cursor:pointer;font-size:13px;font-weight:700;letter-spacing:0.05em">📊 マイページへ</button></div>';
+  }
+};
 </script>
 
 </body>
