@@ -274,18 +274,9 @@ window.__dlog = function(msg){
   </div>
 </div>
 <script>
-// 【暫定】quest_v2 を開いても自動的に dashboard へリダイレクト（?game=1 で解除）
+// dashboard リンクにURLパラメータをコピー（自動リダイレクトは廃止）
 (function(){
   try {
-    var params = new URLSearchParams(window.location.search);
-    var wantGame = params.get('game') === '1';
-    if(!wantGame){
-      // ゲーム機能は不安定なので、目標入力を優先。dashboard に自動遷移
-      var dashUrl = 'dashboard.html' + (window.location.search || '');
-      window.location.replace(dashUrl);
-      return;
-    }
-    // ゲームを開く場合、dashboard リンクにURLパラメータをコピー
     var dashLink = document.getElementById('rescueDashLink');
     if(dashLink){ dashLink.href = 'dashboard.html' + (window.location.search || ''); }
   } catch(e){}
