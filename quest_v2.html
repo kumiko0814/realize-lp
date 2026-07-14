@@ -274,11 +274,22 @@ window.__dlog = function(msg){
   </div>
 </div>
 <script>
-// dashboard リンクにURLパラメータをコピー（自動リダイレクトは廃止）
+// dashboard リンクにURLパラメータをコピー
 (function(){
   try {
     var dashLink = document.getElementById('rescueDashLink');
     if(dashLink){ dashLink.href = 'dashboard.html' + (window.location.search || ''); }
+  } catch(e){}
+})();
+// ?autostart=1 でbootShieldをスキップして直接ゲーム画面へ（テスト用）
+(function(){
+  try {
+    var p = new URLSearchParams(window.location.search);
+    if(p.get('autostart') === '1'){
+      setTimeout(function(){
+        if(typeof startGame === 'function'){ startGame(); }
+      }, 100);
+    }
   } catch(e){}
 })();
 // bootStartGame: bootShield を消して既存の howto → startGame フローに繋ぐ
