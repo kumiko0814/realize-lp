@@ -2656,6 +2656,8 @@ async function startGame(){
   if(hs){ hs.classList.remove('show'); hs.style.display = 'none'; }
 
   const overlay = document.getElementById('cloudLoadingOverlay');
+  // isDemo は quest_v2 全体で使えるようURLパラメータから判定
+  const isDemo = (new URLSearchParams(window.location.search)).get('demo') === '1';
   const isCloudEnabled = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.enabled && userKey !== 'guest' && !isDemo);
   let restored = false;
 
