@@ -287,6 +287,12 @@ window.__dlog = function(msg){
     var p = new URLSearchParams(window.location.search);
     if(p.get('autostart') === '1'){
       setTimeout(function(){
+        var shield = document.getElementById('bootShield');
+        if(shield) shield.style.display = 'none';
+        var ts = document.getElementById('titleScreen');
+        if(ts) ts.style.display = 'none';
+        var hs = document.getElementById('howtoScreen');
+        if(hs){ hs.classList.remove('show'); hs.style.display = 'none'; }
         if(typeof startGame === 'function'){ startGame(); }
       }, 100);
     }
