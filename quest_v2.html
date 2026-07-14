@@ -274,9 +274,18 @@ window.__dlog = function(msg){
   </div>
 </div>
 <script>
-// dashboard リンクに URL params をコピー
+// 【暫定】quest_v2 を開いても自動的に dashboard へリダイレクト（?game=1 で解除）
 (function(){
   try {
+    var params = new URLSearchParams(window.location.search);
+    var wantGame = params.get('game') === '1';
+    if(!wantGame){
+      // ゲーム機能は不安定なので、目標入力を優先。dashboard に自動遷移
+      var dashUrl = 'dashboard.html' + (window.location.search || '');
+      window.location.replace(dashUrl);
+      return;
+    }
+    // ゲームを開く場合、dashboard リンクにURLパラメータをコピー
     var dashLink = document.getElementById('rescueDashLink');
     if(dashLink){ dashLink.href = 'dashboard.html' + (window.location.search || ''); }
   } catch(e){}
@@ -2683,10 +2692,12 @@ async function startGame(){
       overlay.style.visibility = 'hidden';
       overlay.style.pointerEvents = 'none';
     }
-    // frame を必ず前面表示（iOS Safari 対策で明示的スタイル指定）
+    // frame を表示（既存 CSS を保持したまま最小限のスタイル上書き）
     const frame = document.getElementById('frame');
     if(frame){
-      frame.style.cssText = 'display:flex !important;visibility:visible !important;opacity:1 !important;z-index:10;position:relative;width:100%;max-width:780px;background:linear-gradient(180deg,#2a1a3a,#1e1e2a);border:6px solid #5a3a5a;border-radius:8px;padding:10px;flex-direction:column;gap:8px;min-height:60vh;margin:0 auto';
+      frame.style.display = 'flex';
+      frame.style.visibility = 'visible';
+      frame.style.opacity = '1';
     }
     // body の背景も明るく（iOS で真っ黒回避）
     document.body.style.background = 'linear-gradient(180deg,#3a2a5a 0%,#1e1e2a 100%)';
