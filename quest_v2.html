@@ -789,7 +789,8 @@ function scheduleCloudSync(){
     showSyncIndicator('syncing');
     try {
       const result = await uploadMyProfile();
-      showSyncIndicator(result.ok ? 'synced' : 'error');
+      if(result && result.skipped){ const el = document.getElementById('syncIndicator'); if(el) el.style.opacity = '0'; }
+      else showSyncIndicator(result.ok ? 'synced' : 'error');
     } catch(e){ showSyncIndicator('error'); }
     _isSyncing = false;
   }, 2500); // 2.5秒のデバウンス
@@ -811,13 +812,20 @@ function showSyncIndicator(status){
   }
 }
 
+// ── 2026-10-12 データ消失防止フラグ ──
+// 空のローカル状態をクラウドに上書きして記録が消える事故（10/11 tae さん）を防ぐ。
+// クラウドを1回読めるまでは一切アップロードしない。
+var _cloudChecked = false;     // クラウドの自分の行を読めた（行が無い場合も「確認済み」）
+var _cloudRowMissing = false;  // クラウドに行が無い（初回登録のときだけ最小限の行を作ってよい）
 // クラウドから進捗を復元
 async function loadFromCloud(){
   const client = (typeof getSupabaseClient === 'function') ? getSupabaseClient() : null;
   if(!client) return false;
   try {
     const { data, error } = await client.from('realize_members').select('*').eq('id', userKey).maybeSingle();
-    if(error || !data) return false;
+    if(error){ console.warn('Cloud load error:', error); return false; }
+    if(!data){ _cloudRowMissing = true; _cloudChecked = true; return false; }
+    _cloudChecked = true;
     const cloudUpdated = data.updated_at ? new Date(data.updated_at).getTime() : 0;
     const localUpdated = state.lastVisit ? new Date(state.lastVisit).getTime() : 0;
     // クラウドの方が新しい OR ローカルが空 OR クラウドMBTIとローカルMBTIが不一致
@@ -1911,24 +1919,33 @@ let _cloudMembers = null;
 async function uploadMyProfile(){
   const client = getSupabaseClient();
   if(!client){ console.log('Supabase未設定：ローカルのみ'); return { ok:false, reason:'no_supabase' }; }
-  const payload = {
-    id: userKey,
-    name: state.name || 'なまえ未設定',
-    mbti: state.mbti || null,
-    role: state.role || null,
-    animal_key: state.animal || null,
-    ijouchi: state.progress.town3IjouchiStatement || null,
-    strengths_others: state.progress.strengthsFromOthers.filter(s=>s),
-    strengths_town2: state.progress.town2NpcStrengths.flat().filter(s=>s),
-    strengths_additional: (state.progress.additionalStrengths || []).map(s=>s.text||s),
-    my_strength_answer: state.progress.myStrengthAnswer || null,
-    current_goal: state.progress.currentGoal || null,
-    companion_level: getCompanionLevel(),
-    updated_at: new Date().toISOString()
-  };
+  // ── 2026-10-12 データ消失防止 ──
+  // (1) クラウドを読む前（復元が3秒で打ち切られた直後など）は送らない
+  if(!_cloudChecked){ console.log('☁ クラウド確認前のため同期をスキップ'); return { ok:true, skipped:true }; }
+  // (2) 空の項目は payload に入れない（upsert は入れた列だけ更新＝クラウドの既存値を消さない）
+  // (3) current_goal（目標）は dashboard が管理するので、ここからは送らない（送ると目標が消える）
+  const prog = state.progress || {};
+  const payload = { id: userKey, updated_at: new Date().toISOString() };
+  if(state.name) payload.name = state.name;
+  if(state.mbti){ payload.mbti = state.mbti; if(state.role) payload.role = state.role; }
+  if(state.animal) payload.animal_key = state.animal;
+  const so = (prog.strengthsFromOthers || []).filter(s=>s);
+  if(so.length) payload.strengths_others = so;
+  const st2 = (prog.town2NpcStrengths || []).flat().filter(s=>s);
+  if(st2.length) payload.strengths_town2 = st2;
+  const sa = (prog.additionalStrengths || []).map(s=>s.text||s).filter(s=>s);
+  if(sa.length) payload.strengths_additional = sa;
+  if(prog.myStrengthAnswer) payload.my_strength_answer = prog.myStrengthAnswer;
+  if(prog.town3IjouchiStatement) payload.ijouchi = prog.town3IjouchiStatement;
+  const substantive = Object.keys(payload).some(k => k !== 'id' && k !== 'name' && k !== 'updated_at');
+  if(substantive) payload.companion_level = getCompanionLevel();
+  // 中身が無い（名前だけ）なら、クラウドに行が無い初回だけ行を作る。それ以外は送らない
+  if(!substantive && !_cloudRowMissing) return { ok:true, skipped:true };
+  if(_cloudRowMissing && !payload.name) payload.name = 'なまえ未設定';
   try {
     const { data, error } = await client.from('realize_members').upsert(payload, { onConflict: 'id' });
     if(error){ console.warn('Upload error', error); return { ok:false, reason:error.message }; }
+    _cloudRowMissing = false;
     console.log('✅ クラウド登録成功', data);
     return { ok:true };
   } catch(e){ console.warn('Upload exception', e); return { ok:false, reason:e.message }; }
@@ -2597,13 +2614,13 @@ function openReportMenu(){
   `);
 }
 function resetAll(){
-  if(!confirm('全リセットする？')) return;
+  // 2026-10-12: 以前は端末のデータを消したあと空の状態がクラウドへ送られ、キャラ・異常値が丸ごと消える事故があった。
+  // いまは「この端末のデータを消してクラウドから読み直す」だけ。クラウドの記録は消さない（完全削除は admin から）。
+  if(!confirm('この端末のゲームデータを消して、クラウドに保存されている進行を読み直します。\n（クラウドの記録は消えません）\n\nよろしいですか？')) return;
+  _cloudChecked = false; // 再読込までは一切送信しない
+  if(typeof _syncTimer !== 'undefined' && _syncTimer) clearTimeout(_syncTimer);
   localStorage.removeItem(storageKey);
-  state = defaultState();
-  state.lastVisit = new Date().toISOString();
-  saveState(); closeModal();
-  renderStage(); renderHero(); renderStatus();
-  setMsg('▼ あたらしい旅が はじまる！');
+  location.reload();
 }
 
 function escapeHtml(s){return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}

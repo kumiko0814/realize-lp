@@ -1130,9 +1130,9 @@ body{
 
   <footer class="footer-msg">
     <span class="serif">— You are not alone. —</span>
-    Re:alize ｜ あなたの記録はこのブラウザにだけ保存されています
+    Re:alize ｜ あなたの記録はクラウドに自動保存されています（PC・スマホどちらでも同じ記録）
     <a href="welcome.html" class="help-link">使い方を見る</a>
-    <button class="reset-btn" id="resetBtn">記録をリセット</button>
+    <button class="reset-btn" id="resetBtn">表示を読み直す</button>
   </footer>
 
 </div>
@@ -1164,6 +1164,7 @@ const DEMO_KRS = [
 const DEFAULT_KRS = [];
 // 体験版判定
 const isDemo = (new URLSearchParams(location.search)).get('demo') === '1';
+var isDemoMode = isDemo; // 2026-10-12: 初回描画の renderKREdit が参照するため先に定義（const だと TDZ エラーになっていた）
 
 function normalizeKrs(krs){
   if(!Array.isArray(krs)) krs = [];
@@ -2249,10 +2250,13 @@ document.getElementById('krEditHead').addEventListener('click', () => {
 });
 
 document.getElementById('resetBtn').addEventListener('click', () => {
-  if(!confirm('これまでの記録をすべて消す？ミーもまた、卵から始まるよ。')) return;
+  // 2026-10-12: 以前は端末の記録を消したあと空の状態がクラウドへ送られ、記録が丸ごと消える事故があった。
+  // いまは「この端末の表示を消してクラウドから読み直す」だけ。クラウドの記録は消さない。
+  if(!confirm('この端末に表示している記録を消して、クラウドに保存されている記録を読み直します。\n（クラウドの記録は消えません）\n\nよろしいですか？')) return;
+  _cloudRestoreDone = false; // 再読込までは一切送信しない
+  if(_cloudSyncTimer) clearTimeout(_cloudSyncTimer);
   localStorage.removeItem(storageKey);
-  state = loadState();
-  render();
+  location.reload();
 });
 
 /* ============================================================
@@ -2530,7 +2534,7 @@ function closeOnboard(){
 maybeShowOnboard();
 
 // ===== DEMO MODE =====
-const isDemoMode = params.get('demo') === '1';
+isDemoMode = params.get('demo') === '1';
 if(isDemoMode){
   document.getElementById('demoPanel').style.display = 'block';
   // demoモードの時はonboardingを隠す（重複表示を避ける）
@@ -2806,13 +2810,25 @@ function getSupa(){
 }
 
 // クラウドから自分の目標データを復元（起動時に呼ぶ）
+// ── 2026-10-12 データ消失防止フラグ ──
+// 空のローカル状態をクラウドに上書きして記録が消える事故（10/11 tae さん）を防ぐ。
+// クラウド復元が1回完了するまでは一切アップロードしない。
+var _cloudRestoreDone = false;   // クラウドから自分の行を読めた（行が無い場合も「確認済み」扱い）
+var _cloudRowMissing = false;    // クラウドに自分の行がまだ無い（初回登録のときだけ最小限の行を作ってよい）
+var _cloudRestoreRetry = 0;
 async function restoreFromCloud(){
   const client = getSupa();
   if(!client || userKey === 'guest' || isDemo) return;
   try {
     // MBTI/動物/強み/異常値 も一緒に取得（PC⇄携帯連携のため必須）
     const { data, error } = await client.from('realize_members').select('current_goal,name,mbti,role,animal_key,ijouchi,strengths_others,strengths_town2,strengths_additional,my_strength_answer').eq('id', userKey).maybeSingle();
-    if(error || !data) return;
+    if(error){
+      console.warn('restoreFromCloud fetch error:', error);
+      if(_cloudRestoreRetry++ < 5) setTimeout(restoreFromCloud, 10000); // 読めるまで再試行（読めるまで送信もしない）
+      return;
+    }
+    if(!data){ _cloudRowMissing = true; _cloudRestoreDone = true; return; }
+    _cloudRestoreDone = true;
     let changed = false;
 
     // 【重要】quest_v2 の localStorage にキャラ情報を復元（卵→本キャラ化）
@@ -2892,7 +2908,10 @@ async function restoreFromCloud(){
       render();
       console.log('☁ クラウドから復元しました');
     }
-  } catch(e){ console.warn('restoreFromCloud error:', e); }
+  } catch(e){
+    console.warn('restoreFromCloud error:', e);
+    if(!_cloudRestoreDone && _cloudRestoreRetry++ < 5) setTimeout(restoreFromCloud, 10000);
+  }
 }
 
 // quest_v2 連動の動物SVG（10種類）
@@ -2940,20 +2959,33 @@ async function syncMyProgressToCloud(){
     dashboardStage: stage,
     syncedAt: new Date().toISOString()
   });
-  const payload = {
-    id: userKey,
-    name: state.userName || qv2.name || nameParam || 'なまえ未設定',
-    mbti: qv2.mbti || null,
-    role: qv2.role || null,
-    animal_key: qv2.animal || null,
-    ijouchi: (qv2.progress && qv2.progress.town3IjouchiStatement) || null,
-    current_goal: okrPack,
-    companion_level: Math.min(30, Math.max(1, Math.floor((state.currentWeek || 1)))),
-    updated_at: new Date().toISOString()
-  };
+  // ── 2026-10-12 データ消失防止 ──
+  // (1) クラウド復元が終わる前は送らない（新しい端末・LINE内ブラウザ等で空のまま上書きしない）
+  if(userKey === 'guest' || isDemo) return;
+  if(!_cloudRestoreDone){ console.log('☁ クラウド復元前のため同期をスキップ'); return; }
+  // (2) 空の項目は payload に入れない（upsert は入れた列だけ更新する＝クラウドの既存値を消さない）
+  const hasOkrInput = !!((state.goal||'').trim() || (state.dream||'').trim() ||
+    (state.krs||[]).some(kr => (kr.name||'').trim() || (kr.subs||[]).some(s => (s.name||'').trim() || (s.history||[]).some(v => v))));
+  const realName = state.userName || qv2.name || nameParam || '';
+  const payload = { id: userKey, updated_at: new Date().toISOString() };
+  if(realName) payload.name = realName;
+  if(qv2.mbti) payload.mbti = qv2.mbti;
+  if(qv2.mbti && qv2.role) payload.role = qv2.role;
+  if(qv2.animal) payload.animal_key = qv2.animal;
+  const ijouchiText = qv2.progress && qv2.progress.town3IjouchiStatement;
+  if(ijouchiText) payload.ijouchi = ijouchiText;
+  if(hasOkrInput){
+    payload.current_goal = okrPack;
+    payload.companion_level = Math.min(30, Math.max(1, Math.floor((state.currentWeek || 1))));
+  }
+  // (3) 中身が無い（名前だけ）なら、クラウドに行が無い初回だけ行を作る。それ以外は送らない
+  const substantive = Object.keys(payload).some(k => k !== 'id' && k !== 'name' && k !== 'updated_at');
+  if(!substantive && !_cloudRowMissing){ return; }
+  if(_cloudRowMissing && !payload.name) payload.name = 'なまえ未設定';
   try {
     const { error } = await client.from('realize_members').upsert(payload, { onConflict:'id' });
     if(error) console.warn('Dashboard sync error:', error);
+    else _cloudRowMissing = false;
   } catch(e){ console.warn('Dashboard sync exception:', e); }
 }
 
@@ -3256,5 +3288,54 @@ document.addEventListener('keydown', e => {
 });
 </script>
 
+
+<!-- ===== 不具合報告ツール（2026-10-12 追加・ailab_notes 相乗り／member_id="bug_realize"） ===== -->
+<style>
+#bugL{position:fixed;right:12px;bottom:12px;z-index:9990;font-size:11px;letter-spacing:0.08em;color:#8a7f88;background:rgba(255,255,255,0.92);border:1px solid #e8dfe4;border-radius:999px;padding:6px 12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+#bugL:hover{color:#e63d6a;border-color:#f3b9cc}
+#bugM{display:none;position:fixed;inset:0;z-index:9991;background:rgba(40,30,36,0.45);align-items:center;justify-content:center;padding:16px}
+#bugM.on{display:flex}
+#bugM .bx{background:#fff;border-radius:16px;max-width:420px;width:100%;padding:20px 18px;box-shadow:0 12px 40px rgba(0,0,0,0.18);font-family:inherit}
+#bugM h3{margin:0 0 10px;font-size:15px;color:#3a2f36}
+#bugM textarea{width:100%;min-height:110px;box-sizing:border-box;border:1px solid #e8dfe4;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;resize:vertical}
+#bugM .bb{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+#bugM button{font-family:inherit;font-size:13px;border-radius:999px;padding:8px 16px;cursor:pointer;border:1px solid #e8dfe4;background:#fff;color:#6a5f66}
+#bugM button.s{background:#e63d6a;border-color:#e63d6a;color:#fff}
+#bugM .done{display:none;margin-top:10px;font-size:13px;color:#2e8b57}
+</style>
+<div id="bugL">不具合を報告</div>
+<div id="bugM"><div class="bx">
+  <h3>不具合・気になったことを教えてください</h3>
+  <textarea id="bugT" placeholder="例）目標が消えてしまいました（iPhone／LINEから開きました）"></textarea>
+  <div class="bb"><button class="c" id="bugC">閉じる</button><button class="s" id="bugS">送信する</button></div>
+  <div class="done" id="bugD">届きました。ありがとうございます。すぐ確認します。</div>
+</div></div>
+<script>
+(function(){
+var U="https://inrvprlyobghviklulcv.supabase.co/rest/v1/ailab_notes";
+var K="sb_publishable_ZrCNcsRHMci-l7Fns8QtIA_X22XZGJp";
+var P=new URLSearchParams(location.search);
+var uid=(P.get("u")||"guest");
+var nm=(P.get("name")||"");
+var demo=P.get("demo")==="1";
+var M=document.getElementById("bugM");
+document.getElementById("bugL").onclick=function(){ M.classList.add("on"); };
+document.getElementById("bugC").onclick=function(){ M.classList.remove("on"); document.getElementById("bugD").style.display="none"; };
+document.getElementById("bugS").onclick=function(){
+  var t=document.getElementById("bugT").value.trim();
+  if(!t){ document.getElementById("bugT").focus(); return; }
+  var btn=this; btn.disabled=true;
+  function done(){
+    document.getElementById("bugD").style.display="block";
+    document.getElementById("bugT").value=""; btn.disabled=false;
+    setTimeout(function(){ M.classList.remove("on"); document.getElementById("bugD").style.display="none"; },1800);
+  }
+  if(demo){ done(); return; }
+  fetch(U,{method:"POST",headers:{apikey:K,Authorization:"Bearer "+K,"Content-Type":"application/json"},
+    body:JSON.stringify({member_id:"bug_realize",member_name:("Re:alize｜"+(nm||uid)).slice(0,30),mood:"バグ報告",worry:t,want:location.href.slice(0,180)+" ／ "+navigator.userAgent.slice(0,140)})})
+    .then(function(){ done(); }).catch(function(){ btn.disabled=false; alert("送信できませんでした。通信環境をご確認ください。"); });
+};
+})();
+</script>
 </body>
 </html>
