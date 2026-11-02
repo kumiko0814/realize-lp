@@ -1556,8 +1556,8 @@ function getSubmissionRate(){
   const recentN = 4;
   const week = state.currentWeek;
   if(week <= 1) return 1;
-  const startIdx = Math.max(0, week - 1 - recentN);
-  const endIdx = week - 1;
+  const startIdx = Math.max(0, week - recentN);
+  const endIdx = week;
   const totalCount = endIdx - startIdx;
   if(totalCount <= 0) return 1;
   let submitted = 0;
@@ -1589,8 +1589,8 @@ function judgeRoute(){
   state.krs.forEach(kr => kr.subs.forEach(sub => {
     if(!sub.cha) return;
     const hist = sub.history || [];
-    const startIdx = Math.max(0, week - 1 - recentN);
-    const endIdx = week - 1;
+    const startIdx = Math.max(0, week - recentN);
+    const endIdx = week;
     const recent = hist.slice(startIdx, endIdx);
     const recentSum = sumHistory(recent);
     const weeklyTarget = sub.cha / TOTAL_WEEKS;
