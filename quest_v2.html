@@ -437,7 +437,37 @@ function bootStartGame(){
 <script>
 const params = new URLSearchParams(location.search);
 const userKey = params.get('u') || 'guest';
-const userName = (params.get('name') || '').trim();
+// ── 名前の文字化け対策（2026-11-06）── URLの name= が二重エンコードされても元の文字に戻す（dashboard.html と同じ関数）
+function looksUrlEncoded(s){ return /%[0-9A-Fa-f]{2}/.test(String(s == null ? '' : s)); }
+function safeDecodeName(s){
+  let cur = String(s == null ? '' : s);
+  for(let round = 0; round < 3 && looksUrlEncoded(cur); round++){
+    let t = cur, ok = false;
+    for(let i = 0; i < 8 && t; i++){
+      try { cur = decodeURIComponent(t); ok = true; break; }
+      catch(e){ t = t.replace(/%[0-9A-Fa-f]{0,2}$/, ''); }
+    }
+    if(!ok) break;
+  }
+  return cur.replace(/\uFFFD/g, '').trim();
+}
+// current_goal（JSON文字列）から進捗を取り出す（current_week / achievement_rate 列は Supabase に無い）
+function unpackCloudGoal(m){
+  let o = {};
+  if(m && m.current_goal){
+    try { const p = JSON.parse(m.current_goal); if(p && typeof p === 'object') o = p; }
+    catch(e){ o = { goal: String(m.current_goal) }; }
+  }
+  const num = v => { const n = Number(v); return isFinite(n) ? n : 0; };
+  const pick = (a, b) => (a !== undefined && a !== null) ? a : b;
+  return {
+    week: Math.max(0, Math.round(num(pick(o.currentWeek, m.current_week)))),
+    rate: Math.max(0, Math.round(num(pick(o.achievementRate, m.achievement_rate)))),
+    sub:  Math.max(0, Math.round(num(pick(o.submissionRate, m.submission_rate)))),
+    goal: o.dream || o.goal || ''
+  };
+}
+const userName = safeDecodeName((params.get('name') || '').trim());
 const storageKey = 're_alize_quest_v2_' + userKey;
 if(params.get('reset') === '1'){ localStorage.removeItem(storageKey); }
 const IS_DEMO = params.get('demo') === '1';
@@ -837,7 +867,10 @@ async function loadFromCloud(){
         console.warn('☁ ローカルとクラウドで不一致 → クラウド優先で復元', {local:{mbti:state.mbti, animal:state.animal}, cloud:{mbti:data.mbti, animal:data.animal_key}});
       }
       console.log('☁ クラウドから進捗を復元', data);
-      if(data.name && !state.name) state.name = data.name;
+      if(data.name && !looksUrlEncoded(data.name) &&
+         (!state.name || state.name === 'あなた' || looksUrlEncoded(state.name) || looksUrlEncoded(params.get('name') || ''))){
+        state.name = data.name;
+      }
       if(data.mbti) state.mbti = data.mbti;
       if(data.role) state.role = data.role;
       if(data.animal_key) state.animal = data.animal_key;
@@ -1521,7 +1554,7 @@ async function setupTown4DynamicNpcs(){
   try {
     // 全メンバー取得（自分以外）
     const { data: members } = await client.from('realize_members')
-      .select('id,name,mbti,animal_key,achievement_rate,current_week,companion_level')
+      .select('id,name,mbti,animal_key,current_goal,companion_level')
       .neq('id', userKey)
       .limit(20);
     // オンライン状態取得
@@ -1552,11 +1585,11 @@ async function setupTown4DynamicNpcs(){
         id: 'cloud_' + m.id,
         realId: m.id,
         x: pos.x, y: pos.y,
-        name: m.name || '匿名',
+        name: safeDecodeName(m.name) || '匿名',
         mbti: m.mbti,
         animalKey: m.animal_key || 'tamago',
-        achievementRate: m.achievement_rate || 0,
-        currentWeek: m.current_week || 0,
+        achievementRate: unpackCloudGoal(m).rate,
+        currentWeek: unpackCloudGoal(m).week,
         companionLevel: m.companion_level || 1,
         isOnline: onlineIds.has(m.id)
       };
@@ -1926,7 +1959,7 @@ async function uploadMyProfile(){
   // (3) current_goal（目標）は dashboard が管理するので、ここからは送らない（送ると目標が消える）
   const prog = state.progress || {};
   const payload = { id: userKey, updated_at: new Date().toISOString() };
-  if(state.name) payload.name = state.name;
+  if(state.name) payload.name = safeDecodeName(state.name);
   if(state.mbti){ payload.mbti = state.mbti; if(state.role) payload.role = state.role; }
   if(state.animal) payload.animal_key = state.animal;
   const so = (prog.strengthsFromOthers || []).filter(s=>s);
@@ -1965,10 +1998,11 @@ async function fetchAllMembers(){
 
 // クラウドメンバーを内部形式（rival風）に変換
 function cloudMemberToRival(m){
+  const pg = unpackCloudGoal(m);
   return {
     id: 'cloud_' + m.id,
     isCloud: true,
-    name: m.name,
+    name: safeDecodeName(m.name),
     mbti: m.mbti || '?',
     animalKey: m.animal_key || 'tamago',
     ijouchi: m.ijouchi || '異常値発見中…',
@@ -1983,11 +2017,11 @@ function cloudMemberToRival(m){
       ...(m.strengths_additional || [])
     ].filter(Boolean),
     backstory: '同じ Realize の仲間。実在の参加者。',
-    currentGoal: m.current_goal,
+    currentGoal: pg.goal,
     companionLevel: m.companion_level || 1,
-    currentWeek: m.current_week || 0,
-    achievementRate: m.achievement_rate || 0,
-    submissionRate: m.submission_rate || 0
+    currentWeek: pg.week,
+    achievementRate: pg.rate,
+    submissionRate: pg.sub
   };
 }
 

@@ -1510,8 +1510,8 @@ const MOOD_SUCCESS = {
 };
 const MOOD_FAIL = {
   warn: '直近の進捗が落ちてる…このままだと、おじ化が進むよ。',
-  mid: '頑張りどき。1つでも数字を入れれば戻れる。',
-  deep: 'おじ化が進行中。1週でも達成すれば、ミーに戻る。'
+  mid: '頑張りどき。直近4週の合計が目標ペースの6割を超えると戻れるよ。',
+  deep: 'おじ化が進行中。直近4週の合計が目標ペースの6割に届けば、ミーに戻る。'
 };
 
 /* ============================================================
@@ -1573,18 +1573,11 @@ function getSubmissionRate(){
   return submitted / totalCount;
 }
 
-function judgeRoute(){
-  // 直近4週で「週報提出率」と「達成率」の両方で判定。
-  // どちらかが基準を下回ったら fail。達成し始めれば戻る。
+// 直近4週のペース（判定に使う数字をそのまま画面にも出す。2026-11-06「なぜおじのままか」が見えるように）
+function getRecentPace(){
   const recentN = 4;
   const week = state.currentWeek;
-  if(week <= 1) return 'success';
-
-  // 1) 週報提出率
   const submissionRate = getSubmissionRate();
-  if(submissionRate < 0.5) return 'fail';
-
-  // 2) 達成率
   let achieved = 0, expected = 0;
   state.krs.forEach(kr => kr.subs.forEach(sub => {
     if(!sub.cha) return;
@@ -1598,9 +1591,21 @@ function judgeRoute(){
     achieved += recentSum;
     expected += expectedSum;
   }));
-  if(expected === 0) return 'success';
-  const achievementRatio = achieved / expected;
-  return achievementRatio >= 0.6 ? 'success' : 'fail';
+  const ratio = expected === 0 ? null : achieved / expected;
+  return {
+    week, submissionRate, achieved, expected, ratio,
+    submissionOk: submissionRate >= 0.5,          // 直近4週の提出率 50%以上
+    ratioOk: ratio === null || ratio >= 0.6        // 直近4週の合計が目標ペースの 60%以上
+  };
+}
+
+function judgeRoute(){
+  // 直近4週で「週報提出率」と「達成率」の両方で判定。
+  // どちらかが基準を下回ったら fail。達成し始めれば戻る。
+  if(state.currentWeek <= 1) return 'success';
+  const p = getRecentPace();
+  if(!p.submissionOk) return 'fail';
+  return p.ratioOk ? 'success' : 'fail';
 }
 
 function judgeStage(){
@@ -1709,7 +1714,19 @@ function render(){
   const paceCard = document.getElementById('paceCard');
   paceCard.classList.toggle('warn', route === 'fail');
   document.getElementById('paceLabel').textContent = route === 'fail' ? '✕' : (stage >= 3 ? '◎' : (stage >= 2 ? '○' : '△'));
-  document.getElementById('paceDesc').textContent = route === 'fail' ? '直近の進捗低め' : '直近4週で判定';
+  try {
+    const p = getRecentPace();
+    const pct = p.ratio === null ? null : Math.round(p.ratio * 100);
+    const subPct = Math.round(p.submissionRate * 100);
+    let desc = '直近4週で判定';
+    if(state.currentWeek > 1 && pct !== null){
+      desc = '直近4週 ' + pct + '%' + (p.ratioOk ? '' : '（60%で戻る）')
+           + '・提出 ' + subPct + '%' + (p.submissionOk ? '' : '（50%で戻る）');
+    }
+    document.getElementById('paceDesc').textContent = desc;
+  } catch(e){
+    document.getElementById('paceDesc').textContent = route === 'fail' ? '直近の進捗低め' : '直近4週で判定';
+  }
 
   try { renderWeeklyInputs(); } catch(e){ console.error('renderWeeklyInputs err:', e); }
   try { populatePastWeekSelect(); } catch(e){}
@@ -1774,7 +1791,7 @@ function renderKREdit(){
 
 // 📋 進捗をLINE送付用テキストにしてクリップボードにコピー
 function _buildProgressText(mode){
-  const name = state.userName || (new URLSearchParams(location.search)).get('name') || '';
+  const name = safeDecodeName(state.userName || (new URLSearchParams(location.search)).get('name') || '');
   const week = state.currentWeek || 1;
   const dream = state.goal || state.dream || '';
   const qv2raw = localStorage.getItem('re_alize_quest_v2_' + userKey);
@@ -2565,7 +2582,12 @@ function renderDemoPlaceholder(){
 }
 
 // nameパラメータがあれば自動セット
-const nameParam = params.get('name');
+const nameParam = (function(){ const v = params.get('name'); return v ? safeDecodeName(v) : v; })();
+// 端末に文字化けした名前（%E6%B0%B4…）が残っていたら読める形に直す
+if(state.userName && looksUrlEncoded(state.userName)){
+  state.userName = safeDecodeName(state.userName);
+  saveState(state);
+}
 if(nameParam && !state.userName){
   state.userName = nameParam;
   saveState(state);
@@ -2831,13 +2853,21 @@ async function restoreFromCloud(){
     _cloudRestoreDone = true;
     let changed = false;
 
+    // 名前：クラウドの名前が正常で、端末側が「未設定」「文字化け」「文字化けしたURLから来た」なら クラウドの名前を採用
+    if(data.name && !looksUrlEncoded(data.name)){
+      const rawNameParam = params.get('name') || '';
+      if(!state.userName || looksUrlEncoded(state.userName) || looksUrlEncoded(rawNameParam)){
+        if(state.userName !== data.name){ state.userName = data.name; changed = true; }
+      }
+    }
+
     // 【重要】quest_v2 の localStorage にキャラ情報を復元（卵→本キャラ化）
     if(data.mbti || data.animal_key){
       const qv2Key = 're_alize_quest_v2_' + userKey;
       let qv2 = {};
       try { const raw = localStorage.getItem(qv2Key); if(raw) qv2 = JSON.parse(raw); } catch(e){}
       const hadMbti = !!qv2.mbti;
-      if(data.name && !qv2.name) qv2.name = data.name;
+      if(data.name && !looksUrlEncoded(data.name) && (!qv2.name || looksUrlEncoded(qv2.name))) qv2.name = data.name;
       if(data.mbti) qv2.mbti = data.mbti;
       if(data.role) qv2.role = data.role;
       if(data.animal_key) qv2.animal = data.animal_key;
@@ -2966,7 +2996,7 @@ async function syncMyProgressToCloud(){
   // (2) 空の項目は payload に入れない（upsert は入れた列だけ更新する＝クラウドの既存値を消さない）
   const hasOkrInput = !!((state.goal||'').trim() || (state.dream||'').trim() ||
     (state.krs||[]).some(kr => (kr.name||'').trim() || (kr.subs||[]).some(s => (s.name||'').trim() || (s.history||[]).some(v => v))));
-  const realName = state.userName || qv2.name || nameParam || '';
+  const realName = safeDecodeName(state.userName || qv2.name || nameParam || '');
   const payload = { id: userKey, updated_at: new Date().toISOString() };
   if(realName) payload.name = realName;
   if(qv2.mbti) payload.mbti = qv2.mbti;
@@ -2987,6 +3017,42 @@ async function syncMyProgressToCloud(){
     if(error) console.warn('Dashboard sync error:', error);
     else _cloudRowMissing = false;
   } catch(e){ console.warn('Dashboard sync exception:', e); }
+}
+
+// ── 名前の文字化け対策（2026-11-06 水谷さんの「%E6%B0%B4…」対応）──
+// URLの name= が二重にエンコードされると、そのままクラウドに保存されて全員の画面で文字化けする。
+// 表示と送信の両方で必ず元の文字に戻す。
+function looksUrlEncoded(s){ return /%[0-9A-Fa-f]{2}/.test(String(s == null ? '' : s)); }
+function safeDecodeName(s){
+  let cur = String(s == null ? '' : s);
+  for(let round = 0; round < 3 && looksUrlEncoded(cur); round++){
+    let t = cur, ok = false;
+    for(let i = 0; i < 8 && t; i++){
+      try { cur = decodeURIComponent(t); ok = true; break; }
+      catch(e){ t = t.replace(/%[0-9A-Fa-f]{0,2}$/, ''); } // 末尾の欠けたバイト（%E3%82%B 等）を削って再試行
+    }
+    if(!ok) break;
+  }
+  return cur.replace(/\uFFFD/g, '').trim();
+}
+// current_goal（JSON文字列）から進捗を取り出す。
+// ※ current_week / achievement_rate 列は Supabase に存在しない（7/13の経緯で current_goal にまとめて保存）。
+//   ここを見ないと「みんなの進捗」が全員 0% / Week 0 になる（2026-11-06 ののさん報告）。
+function unpackPeerGoal(m){
+  let o = {};
+  if(m && m.current_goal){
+    try { const p = JSON.parse(m.current_goal); if(p && typeof p === 'object') o = p; }
+    catch(e){ o = { goal: String(m.current_goal) }; }
+  }
+  const num = v => { const n = Number(v); return isFinite(n) ? n : 0; };
+  const pick = (a, b) => (a !== undefined && a !== null) ? a : b;
+  return {
+    week: Math.max(0, Math.round(num(pick(o.currentWeek, m.current_week)))),
+    rate: Math.max(0, Math.round(num(pick(o.achievementRate, m.achievement_rate)))),
+    sub:  Math.max(0, Math.round(num(pick(o.submissionRate, m.submission_rate)))),
+    goal: o.dream || o.goal || '',
+    krs: Array.isArray(o.krs) ? o.krs : []
+  };
 }
 
 // 他メンバーを取得して表示
@@ -3029,15 +3095,16 @@ function renderPeers(members){
   body.innerHTML = '<div class="peers-grid">' + members.map(m => {
     const animal = m.animal_key && ANIMAL_SVG_DASH[m.animal_key] ? m.animal_key : 'tamago';
     const role = ROLE_DESC_DASH[animal] || '旅人';
-    const rate = m.achievement_rate || 0;
+    const pg = unpackPeerGoal(m);
+    const rate = pg.rate;
     const isMe = m.id === userKey;
     return `
       <div class="peer-card ${isMe?'me':''}" onclick='showPeerModal(${JSON.stringify(m.id)})'>
         <div class="avatar">${ANIMAL_SVG_DASH[animal]}</div>
-        <div class="nm">${escapeHtmlD(m.name)}</div>
+        <div class="nm">${escapeHtmlD(safeDecodeName(m.name))}</div>
         <div class="role">${m.mbti || '?'} ／ ${role}</div>
-        <div class="bar"><div class="bar-fill" style="width:${rate}%"></div></div>
-        <div class="rate">達成率 ${rate}% ／ Week ${m.current_week || 0}</div>
+        <div class="bar"><div class="bar-fill" style="width:${Math.min(100, rate)}%"></div></div>
+        <div class="rate">達成率 ${rate}% ／ Week ${pg.week}</div>
       </div>`;
   }).join('') + '</div>';
   window._peersData = members;
@@ -3045,6 +3112,8 @@ function renderPeers(members){
 function showPeerModal(id){
   const m = (window._peersData || []).find(x => x.id === id);
   if(!m) return;
+  const pg = unpackPeerGoal(m);
+  const krNames = pg.krs.map(k => (k && k.name || '').trim()).filter(Boolean).slice(0, 3);
   const animal = m.animal_key && ANIMAL_SVG_DASH[m.animal_key] ? m.animal_key : 'tamago';
   const allStrengths = [
     ...(m.strengths_others || []),
@@ -3052,16 +3121,17 @@ function showPeerModal(id){
     ...(m.strengths_additional || [])
   ].filter(Boolean);
   document.getElementById('peerModal').innerHTML = `
-    <h3>${escapeHtmlD(m.name)}${m.id === userKey?' <span style="font-size:12px;color:#c25b3f">(自分)</span>':''}</h3>
+    <h3>${escapeHtmlD(safeDecodeName(m.name))}${m.id === userKey?' <span style="font-size:12px;color:#c25b3f">(自分)</span>':''}</h3>
     <div class="role-line">${m.mbti || '未診断'} ・ ${ROLE_DESC_DASH[animal] || '旅人'}</div>
     <div class="big-avatar">${ANIMAL_SVG_DASH[animal]}</div>
     ${m.ijouchi ? `<div class="ijouchi-box"><div class="lbl">— 異常値 —</div><div class="stmt">${escapeHtmlD(m.ijouchi)}</div></div>` : ''}
-    <div class="progress-row"><span class="k">📅 現在の週</span><span class="v">Week ${m.current_week || 0} / 26</span></div>
-    <div class="progress-row"><span class="k">📊 達成率</span><span class="v">${m.achievement_rate || 0}%</span></div>
-    <div class="progress-row"><span class="k">📝 提出率</span><span class="v">${m.submission_rate || 0}%</span></div>
+    <div class="progress-row"><span class="k">📅 現在の週</span><span class="v">Week ${pg.week} / 26</span></div>
+    <div class="progress-row"><span class="k">📊 達成率</span><span class="v">${pg.rate}%</span></div>
+    <div class="progress-row"><span class="k">📝 提出率</span><span class="v">${pg.sub}%</span></div>
     ${m.companion_level ? `<div class="progress-row"><span class="k">🐾 相棒レベル</span><span class="v">Lv.${m.companion_level}</span></div>`:''}
     ${allStrengths.length ? `<h4>💎 強み (${allStrengths.length}個)</h4><ul>${allStrengths.slice(0,12).map(s=>`<li>${escapeHtmlD(s)}</li>`).join('')}${allStrengths.length>12?`<li style="color:#8b8278">…他 ${allStrengths.length-12}個</li>`:''}</ul>`:''}
-    ${m.current_goal ? `<h4>🎯 今の目標</h4><p style="font-size:12px;line-height:1.85">${escapeHtmlD(m.current_goal)}</p>`:''}
+    ${pg.goal ? `<h4>🎯 今の目標</h4><p style="font-size:12px;line-height:1.85">${escapeHtmlD(pg.goal)}</p>`:''}
+    ${krNames.length ? `<ul style="font-size:12px;line-height:1.85">${krNames.map(n=>`<li>${escapeHtmlD(n)}</li>`).join('')}</ul>`:''}
     <button class="close" onclick="closePeerModal()">閉じる</button>
   `;
   document.getElementById('peerModalBg').classList.add('show');
@@ -3317,6 +3387,7 @@ var K="sb_publishable_ZrCNcsRHMci-l7Fns8QtIA_X22XZGJp";
 var P=new URLSearchParams(location.search);
 var uid=(P.get("u")||"guest");
 var nm=(P.get("name")||"");
+try{ if(/%[0-9A-Fa-f]{2}/.test(nm)) nm=decodeURIComponent(nm); }catch(e){}
 var demo=P.get("demo")==="1";
 var M=document.getElementById("bugM");
 document.getElementById("bugL").onclick=function(){ M.classList.add("on"); };
