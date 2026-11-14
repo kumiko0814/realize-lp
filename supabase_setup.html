@@ -99,18 +99,8 @@ code{background:#f5efe7;padding:2px 6px;border-radius:4px;font-family:monospace;
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 全員 SELECT 可能、自分の ID 行のみ INSERT/UPDATE 可能
-ALTER TABLE realize_members ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "everyone_can_select"
-  ON realize_members FOR SELECT TO anon USING (true);
-
-CREATE POLICY "everyone_can_upsert"
-  ON realize_members FOR INSERT TO anon WITH CHECK (true);
-
-CREATE POLICY "everyone_can_update"
-  ON realize_members FOR UPDATE TO anon USING (true);</div>
-    <div class="box">⚠ 上記の RLS（行レベルセキュリティ）は <span class="warn">「誰でも書き込めて、誰でも読める」</span>状態。Realize の運用には十分。<br>もし不適切投稿をブロックしたい場合は、後で認証システムを追加できる。</div>
+ALTER TABLE realize_members ENABLE ROW LEVEL SECURITY;</div>
+    <div class="box">⚠ アクセス権限（RLS ポリシー）は <span class="warn">運営側でまとめて管理</span>しています。<br>この手順で権限を追加・変更しないでください（「誰でも読み書きできる」設定は、参加者の情報が外から見える原因になります）。</div>
   </div>
 
   <div class="step">

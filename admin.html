@@ -7,6 +7,7 @@
 <!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="supabase_config.js"></script>
+<script src="https://kumiko0814.github.io/merone-auth/admin-auth.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -706,12 +707,9 @@ const ANIMAL_SVG_ADMIN = {
 };
 const ANIMAL_NAME_ADMIN = {neko:'ねこ',usagi:'うさぎ',panda:'パンダ',fukurou:'フクロウ',kitsune:'キツネ',shibainu:'シバイヌ',risu:'リス',hamster:'ハムスター',penguin:'ペンギン',tamago:'たまご'};
 
-let _supaAdmin = null;
+let _supaAdmin = null; // 管理者ログイン（MeroneAdminAuth.require）完了後に、ログイン済みクライアントが入る
 function getSupaAdmin(){
-  if(_supaAdmin) return _supaAdmin;
-  if(typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.enabled) return null;
-  if(typeof supabase === 'undefined') return null;
-  try { _supaAdmin = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey); return _supaAdmin; } catch(e){ return null; }
+  return _supaAdmin;
 }
 
 let _allMembers = [];
@@ -1180,105 +1178,16 @@ function closeMemberModal(){ document.getElementById('memberModalBg').style.disp
 function showHelp(){ document.getElementById('helpModalBg').style.display = 'flex'; }
 function closeHelp(){ document.getElementById('helpModalBg').style.display = 'none'; }
 
-// 初回 Supabase SQL を自動コピー＋Supabase SQL Editor を開く
+// Supabase 設定：テーブルの権限は運営側で一元管理（このページからSQLは出さない）
 function setupSupabaseSQL(){
-  const SQL = `-- Re:alize Quest 初回設定（何度実行してもOK）
-
--- 1) DELETE 権限
-DROP POLICY IF EXISTS "del_members" ON realize_members;
-CREATE POLICY "del_members" ON realize_members FOR DELETE TO anon USING (true);
-DROP POLICY IF EXISTS "del_comments" ON realize_comments;
-CREATE POLICY "del_comments" ON realize_comments FOR DELETE TO anon USING (true);
-
--- 2) presence テーブル
-CREATE TABLE IF NOT EXISTS realize_presence (
-  user_id TEXT PRIMARY KEY,
-  name TEXT,
-  animal_key TEXT,
-  mbti TEXT,
-  status TEXT DEFAULT 'online',
-  last_seen TIMESTAMPTZ DEFAULT NOW()
-);
-ALTER TABLE realize_presence ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "pres_select" ON realize_presence;
-CREATE POLICY "pres_select" ON realize_presence FOR SELECT TO anon USING (true);
-DROP POLICY IF EXISTS "pres_insert" ON realize_presence;
-CREATE POLICY "pres_insert" ON realize_presence FOR INSERT TO anon WITH CHECK (true);
-DROP POLICY IF EXISTS "pres_update" ON realize_presence;
-CREATE POLICY "pres_update" ON realize_presence FOR UPDATE TO anon USING (true);
-DROP POLICY IF EXISTS "pres_delete" ON realize_presence;
-CREATE POLICY "pres_delete" ON realize_presence FOR DELETE TO anon USING (true);
-
--- 3) battles テーブル
-CREATE TABLE IF NOT EXISTS realize_battles (
-  id BIGSERIAL PRIMARY KEY,
-  challenger_id TEXT NOT NULL,
-  challenger_name TEXT,
-  challenger_animal_key TEXT,
-  challenger_mbti TEXT,
-  opponent_id TEXT NOT NULL,
-  opponent_name TEXT,
-  opponent_animal_key TEXT,
-  opponent_mbti TEXT,
-  status TEXT DEFAULT 'pending',
-  current_question INTEGER DEFAULT 0,
-  questions JSONB,
-  challenger_answers JSONB DEFAULT '[]'::jsonb,
-  opponent_answers JSONB DEFAULT '[]'::jsonb,
-  winner_id TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-ALTER TABLE realize_battles ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "bat_select" ON realize_battles;
-CREATE POLICY "bat_select" ON realize_battles FOR SELECT TO anon USING (true);
-DROP POLICY IF EXISTS "bat_insert" ON realize_battles;
-CREATE POLICY "bat_insert" ON realize_battles FOR INSERT TO anon WITH CHECK (true);
-DROP POLICY IF EXISTS "bat_update" ON realize_battles;
-CREATE POLICY "bat_update" ON realize_battles FOR UPDATE TO anon USING (true);
-
--- 4) Realtime 有効化
-ALTER PUBLICATION supabase_realtime ADD TABLE realize_battles;
-`;
-
-  // クリップボードにコピー
-  navigator.clipboard.writeText(SQL).then(() => {
-    showToast('☑ SQLをコピー＆Supabaseを開きます');
-  }).catch(()=>{
-    // フォールバック
-    const ta = document.createElement('textarea');
-    ta.value = SQL; document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); } catch(e){}
-    document.body.removeChild(ta);
-  });
-
-  // 案内モーダル
   document.getElementById('memberModal').innerHTML = `
-    <h3 style="font-size:18px;font-weight:700;color:#5a7050;margin-bottom:6px">🛠 Supabase 初回設定（あと2ステップ）</h3>
+    <h3 style="font-size:18px;font-weight:700;color:#5a7050;margin-bottom:6px">🛠 Supabase 設定について</h3>
     <p style="font-size:11px;color:#8b8278;letter-spacing:0.15em;margin-bottom:18px">— SUPABASE SETUP —</p>
-
     <div style="background:#f5f9f0;border:2px solid #5a7050;border-radius:10px;padding:14px;margin-bottom:14px">
-      <p style="font-size:14px;color:#5a7050;font-weight:700;margin-bottom:8px">✅ SQL は すでに クリップボードにコピー済み！</p>
-      <p style="font-size:12px;color:#5a5a5a;line-height:1.85">あと2ステップで完了します。</p>
+      <p style="font-size:13px;color:#5a7050;font-weight:700;margin-bottom:8px">テーブルの権限（読み書き・削除）は、運営側でまとめて管理しています。</p>
+      <p style="font-size:12px;color:#5a5a5a;line-height:1.85">このページから SQL を実行する必要はありません。<br><strong>データベースの設定は変更しないでください。</strong></p>
     </div>
-
-    <h4 style="font-size:13px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">STEP 1：Supabase の SQL Editor を開く</h4>
-    <p style="font-size:11.5px;color:#5a5a5a;margin-bottom:8px">下のボタンを押すと、Supabase が別タブで開きます。</p>
-    <button onclick="window.open('https://supabase.com/dashboard/project/inrvprlyobghviklulcv/sql/new','_blank')" style="background:#3ecf8e;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-family:inherit;font-weight:700;cursor:pointer;font-size:13px;display:block;width:100%">▶ Supabase SQL Editor を開く</button>
-
-    <h4 style="font-size:13px;color:#5a7050;border-left:3px solid #5a7050;padding-left:10px;margin:18px 0 10px">STEP 2：Supabase のページで貼り付けて実行</h4>
-    <ol style="padding-left:20px;font-size:12px;line-height:2;color:#5a5a5a">
-      <li>SQL Editor が開いたら、エディタ部分をクリック</li>
-      <li><strong>Cmd+V</strong>（Macなら）or <strong>Ctrl+V</strong>（Windows）で貼り付け</li>
-      <li>右下の <strong style="color:#3ecf8e">「Run」</strong> ボタンを押す（or Cmd+Enter）</li>
-      <li>「Success」と出れば完了！</li>
-    </ol>
-
-    <div style="background:#fff7ec;border:1px solid #c9a574;border-radius:6px;padding:10px;margin-top:14px;font-size:11.5px;line-height:1.85">
-      <strong>★ 完了したら：</strong><br>
-      この管理者ボードに戻って Cmd+Shift+R で再読み込み → 「✕」ボタンで削除できるようになります。
-    </div>
-
+    <p style="font-size:11.5px;color:#5a5a5a;line-height:1.85">表示や削除がうまくいかないときは、管理者ログインが切れていないか確認して、ページを再読み込みしてください。</p>
     <div style="margin-top:18px;text-align:right">
       <button onclick="closeMemberModal()" style="background:#1a1a1a;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-family:inherit;cursor:pointer;font-size:12px">閉じる</button>
     </div>
@@ -1338,7 +1247,7 @@ async function executeBulkDelete(){
   }
   closeMemberModal();
   if(errCount > 0){
-    alert('削除エラー：' + errCount + '件 失敗、' + okCount + '件 成功。\n\n💡 SupabaseでDELETE権限がない可能性。SQL Editorで以下を実行してください：\n\nCREATE POLICY "del_members" ON realize_members FOR DELETE TO anon USING (true);\nCREATE POLICY "del_comments" ON realize_comments FOR DELETE TO anon USING (true);');
+    alert('削除できませんでした：' + errCount + '件 失敗、' + okCount + '件 成功。\n\n管理者ログインが切れていないか確認してください（データベースの設定は変更しないでください）');
   } else {
     showToast('☑ ' + okCount + '件 削除完了');
   }
@@ -1352,12 +1261,12 @@ async function deleteMember(id, name){
   if(!client){ alert('Supabase未接続'); return; }
   try {
     const { error: e1 } = await client.from('realize_members').delete().eq('id', id);
-    if(e1){ alert('削除エラー：' + e1.message + '\n\nSupabaseで以下のSQL実行が必要です：\nCREATE POLICY "del_m" ON realize_members FOR DELETE TO anon USING (true);'); return; }
+    if(e1){ alert('削除できませんでした（' + e1.message + '）。\n\n管理者ログインが切れていないか確認してください（データベースの設定は変更しないでください）'); return; }
     await client.from('realize_comments').delete().eq('target_id', id).then(()=>{}).catch(()=>{});
     // 実際に消えたかを確認
     const { data: check } = await client.from('realize_members').select('id').eq('id', id).maybeSingle();
     if(check){
-      alert('⚠ 削除リクエストは送信されましたが、データがまだ残っています。\n\n原因：Supabase に DELETE 権限が設定されていません。\n\n👉 Supabase の SQL Editor で次のSQLを実行してください：\n\nCREATE POLICY "del_members" ON realize_members FOR DELETE TO anon USING (true);\nCREATE POLICY "del_comments" ON realize_comments FOR DELETE TO anon USING (true);\n\n実行後、再度削除ボタンを押してください。');
+      alert('⚠ 削除できませんでした（データがまだ残っています）。\n\n管理者ログインが切れていないか確認してください（データベースの設定は変更しないでください）');
       return;
     }
     showToast('☑ 削除しました：' + name);
@@ -1394,8 +1303,12 @@ function exportCSV(){
 
 function escapeAdmin(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-setTimeout(loadMembers, 500);
-setInterval(loadMembers, 300000); // 5分ごと自動更新
+// 管理者ログイン → ログイン済みクライアントで読み込み開始
+MeroneAdminAuth.require({ url: SUPABASE_CONFIG.url, anonKey: SUPABASE_CONFIG.anonKey, title: 'Re:alize 管理者ボード' }).then(function(){
+  _supaAdmin = MeroneAdminAuth.client();
+  loadMembers();
+  setInterval(loadMembers, 300000); // 5分ごと自動更新
+});
 </script>
 
 </body>
