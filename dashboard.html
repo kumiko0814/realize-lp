@@ -2827,7 +2827,8 @@ function getSupa(){
   if(_supaClient) return _supaClient;
   if(typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.enabled) return null;
   if(typeof supabase === 'undefined') return null;
-  try { _supaClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey); return _supaClient; }
+  // x-member-id：自分のID（データベース側で「自分の行だけ」読み書きできるようにするための目印）。ASCII以外はヘッダーに入らないので符号化
+  try { _supaClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, { global: { headers: { 'x-member-id': /^[\x20-\x7e]*$/.test(userKey) ? userKey : encodeURIComponent(userKey) } } }); return _supaClient; }
   catch(e){ return null; }
 }
 
@@ -3068,9 +3069,13 @@ async function refreshPeers(){
   body.innerHTML = '<div class="peers-loading">クラウドから 仲間を呼び寄せ中…</div>';
   // 先に自分を同期
   await syncMyProgressToCloud();
-  // 全員取得（自分含む）
+  // 全員取得（自分含む）：表示に使う列だけ返す realize_public_board を使う。SQL未適用（関数なし）の間だけ従来の直接取得
   try {
-    const { data, error } = await client.from('realize_members').select('*').order('updated_at', { ascending:false }).limit(50);
+    let res = await client.rpc('realize_public_board', { p_member: userKey });
+    if(res.error && (res.error.code === 'PGRST202' || res.status === 404)){
+      res = await client.from('realize_members').select('*').order('updated_at', { ascending:false }).limit(50);
+    }
+    const { data, error } = res;
     if(error){ body.innerHTML = '<div class="peers-empty">取得エラー：' + error.message + '</div>'; count.textContent = '0人'; return; }
     if(!data || data.length === 0){
       body.innerHTML = '<div class="peers-empty">まだ仲間がいません。<br>このページを更新するたびに、あなたのデータも反映されます。</div>';
@@ -3402,7 +3407,7 @@ document.getElementById("bugS").onclick=function(){
     setTimeout(function(){ M.classList.remove("on"); document.getElementById("bugD").style.display="none"; },1800);
   }
   if(demo){ done(); return; }
-  fetch(U,{method:"POST",headers:{apikey:K,Authorization:"Bearer "+K,"Content-Type":"application/json"},
+  fetch(U,{method:"POST",headers:{apikey:K,Authorization:"Bearer "+K,"Content-Type":"application/json","x-member-id":(/^[\x20-\x7e]*$/.test(uid)?uid:encodeURIComponent(uid))},
     body:JSON.stringify({member_id:"bug_realize",member_name:("Re:alize｜"+(nm||uid)).slice(0,30),mood:"バグ報告",worry:t,want:location.href.slice(0,180)+" ／ "+navigator.userAgent.slice(0,140)})})
     .then(function(){ done(); }).catch(function(){ btn.disabled=false; alert("送信できませんでした。通信環境をご確認ください。"); });
 };

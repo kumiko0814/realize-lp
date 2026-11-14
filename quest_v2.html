@@ -1553,14 +1553,15 @@ async function setupTown4DynamicNpcs(){
   if(!client){ TOWN4.dynamicNpcs = []; return; }
   try {
     // 全メンバー取得（自分以外）
-    const { data: members } = await client.from('realize_members')
+    const { data: allMembers } = await rpcOrDirect(client, 'realize_public_board', () => client.from('realize_members')
       .select('id,name,mbti,animal_key,current_goal,companion_level')
       .neq('id', userKey)
-      .limit(20);
+      .limit(20));
+    const members = (allMembers || []).filter(m => m.id !== userKey).slice(0, 20);
     // オンライン状態取得
     const fiveMinAgo = new Date(Date.now() - 5*60*1000).toISOString();
-    const { data: presence } = await client.from('realize_presence')
-      .select('user_id').gte('last_seen', fiveMinAgo);
+    const { data: presence } = await rpcOrDirect(client, 'realize_online_ids', () => client.from('realize_presence')
+      .select('user_id').gte('last_seen', fiveMinAgo));
     const onlineIds = new Set((presence||[]).map(p => p.user_id));
     window._onlineIds = onlineIds;
     // 草マスを探す
@@ -1940,9 +1941,17 @@ function getSupabaseClient(){
   if(typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.enabled) return null;
   if(typeof supabase === 'undefined') return null;
   try {
-    _supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    // x-member-id：自分のID（データベース側で「自分の行だけ」読み書きできるようにするための目印）。ASCII以外はヘッダーに入らないので符号化
+    _supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, { global: { headers: { 'x-member-id': /^[\x20-\x7e]*$/.test(userKey) ? userKey : encodeURIComponent(userKey) } } });
     return _supabaseClient;
   } catch(e){ console.warn('Supabase init failed', e); return null; }
+}
+// 仲間の一覧・オンライン状況は、表示に使う列だけ返す関数（RPC）で読む。
+// SQL未適用（関数なし＝404 / PGRST202）の間だけ、従来の直接取得（direct）で読む。
+async function rpcOrDirect(client, fn, direct){
+  const res = await client.rpc(fn, { p_member: userKey });
+  if(res.error && (res.error.code === 'PGRST202' || res.status === 404)) return direct();
+  return res;
 }
 
 // クラウドメンバーキャッシュ
@@ -1989,9 +1998,10 @@ async function fetchAllMembers(){
   const client = getSupabaseClient();
   if(!client) return null;
   try {
-    const { data, error } = await client.from('realize_members').select('*').neq('id', userKey).order('updated_at', { ascending:false }).limit(50);
+    const { data, error } = await rpcOrDirect(client, 'realize_public_board',
+      () => client.from('realize_members').select('*').neq('id', userKey).order('updated_at', { ascending:false }).limit(50));
     if(error){ console.warn('Fetch error', error); return null; }
-    _cloudMembers = data || [];
+    _cloudMembers = (data || []).filter(m => m.id !== userKey);
     return _cloudMembers;
   } catch(e){ console.warn('Fetch exception', e); return null; }
 }
@@ -2367,7 +2377,7 @@ async function showMembersBoard(){
       const client = getSupabaseClient();
       if(client){
         const fiveMinAgo = new Date(Date.now() - 5*60*1000).toISOString();
-        const { data } = await client.from('realize_presence').select('user_id,status').gte('last_seen', fiveMinAgo);
+        const { data } = await rpcOrDirect(client, 'realize_online_ids', () => client.from('realize_presence').select('user_id,status').gte('last_seen', fiveMinAgo));
         if(data) data.forEach(p => onlineIds.add(p.user_id));
       }
     } catch(e){}
